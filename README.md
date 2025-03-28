@@ -1,4 +1,4 @@
-# Comparador de Precios de Supermercados y Productos Frescos
+# Comparador de Precios de Supermercados
 
 ## Descripción del Proyecto
 
