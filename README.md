@@ -81,7 +81,9 @@ El objetivo principal es proporcionar a los usuarios una experiencia completa pa
 
 ## Arquitectura del Proyecto y elección de diseño
 
-El proyecto sigue una **arquitectura hexagonal** y utiliza principios de **Domain-Driven Design (DDD)** para garantizar modularidad, escalabilidad y facilidad de mantenimiento.
+El proyecto sigue una **arquitectura hexagonal** y utiliza principios de **Domain-Driven Design (DDD)** para garantizar modularidad, escalabilidad y facilidad de mantenimiento. Esto nos permitirá modularizar la aplicación para acoplar nuevas tecnologías o plataformas sin cambiar la lógica de negocio, a la vez que facilita mucho la integración de APIs que recojan los precios.
+
+El uso de estar arquitectura facilita el ampliar el abanico de tecnologías, y las pruebas unitarías y de integración ya que la lógica de negocio siempre se va a poder probar de forma aislada y los adaptadores tambien garantizando que cumplen con los objetivos de los puertos.
 
 ---
 
@@ -98,5 +100,6 @@ El proyecto sigue una **arquitectura hexagonal** y utiliza principios de **Domai
    git clone https://github.com/usuario/proyecto-comparador-precios.git
    cd proyecto-comparador-precios
 2. Construye los contenedores con Docker:
-    ``` docker-compose up --build
+    ```bash
+     docker-compose up --build
 3. Accede a la aplicación en tu navegador en http://localhost:8000
