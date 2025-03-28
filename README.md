@@ -18,6 +18,8 @@ El objetivo principal es proporcionar a los usuarios una experiencia completa pa
 - **Gestión de Productos**:
   - CRUD (Crear, Leer, Actualizar, Eliminar) de productos.
   - Clasificación por categorías (frutas, verduras, lácteos, etc.).
+  - Clasificación por supermercado.
+  - Busqueda de productos por información específica.
 
 - **Comparación de Precios**:
   - Comparación de precios entre diferentes supermercados.
@@ -27,17 +29,13 @@ El objetivo principal es proporcionar a los usuarios una experiencia completa pa
 - **Carrito de Compras**:
   - Creación y gestión de carritos de compras.
   - Cálculo del coste total según el supermercado seleccionado.
+  - Uso compartido de carritos con desglose por persona.
 
 - **Historial de Precios**:
   - Registro de precios históricos.
   - Gráficas de evolución de precios.
-  - Análisis de tendencias.
 
-- **Previsión de Costes**:
-  - Algoritmo para prever costes basados en datos históricos.
-  - Sugerencias de compra según previsiones de inflación.
-
-- **Alertas y Notificaciones**:
+- **Alertas y Notificaciones**: (previsto despues de la v1)
   - Notificaciones de cambios significativos en los precios.
   - Alertas de ofertas y descuentos.
 
@@ -45,11 +43,14 @@ El objetivo principal es proporcionar a los usuarios una experiencia completa pa
   - Gestión de usuarios y permisos.
   - Administración de productos y precios.
   - Visualización de estadísticas de uso.
+  - Moderación en comentarios y valoraciones.
 
 ---
 
 ## Funcionalidades Extra/Opcionales
 
+- Análisis de tendencias de precios.
+- Creación de API propia para extraer los precios de los supermercados periódicamente.
 - Integración con APIs de supermercados para actualizaciones automáticas.
 - Sistema de rankings y valoraciones de productos.
 - Recomendaciones basadas en compras habituales.
@@ -59,6 +60,9 @@ El objetivo principal es proporcionar a los usuarios una experiencia completa pa
 - Geolocalización de supermercados cercanos.
 - Modo offline.
 - Alertas de disponibilidad de productos.
+- **Previsión de Costes**:
+  - Algoritmo para prever costes basados en datos históricos.
+  - Sugerencias de compra según previsiones de inflación.
 
 ---
 
@@ -76,6 +80,7 @@ El objetivo principal es proporcionar a los usuarios una experiencia completa pa
 ### **Herramientas de Desarrollo**:
 - **GitHub** para control de versiones.
 - **Docker** para contenedores y despliegue.
+- **Postman** para pruebas durante el desarrollo.
 
 ---
 
@@ -97,8 +102,9 @@ El uso de estar arquitectura facilita el ampliar el abanico de tecnologías, y l
 ### Pasos
 1. Clona el repositorio:
    ```bash
-   git clone https://github.com/usuario/proyecto-comparador-precios.git
-   cd proyecto-comparador-precios
+   [Propenso a cambios de nombre, puede estar desactualizado]
+   git clone https://github.com/FjReinoso/CarritoScout
+   cd CarritoScout
 2. Construye los contenedores con Docker:
     ```bash
      docker-compose up --build
