@@ -1,0 +1,36 @@
+services:
+  web:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: django_backend
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      - DEBUG=1
+      - DB_NAME=carrito_db
+      - DB_USER=carrito_user
+      - DB_PASSWORD=carrito_password
+      - DB_HOST=db
+      - DB_PORT=3306
+
+  db:
+    image: mariadb:10.5
+    container_name: mariadb_db
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: carrito_db
+      MYSQL_USER: carrito_user
+      MYSQL_PASSWORD: carrito_password
+      MYSQL_ROOT_PASSWORD: root_password
+    ports:
+      - "3306:3306"
+
+volumes:
+  mariadb_data:

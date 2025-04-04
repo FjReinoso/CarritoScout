@@ -86,9 +86,15 @@ El objetivo principal es proporcionar a los usuarios una experiencia completa pa
 
 ## Arquitectura del Proyecto y elección de diseño
 
-El proyecto sigue una **arquitectura hexagonal** y utiliza principios de **Domain-Driven Design (DDD)** para garantizar modularidad, escalabilidad y facilidad de mantenimiento. Esto nos permitirá modularizar la aplicación para acoplar nuevas tecnologías o plataformas sin cambiar la lógica de negocio, a la vez que facilita mucho la integración de APIs que recojan los precios.
+El proyecto sigue la arquitectura MVC (Modelo-Vista-Controlador), que es compatible con Django. Esta arquitectura organiza la aplicación en tres componentes interconectados:
 
-El uso de estar arquitectura facilita el ampliar el abanico de tecnologías, y las pruebas unitarías y de integración ya que la lógica de negocio siempre se va a poder probar de forma aislada y los adaptadores tambien garantizando que cumplen con los objetivos de los puertos.
+Modelo: Representa los datos y la lógica de negocio de la aplicación.
+Vista: Maneja la capa de presentación y la interfaz de usuario.
+Controlador: Gestiona la interacción entre el modelo y la vista.
+
+Esta arquitectura asegura una clara separación de responsabilidades, lo que facilita el mantenimiento y la extensión de la aplicación.
+
+
 
 ---
 
