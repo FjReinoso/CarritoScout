@@ -12,10 +12,12 @@ services:
       - "3306:3306"
     volumes:
       - db_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
 
   web:
     build:
       context: .
+      dockerfile: Dockerfile
     container_name: carrito_django
     command: >
       sh -c "while ! nc -z db 3306; do sleep 1; done;
@@ -28,6 +30,18 @@ services:
       - db
     environment:
       - DEBUG=True
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: phpmyadmin
+    restart: always
+    environment:
+      PMA_HOST: db
+      MYSQL_ROOT_PASSWORD: root_password
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
 
 volumes:
   db_data:
