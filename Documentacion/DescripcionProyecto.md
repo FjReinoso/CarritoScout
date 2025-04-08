@@ -85,47 +85,100 @@ Se incluirá un archivo `docker-compose.yml` para orquestar los diferentes servi
 Estas funcionalidades extra están pensadas para añadir más profundidad y complejidad al proyecto en caso de que sea necesario. Algunas de ellas pueden ser un poco irreales o complejas, ya que implican tecnologías o algoritmos avanzados (como geolocalización o previsión de costes), pero son propuestas para explorar.
 
 CarritoScout/
-├── backend/
-│   ├── carritoscout/  # Proyecto principal de Django
-│   │   ├── __init__.py
-│   │   ├── asgi.py
-│   │   ├── settings.py
-│   │   ├── urls.py
-│   │   ├── wsgi.py
-│   │   ├── templates/  # Plantillas HTML globales
-│   │   │   ├── base.html
-│   │   │   ├── index.html
-│   │   │   └── ...
-│   │   ├── static/  # Archivos estáticos globales
-│   │   │   ├── css/
-│   │   │   ├── js/
-│   │   │   └── images/
-│   │   └── media/  # Archivos multimedia subidos por los usuarios
-│   ├── APIrest/  # Aplicación principal para la API y funcionalidad central
-│   │   ├── __init__.py
-│   │   ├── admin.py  # Registro de modelos en el panel de administración
-│   │   ├── apps.py
-│   │   ├── models.py  # Modelos de la base de datos
-│   │   ├── views.py  # Vistas para manejar las solicitudes
-│   │   ├── urls.py  # Enrutamiento de URLs para la app
-│   │   ├── serializers.py  # Serializadores para las respuestas de la API
-│   │   ├── forms.py  # Formularios para la entrada de usuario (si es necesario)
-│   │   ├── templates/  # Plantillas específicas de la app
-│   │   │   ├── APIrest/
-│   │   │       ├── product_list.html
-│   │   │       ├── product_detail.html
-│   │   │       └── ...
-│   │   ├── static/  # Archivos estáticos específicos de la app
-│   │   │   ├── css/
-│   │   │   ├── js/
-│   │   │   └── images/
-│   │   ├── migrations/  # Migraciones de la base de datos
-│   │   │   ├── __init__.py
-│   │   │   └── ...
-│   │   └── tests.py  # Pruebas unitarias para la app
-│   ├── manage.py  # Script de gestión de Django
-│   ├── requirements.txt  # Dependencias de Python
-│   └── .env  # Variables de entorno
+├── carritoscout/  # Proyecto principal de Django
+│   ├── __init__.py
+│   ├── asgi.py
+│   ├── settings.py
+│   ├── urls.py  # Enrutamiento global
+│   ├── wsgi.py
+│   ├── templates/  # Plantillas HTML globales
+│   │   ├── base.html
+│   │   ├── index.html
+│   │   └── ...
+│   ├── static/  # Archivos estáticos globales
+│   │   ├── css/
+│   │   ├── js/
+│   │   └── images/
+│   └── media/  # Archivos multimedia subidos por los usuarios
+├── users/  # Aplicación para gestión de usuarios
+│   ├── __init__.py
+│   ├── admin.py
+│   ├── apps.py
+│   ├── models.py
+│   ├── views.py
+│   ├── urls.py
+│   ├── forms.py
+│   ├── templates/
+│   │   ├── users/
+│   │       ├── login.html
+│   │       ├── register.html
+│   │       └── ...
+│   └── tests.py
+├── products/  # Aplicación para gestión de productos
+│   ├── __init__.py
+│   ├── admin.py
+│   ├── apps.py
+│   ├── models.py
+│   ├── views.py
+│   ├── urls.py
+│   ├── serializers.py
+│   ├── templates/
+│   │   ├── products/
+│   │       ├── product_list.html
+│   │       ├── product_detail.html
+│   │       └── ...
+│   └── tests.py
+├── cart/  # Aplicación para gestión de carritos
+│   ├── __init__.py
+│   ├── admin.py
+│   ├── apps.py
+│   ├── models.py
+│   ├── views.py
+│   ├── urls.py
+│   ├── templates/
+│   │   ├── cart/
+│   │       ├── cart_detail.html
+│   │       └── ...
+│   └── tests.py
+├── notifications/  # Aplicación para alertas y notificaciones
+│   ├── __init__.py
+│   ├── admin.py
+│   ├── apps.py
+│   ├── models.py
+│   ├── views.py
+│   ├── urls.py
+│   ├── templates/
+│   │   ├── notifications/
+│   │       ├── notification_list.html
+│   │       └── ...
+│   └── tests.py
+├── analytics/  # Aplicación para análisis y previsión
+│   ├── __init__.py
+│   ├── admin.py
+│   ├── apps.py
+│   ├── models.py
+│   ├── views.py
+│   ├── urls.py
+│   ├── templates/
+│   │   ├── analytics/
+│   │       ├── price_history.html
+│   │       └── ...
+│   └── tests.py
+├── admin_panel/  # Aplicación para el panel de administración
+│   ├── __init__.py
+│   ├── admin.py
+│   ├── apps.py
+│   ├── models.py
+│   ├── views.py
+│   ├── urls.py
+│   ├── templates/
+│   │   ├── admin_panel/
+│   │       ├── dashboard.html
+│   │       └── ...
+│   └── tests.py
+├── manage.py  # Script de gestión de Django
+├── requirements.txt  # Dependencias de Python
+├── .env  # Variables de entorno
 ├── docker-compose.yml  # Configuración de Docker
 ├── README.md  # Documentación del proyecto
 └── Documentacion/  # Documentación adicional

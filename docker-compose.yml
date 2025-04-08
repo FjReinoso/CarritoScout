@@ -1,36 +1,33 @@
 services:
+  db:
+    image: mariadb:latest
+    container_name: carrito_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: carrito_db
+      MYSQL_USER: usuario_carrito
+      MYSQL_PASSWORD: contrasena_carrito
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+
   web:
     build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: django_backend
-    command: python manage.py runserver 0.0.0.0:8000
+      context: .
+    container_name: carrito_django
+    command: >
+      sh -c "while ! nc -z db 3306; do sleep 1; done;
+             python manage.py runserver 0.0.0.0:8000"
     volumes:
-      - ./backend:/app
+      - .:/app
     ports:
       - "8000:8000"
     depends_on:
       - db
     environment:
-      - DEBUG=1
-      - DB_NAME=carrito_db
-      - DB_USER=carrito_user
-      - DB_PASSWORD=carrito_password
-      - DB_HOST=db
-      - DB_PORT=3306
-
-  db:
-    image: mariadb:10.5
-    container_name: mariadb_db
-    volumes:
-      - mariadb_data:/var/lib/mysql
-    environment:
-      MYSQL_DATABASE: carrito_db
-      MYSQL_USER: carrito_user
-      MYSQL_PASSWORD: carrito_password
-      MYSQL_ROOT_PASSWORD: root_password
-    ports:
-      - "3306:3306"
+      - DEBUG=True
 
 volumes:
-  mariadb_data:
+  db_data:
