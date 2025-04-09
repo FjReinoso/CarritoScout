@@ -55,15 +55,15 @@ jobs:
         sleep 5;
       done
 
-    - name: Run migrations
-      env:
-        DATABASE_URL: mysql://usuario_carrito:contrasena_carrito@localhost:3306/carrito_db
-      run: |
-        python manage.py makemigrations
-        python manage.py migrate
+      - name: Run migrations
+        env:
+          DATABASE_URL: mysql://usuario_carrito:contrasena_carrito@localhost:3306/carrito_db
+        run: |
+          python manage.py makemigrations
+          python manage.py migrate
 
-    - name: Run tests
-      env:
-        DATABASE_URL: mysql://usuario_carrito:contrasena_carrito@localhost:3306/carrito_db
-      run: |
-        python manage.py test
+      - name: Run tests
+        env:
+          DATABASE_URL: mysql://usuario_carrito:contrasena_carrito@localhost:3306/carrito_db
+        run: |
+          python manage.py test
