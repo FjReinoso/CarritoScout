@@ -59,13 +59,13 @@ jobs:
 
     - name: Run migrations
       env:
-        DATABASE_URL: 127.0.0.1
+        DB_HOST: 127.0.0.1
       run: |
         python manage.py makemigrations
         python manage.py migrate
 
     - name: Run tests
       env:
-        DATABASE_URL: 127.0.0.1
+        DB_HOST: 127.0.0.1
       run: |
         python manage.py test
