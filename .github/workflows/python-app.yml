@@ -23,7 +23,7 @@ jobs:
         ports:
           - 3306:3306
         options: >-
-          --health-cmd="mysqladmin ping -h localhost -u${MYSQL_USER} -p${MYSQL_PASSWORD} || exit 1"
+             --health-cmd="mysqladmin ping -h 127.0.0.1 -uusuario_carrito -pcontrasena_carrito || exit 1"
           --health-interval=10s
           --health-timeout=20s
           --health-retries=5
@@ -35,7 +35,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: 3.10
+        python-version: 3.10-slim
 
     - name: Install dependencies
       run: |
