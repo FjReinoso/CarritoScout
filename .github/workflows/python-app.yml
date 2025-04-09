@@ -69,3 +69,9 @@ jobs:
         DB_HOST: 127.0.0.1
       run: |
         python manage.py test
+    
+    - name: Lint Code with Flake8
+      run: |
+        pip install flake8
+        flake8 .
+    
