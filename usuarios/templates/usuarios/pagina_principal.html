@@ -1,0 +1,14 @@
+<!-- This is the main page template for the user after login -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página Principal</title>
+</head>
+<body>
+    <h1>Bienvenido, {{ user.username }}</h1>
+    <p>Esta es la página principal.</p>
+    <a href="{% url 'logout' %}">Cerrar sesión</a>
+</body>
+</html>
