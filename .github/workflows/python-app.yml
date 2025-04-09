@@ -14,19 +14,21 @@ jobs:
 
     services:
       db:
-        image: mariadb:latest
+        image: mariadb:10.5  # Usa una versión específica en lugar de latest
         env:
           MYSQL_ROOT_PASSWORD: root_password
           MYSQL_DATABASE: carrito_db
           MYSQL_USER: usuario_carrito
           MYSQL_PASSWORD: contrasena_carrito
+          MARIADB_AUTO_UPGRADE: 1  # Habilita la actualización automática
         ports:
           - 3306:3306
         options: >-
-          --health-cmd="mysqladmin ping -h 127.0.0.1 -uusuario_carrito -pcontrasena_carrito || exit 1"
-          --health-interval=10s
-          --health-timeout=20s
-          --health-retries=5
+          --health-cmd="mysql -h127.0.0.1 -uusuario_carrito -pcontrasena_carrito -e 'SELECT 1;'"
+          --health-interval=15s
+          --health-timeout=10s
+          --health-retries=10
+          --health-start-period=30s  # Tiempo inicial antes de la primera verificación
 
     steps:
     - name: Check out code
@@ -35,21 +37,23 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: 3.10-slim
+        python-version: '3.10'  # Sin -slim para evitar problemas de dependencias
 
     - name: Install dependencies
       run: |
+        sudo apt-get update
+        sudo apt-get install -y default-mysql-client
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
     - name: Wait for DB to be ready
       run: |
-        for i in {1..20}; do
-          if mysqladmin ping -h 127.0.0.1 -uusuario_carrito -pcontrasena_carrito --silent; then
+        for i in {1..30}; do
+          if mysql -h127.0.0.1 -uusuario_carrito -pcontrasena_carrito -e 'SELECT 1;' &>/dev/null; then
             echo "Database is ready!";
             break;
           fi
-          echo "Waiting for the database...";
+          echo "Waiting for the database... (Attempt $i of 30)";
           sleep 5;
         done
 
