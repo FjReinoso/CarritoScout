@@ -89,9 +89,6 @@ DATABASES = {
         'PASSWORD': 'contrasena_carrito',
         'HOST': 'db',
         'PORT': '3306',
-        'TEST': {
-            'NAME': 'test_carrito_db',  # Usa la misma base de datos para pruebas
-        },
     }
 }
 
