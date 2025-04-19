@@ -22,11 +22,6 @@ jobs:
           MYSQL_PASSWORD: contrasena_carrito
         ports:
           - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping -h db -uusuario_carrito -pcontrasena_carrito"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
 
     steps:
     - name: Clean up Docker resources
