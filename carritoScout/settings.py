@@ -90,7 +90,7 @@ DATABASES = {
         'HOST': os.environ.get('DB_HOST', 'db'),
         'PORT': '3306',
         'TEST': {
-            'NAME': 'carrito_db',  # Usa la misma base de datos para pruebas
+            'NAME': 'test_carrito_db',  # Usa la misma base de datos para pruebas
         },
     }
 }
