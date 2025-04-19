@@ -31,6 +31,11 @@ jobs:
           - ./init.sql:/docker-entrypoint-initdb.d/init.sql
 
     steps:
+    - name: Clean up Docker resources
+      run: |
+        docker rm -f $(docker ps -aq) || true
+        docker network prune -f || true
+
     - name: Check out code
       uses: actions/checkout@v3
 
@@ -56,6 +61,10 @@ jobs:
           echo "Waiting for the database... (Attempt $i of 30)";
           sleep 5;
         done
+
+    - name: Print MariaDB logs
+      run: |
+        docker logs $(docker ps -q --filter "ancestor=mariadb:10.5") || echo "No logs available"
 
     - name: Run migrations
       env:
