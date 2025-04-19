@@ -20,15 +20,13 @@ jobs:
           MYSQL_DATABASE: carrito_db
           MYSQL_USER: usuario_carrito
           MYSQL_PASSWORD: contrasena_carrito
-          MARIADB_AUTO_UPGRADE: 1  
         ports:
           - 3306:3306
         options: >-
-          --health-cmd="mysql -h127.0.0.1 -uusuario_carrito -pcontrasena_carrito -e 'SELECT 1;'"
-          --health-interval=15s
-          --health-timeout=10s
-          --health-retries=10
-          --health-start-period=30s
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uusuario_carrito -pcontrasena_carrito"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
 
     steps:
     - name: Check out code
@@ -37,7 +35,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.10'  
+        python-version: '3.10'
 
     - name: Install dependencies
       run: |
@@ -49,7 +47,7 @@ jobs:
     - name: Wait for DB to be ready
       run: |
         for i in {1..30}; do
-          if mysql -h127.0.0.1 -uusuario_carrito -pcontrasena_carrito -e 'SELECT 1;' &>/dev/null; then
+          if mysqladmin ping -h 127.0.0.1 -uusuario_carrito -pcontrasena_carrito &>/dev/null; then
             echo "Database is ready!";
             break;
           fi
@@ -69,5 +67,3 @@ jobs:
         DB_HOST: 127.0.0.1
       run: |
         python manage.py test
-
-    
