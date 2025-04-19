@@ -52,7 +52,7 @@ jobs:
     - name: Wait for DB to be ready
       run: |
         for i in {1..30}; do
-          if mysqladmin ping -h 127.0.0.1 -uusuario_carrito -pcontrasena_carrito &>/dev/null; then
+          if mysqladmin ping -h db -uusuario_carrito -pcontrasena_carrito &>/dev/null; then
             echo "Database is ready!";
             break;
           fi
@@ -66,13 +66,13 @@ jobs:
 
     - name: Run migrations
       env:
-        DB_HOST: 127.0.0.1
+        DB_HOST: db
       run: |
         python manage.py makemigrations
         python manage.py migrate
 
     - name: Run tests
       env:
-        DB_HOST: 127.0.0.1
+        DB_HOST: db
       run: |
         python manage.py test
