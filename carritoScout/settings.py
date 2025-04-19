@@ -87,7 +87,7 @@ DATABASES = {
         'NAME': 'carrito_db',
         'USER': 'usuario_carrito',
         'PASSWORD': 'contrasena_carrito',
-        'HOST': os.environ.get('DB_HOST', 'db'),
+        'HOST': '127.0.0.1',
         'PORT': '3306',
         'TEST': {
             'NAME': 'test_carrito_db',  # Usa la misma base de datos para pruebas
