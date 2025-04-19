@@ -1,5 +1,4 @@
 --Damos permisos para que pueda crear la base de datos de test (carrito_db)
-DROP DATABASE IF EXISTS test_carrito_db;
 GRANT ALL PRIVILEGES ON *.* TO 'usuario_carrito'@'%';
 FLUSH PRIVILEGES;
 -- Seleccionar la base de datos (asegúrate de que exista)
