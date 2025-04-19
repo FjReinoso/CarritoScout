@@ -27,8 +27,6 @@ jobs:
           --health-interval=10s
           --health-timeout=5s
           --health-retries=3
-        volumes:
-          - ./init.sql:/docker-entrypoint-initdb.d/init.sql
 
     steps:
     - name: Clean up Docker resources
