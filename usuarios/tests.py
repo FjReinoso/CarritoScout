@@ -1,7 +1,7 @@
 
 from django.test import TestCase
 from django.contrib.auth.models import User
-from usuarios.models import PerfilUsuario
+from usuarios.models import Usuario  
 
 class UsuarioTests(TestCase):
     def setUp(self):
@@ -24,7 +24,7 @@ class UsuarioTests(TestCase):
         self.assertEqual(User.objects.first().username, self.username)
 
         # Verificar que el usuario se duplicó automáticamente en la base de datos personalizada
-        usuario_personalizado = PerfilUsuario.objects.get(username=self.username)
+        usuario_personalizado = Usuario.objects.get(username=self.username)
         self.assertEqual(usuario_personalizado.username, self.username)
         self.assertEqual(usuario_personalizado.email, self.email)
 
@@ -50,4 +50,4 @@ class UsuarioTests(TestCase):
 
         # Intentar crear el mismo usuario nuevamente
         with self.assertRaises(Exception):
-            PerfilUsuario.objects.create(username=self.username, email=self.email)
+            Usuario.objects.create(username=self.username, email=self.email)
