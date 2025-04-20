@@ -24,6 +24,9 @@ jobs:
           - 3306:3306
 
     steps:
+    - name: Print MariaDB logs1
+      run: |
+        docker logs $(docker ps -q --filter "ancestor=mariadb:10.5") || echo "No logs available"
     - name: Clean up Docker resources
       run: |
         docker rm -f $(docker ps -aq) || true
