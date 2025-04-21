@@ -22,21 +22,14 @@ jobs:
           MYSQL_PASSWORD: contrasena_carrito
         ports:
           - 3306:3306
-        volumes:
-          - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
         options: >-
-          --health-cmd="mysqladmin ping -h localhost -u usuario_carrito -pcontrasena_carrito"
+          --health-cmd="mysqladmin ping -h127.0.0.1 -uroot -proot_password"
           --health-interval=20s
-          --health-timeout=5s
+          --health-timeout=10s
           --health-retries=5
-          --health-start-period=30s
+          --health-start-period=40s
 
     steps:
-
-    - name: Verify init.sql in container
-      run: |
-        docker exec $(docker ps -q --filter "ancestor=mariadb:10.5") ls -l /docker-entrypoint-initdb.d/
-
     - name: Check out code
       uses: actions/checkout@v3
 
@@ -51,22 +44,21 @@ jobs:
         sudo apt-get install -y default-mysql-client
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-
-    - name: Get MariaDB IP
-      id: get-db-ip
+        
+    - name: Copy init.sql to container
       run: |
-        DB_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(docker ps -q --filter 'ancestor=mariadb:10.5'))
-        echo "DB_IP=$DB_IP" >> $GITHUB_ENV
-        echo "IP del contenedor MariaDB: $DB_IP"
+        docker cp init.sql $(docker ps -q --filter "ancestor=mariadb:10.5"):/docker-entrypoint-initdb.d/
+        docker exec $(docker ps -q --filter "ancestor=mariadb:10.5") ls -la /docker-entrypoint-initdb.d/
+        docker exec $(docker ps -q --filter "ancestor=mariadb:10.5") cat /docker-entrypoint-initdb.d/init.sql | head -5
 
     - name: Wait for DB to be ready
       run: |
-        for i in {1..20}; do
-          if mysql -h127.0.0.1 -uusuario_carrito -pcontrasena_carrito -e "SELECT 1;" &>/dev/null; then
+        for i in {1..30}; do
+          if mysql -h127.0.0.1 -uroot -proot_password -e "SELECT 1;" &>/dev/null; then
             echo "Database is ready!";
             break;
           fi
-          echo "Waiting for the database... (Attempt $i of 20)";
+          echo "Waiting for the database... (Attempt $i of 30)";
           sleep 5;
         done
 
@@ -81,10 +73,6 @@ jobs:
       run: |
         mysql -h127.0.0.1 -uusuario_carrito -pcontrasena_carrito -e "SHOW DATABASES;"
         mysql -h127.0.0.1 -uusuario_carrito -pcontrasena_carrito -e "SHOW GRANTS FOR 'usuario_carrito'@'%';"
-
-    - name: Verify init.sql in container
-      run: |
-        docker exec $(docker ps -q --filter "ancestor=mariadb:10.5") ls -l /docker-entrypoint-initdb.d/
 
     - name: Print MariaDB logs
       run: |
