@@ -90,4 +90,4 @@ jobs:
       env:
         DB_HOST: 127.0.0.1
       run: |
-        python manage.py test
+        python manage.py test --noinput
