@@ -87,7 +87,7 @@ DATABASES = {
         'NAME': 'carrito_db',
         'USER': 'usuario_carrito',
         'PASSWORD': 'contrasena_carrito',
-        'HOST': 'db',
+        'HOST': os.environ.get('DB_HOST', 'db'),
         'PORT': '3306',
     }
 }

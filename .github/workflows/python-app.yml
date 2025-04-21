@@ -20,9 +20,10 @@ jobs:
           MYSQL_DATABASE: carrito_db
           MYSQL_USER: usuario_carrito
           MYSQL_PASSWORD: contrasena_carrito
-          MARIA_DB_UPGRADE: 1
         ports:
           - 3306:3306
+        volumes:
+          - ${{ github.workspace }}/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
         options: >-
           --health-cmd="mysql -h127.0.0.1 -uusuario_carrito -pcontrasena_carrito -e 'SELECT 1;'"
           --health-interval=15s
@@ -31,14 +32,14 @@ jobs:
           --health-start-period=30s
 
     steps:
-    - name: Print MariaDB logs1
+    - name: Clear test database
       run: |
-        docker logs $(docker ps -q --filter "ancestor=mariadb:10.5") || echo "No logs available"
+        mysql -h127.0.0.1 -uusuario_carrito -pcontrasena_carrito -e "DROP DATABASE IF EXISTS test_carrito_db;"
     - name: Clean up Docker resources
       run: |
         docker rm -f $(docker ps -aq) || true
         docker network prune -f || true
-
+      
     - name: Check out code
       uses: actions/checkout@v3
 
@@ -54,10 +55,17 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
+    - name: Get MariaDB IP
+      id: get-db-ip
+      run: |
+        DB_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(docker ps -q --filter 'ancestor=mariadb:10.5'))
+        echo "DB_IP=$DB_IP" >> $GITHUB_ENV
+        echo "IP del contenedor MariaDB: $DB_IP"
+        
     - name: Inspect Docker network
       run: |
         docker network inspect $(docker network ls -q)
-        
+
     - name: Test database connection
       run: |
         mysql -h db -uusuario_carrito -pcontrasena_carrito -e "SHOW DATABASES;"
@@ -90,6 +98,7 @@ jobs:
 
     - name: Run tests
       env:
-        DB_HOST: db
+        DB_HOST: ${{ env.DB_IP }}
       run: |
         python manage.py test
+
