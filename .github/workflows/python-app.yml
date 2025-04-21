@@ -25,21 +25,13 @@ jobs:
         volumes:
           - ${{ github.workspace }}/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
         options: >-
-          --health-cmd="mysql -h127.0.0.1 -uusuario_carrito -pcontrasena_carrito -e 'SELECT 1;'"
-          --health-interval=15s
-          --health-timeout=10s
-          --health-retries=10
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -u usuario_carrito -pcontrasena_carrito"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
           --health-start-period=30s
 
     steps:
-    - name: Clear test database
-      run: |
-        mysql -h127.0.0.1 -uusuario_carrito -pcontrasena_carrito -e "DROP DATABASE IF EXISTS test_carrito_db;"
-    - name: Clean up Docker resources
-      run: |
-        docker rm -f $(docker ps -aq) || true
-        docker network prune -f || true
-      
     - name: Check out code
       uses: actions/checkout@v3
 
@@ -61,29 +53,29 @@ jobs:
         DB_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(docker ps -q --filter 'ancestor=mariadb:10.5'))
         echo "DB_IP=$DB_IP" >> $GITHUB_ENV
         echo "IP del contenedor MariaDB: $DB_IP"
-        
-    - name: Inspect Docker network
-      run: |
-        docker network inspect $(docker network ls -q)
 
-    - name: Test database connection
-      run: |
-        mysql -h db -uusuario_carrito -pcontrasena_carrito -e "SHOW DATABASES;"
-    
-    - name: Check MariaDB container status
-      run: |
-        docker inspect --format='{{json .State.Health}}' $(docker ps -q --filter "ancestor=mariadb:10.5")
-        
     - name: Wait for DB to be ready
       run: |
-        for i in {1..10}; do
-          if mysqladmin ping -hdb -uusuario_carrito -pcontrasena_carrito &>/dev/null; then
+        for i in {1..20}; do
+          if mysql -h127.0.0.1 -uusuario_carrito -pcontrasena_carrito -e "SELECT 1;" &>/dev/null; then
             echo "Database is ready!";
             break;
           fi
-          echo "Waiting for the database... (Attempt $i of 30)";
+          echo "Waiting for the database... (Attempt $i of 20)";
           sleep 5;
         done
+
+    - name: Create test database
+      run: |
+        mysql -h127.0.0.1 -uusuario_carrito -pcontrasena_carrito -e "DROP DATABASE IF EXISTS test_carrito_db;"
+        mysql -h127.0.0.1 -uusuario_carrito -pcontrasena_carrito -e "CREATE DATABASE IF NOT EXISTS test_carrito_db;"
+        mysql -h127.0.0.1 -uusuario_carrito -pcontrasena_carrito -e "GRANT ALL PRIVILEGES ON test_carrito_db.* TO 'usuario_carrito'@'%';"
+        mysql -h127.0.0.1 -uusuario_carrito -pcontrasena_carrito -e "FLUSH PRIVILEGES;"
+
+    - name: Test database connection
+      run: |
+        mysql -h127.0.0.1 -uusuario_carrito -pcontrasena_carrito -e "SHOW DATABASES;"
+        mysql -h127.0.0.1 -uusuario_carrito -pcontrasena_carrito -e "SHOW GRANTS FOR 'usuario_carrito'@'%';"
 
     - name: Print MariaDB logs
       run: |
@@ -91,14 +83,13 @@ jobs:
 
     - name: Run migrations
       env:
-        DB_HOST: db
+        DB_HOST: 127.0.0.1
       run: |
         python manage.py makemigrations
         python manage.py migrate
 
     - name: Run tests
       env:
-        DB_HOST: ${{ env.DB_IP }}
+        DB_HOST: 127.0.0.1
       run: |
         python manage.py test
-
