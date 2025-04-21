@@ -22,8 +22,7 @@ jobs:
           MYSQL_PASSWORD: contrasena_carrito
         ports:
           - 3306:3306
-        volumes:
-          - ${{ github.workspace }}/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+
         options: >-
           --health-cmd="mysqladmin ping -h 127.0.0.1 -u usuario_carrito -pcontrasena_carrito"
           --health-interval=10s
@@ -32,6 +31,11 @@ jobs:
           --health-start-period=30s
 
     steps:
+
+    - name: Verify init.sql in container
+      run: |
+        docker exec $(docker ps -q --filter "ancestor=mariadb:10.5") ls -l /docker-entrypoint-initdb.d/
+
     - name: Check out code
       uses: actions/checkout@v3
 
@@ -76,6 +80,10 @@ jobs:
       run: |
         mysql -h127.0.0.1 -uusuario_carrito -pcontrasena_carrito -e "SHOW DATABASES;"
         mysql -h127.0.0.1 -uusuario_carrito -pcontrasena_carrito -e "SHOW GRANTS FOR 'usuario_carrito'@'%';"
+
+    - name: Verify init.sql in container
+      run: |
+        docker exec $(docker ps -q --filter "ancestor=mariadb:10.5") ls -l /docker-entrypoint-initdb.d/
 
     - name: Print MariaDB logs
       run: |
