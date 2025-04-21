@@ -54,10 +54,17 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
+    - name: Test database connection
+      run: |
+        mysql -h db -uusuario_carrito -pcontrasena_carrito -e "SHOW DATABASES;"
+    
+    - name: Check MariaDB container status
+      run: |
+        docker inspect --format='{{json .State.Health}}' $(docker ps -q --filter "ancestor=mariadb:10.5")
     - name: Wait for DB to be ready
       run: |
-        for i in {1..30}; do
-          if mysqladmin ping -h db -uusuario_carrito -pcontrasena_carrito &>/dev/null; then
+        for i in {1..10}; do
+          if mysqladmin ping -hdb -uusuario_carrito -pcontrasena_carrito &>/dev/null; then
             echo "Database is ready!";
             break;
           fi
