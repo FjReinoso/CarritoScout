@@ -69,6 +69,9 @@ jobs:
         mysql -h127.0.0.1 -uroot -proot_password -e "CREATE DATABASE IF NOT EXISTS test_carrito_db;"
         mysql -h127.0.0.1 -uroot -proot_password -e "GRANT ALL PRIVILEGES ON test_carrito_db.* TO 'usuario_carrito'@'%';"
         mysql -h127.0.0.1 -uroot -proot_password -e "FLUSH PRIVILEGES;"
+        
+        # Apply the schema from init.sql to the test database
+        mysql -h127.0.0.1 -uroot -proot_password test_carrito_db < init.sql
 
     - name: Test database connection
       run: |
