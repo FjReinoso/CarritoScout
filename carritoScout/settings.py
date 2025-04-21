@@ -89,6 +89,11 @@ DATABASES = {
         'PASSWORD': 'contrasena_carrito',
         'HOST': os.environ.get('DB_HOST', 'db'),
         'PORT': '3306',
+        'TEST': {
+                'NAME': 'test_carrito_db',
+                'CHARSET': 'utf8mb4',
+                'COLLATION': 'utf8mb4_unicode_ci',
+            },
     }
 }
 
