@@ -20,8 +20,15 @@ jobs:
           MYSQL_DATABASE: carrito_db
           MYSQL_USER: usuario_carrito
           MYSQL_PASSWORD: contrasena_carrito
+          MARIA_DB_UPGRADE: 1
         ports:
           - 3306:3306
+        options: >-
+          --health-cmd="mysql -h127.0.0.1 -uusuario_carrito -pcontrasena_carrito -e 'SELECT 1;'"
+          --health-interval=15s
+          --health-timeout=10s
+          --health-retries=10
+          --health-start-period=30s
 
     steps:
     - name: Print MariaDB logs1
