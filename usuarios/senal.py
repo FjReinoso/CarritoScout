@@ -2,7 +2,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.auth.models import User
 from .models import PerfilUsuario
-from django.db import connection, ProgrammingError, transaction, IntegrityError
+from django.db import connection, ProgrammingError, IntegrityError
 
 @receiver(post_save, sender=User)
 def crear_perfil_usuario(sender, instance, created, **kwargs):
@@ -18,10 +18,8 @@ def crear_perfil_usuario(sender, instance, created, **kwargs):
             # Si el perfil ya existe, no necesitamos crear uno nuevo
             pass
         
-        # Intentar insertar en la tabla SQL personalizada, pero no permitir que el error
-        # se propague a la transacción principal
-        connection.set_autocommit(True)  # Asegurar que esta operación no afecte la transacción principal
-        
+        # En lugar de cambiar el modo autocommit (que no funciona en pruebas),
+        # simplemente ejecutamos las consultas SQL dentro del contexto actual
         try:
             with connection.cursor() as cursor:
                 cursor.execute(
@@ -59,7 +57,3 @@ def crear_perfil_usuario(sender, instance, created, **kwargs):
         except Exception as e:
             # Capturar cualquier otra excepción
             print(f"Error al insertar usuario en la tabla Usuarios: {e}")
-        finally:
-            # Restablecer el modo transaccional según convenga
-            if not connection.in_atomic_block:
-                connection.set_autocommit(False)
