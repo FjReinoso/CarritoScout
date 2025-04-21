@@ -22,7 +22,8 @@ jobs:
           MYSQL_PASSWORD: contrasena_carrito
         ports:
           - 3306:3306
-
+        volumes:
+          - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
         options: >-
           --health-cmd="mysqladmin ping -h 127.0.0.1 -u usuario_carrito -pcontrasena_carrito"
           --health-interval=10s
