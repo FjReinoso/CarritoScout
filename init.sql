@@ -1,8 +1,14 @@
---Damos permisos para que pueda crear la base de datos de test (carrito_db)
+-- Crear la base de datos principal si no existe
+CREATE DATABASE IF NOT EXISTS carrito_db;
+
+-- Crear la base de datos de prueba si no existe
 CREATE DATABASE IF NOT EXISTS test_carrito_db;
+
+-- Otorgar permisos globales al usuario
 GRANT ALL PRIVILEGES ON *.* TO 'usuario_carrito'@'%';
 FLUSH PRIVILEGES;
--- Seleccionar la base de datos (asegúrate de que exista)
+
+-- Seleccionar la base de datos principal
 USE carrito_db;
 
 -- Tabla de Usuarios
