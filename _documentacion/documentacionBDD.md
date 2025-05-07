@@ -14,7 +14,7 @@ Este es el diseño final de la base de datos. He decidido representar las tablas
 
 - **Usuarios**: `id_usuario` (Primaria), `nombre`, `email`, `contraseña`, `fecha_registro`.
 - **Supermercados**: `id_supermercado` (Primaria), `nombre`, `direccion`, `geolocalizacion`.
-- **Productos**: `id_producto` (Primaria), `nombre`, `categoria`, `unidad_medida`, `precio`, `descripcion`.
+- **Productos**: `id_producto` (Primaria), `nombre`, `categoria`, `unidad_medida`, `descripcion`.
 - **Precios**: `id_precio` (Primaria), `id_producto` (Clave Ajena), `id_supermercado` (Clave Ajena), `precio`, `fecha_actualizacion`.
 - **Carritos**: `id_carrito` (Primaria), `id_usuario` (Clave Ajena), `fecha_creacion`.
 - **Carrito_Productos**: `id_carrito` (Clave Ajena, Primaria), `id_producto` (Clave Ajena, Primaria), `cantidad`.
