@@ -1,0 +1,100 @@
+/* Estilos para toda la APP en general */
+body {
+    background-color: #ffffff;
+    min-height: 100vh;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Arreglar que no scrollee */
+.no-scroll {
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Button styles */
+.btn-primary {
+    background-color: #FF6A88;
+    border-color: #FF6A88;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-primary:hover {
+    background-color: #FF99AC;
+    border-color: #FF99AC;
+    transform: translateY(-2px);
+}
+
+/* Cartas */
+.card {
+    border: none;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    border-radius: 1rem;
+    overflow: hidden;
+}
+
+.card-header {
+    background-color: transparent;
+    border-bottom: none;
+    padding: 1rem 1rem 0;
+}
+
+.form-control {
+    border-radius: 0.5rem;
+    padding: 0.6rem 1rem;
+}
+
+.form-control:focus {
+    box-shadow: 0 0 0 0.25rem rgba(255, 154, 139, 0.25);
+    border-color: #FF9A8B;
+}
+
+.input-group-text {
+    background-color: #f8f9fa;
+    border-radius: 0.5rem 0 0 0.5rem;
+}
+
+/* Footer */
+.footer {
+    background-color: #000000;
+    color: #ffffff;
+    padding: 0.6rem 0;
+    width: 100%;
+    text-align: center;
+    font-size: 0.85rem;
+    margin-top: auto;
+}
+
+.footer a {
+    color: #ffffff;
+    text-decoration: none;
+    transition: color 0.2s ease-in-out;
+    margin: 0 0.4rem;
+}
+
+.footer a:hover {
+    color: #FF6A88;
+}
+
+/* Intento de arreglar cuando se achica para que siga estand ok */
+@media (max-width: 767.98px) {
+    .navbar .btn {
+        margin-bottom: 5px;
+        width: 100%;
+        margin-left: 0;
+    }
+    
+    .d-flex.justify-content-center.position-absolute.start-50.translate-middle-x {
+        position: relative !important;
+        transform: none !important;
+        margin: 10px 0;
+    }
+    
+    .navbar-collapse {
+        margin-top: 10px;
+    }
+}

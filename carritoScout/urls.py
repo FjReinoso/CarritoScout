@@ -17,9 +17,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.shortcuts import redirect
-
+app_name='usuarios'
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('usuarios/', include('usuarios.urls')),  # Incluye las URLs de la app usuarios
-    path('', lambda request: redirect('login')),  # Redirige la raíz al login
+    path('usuarios/', include(('usuarios.urls', 'usuarios'))),  # URLs de la aplicación de usuarios
+    path('', lambda request: redirect('usuarios:login')),  # Redirige la raíz al login
+    path("__reload__/", include("django_browser_reload.urls")),
 ]

@@ -1,17 +1,112 @@
+{% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>CarritoScout - Iniciar Sesión</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!--CSS -->
+    <link href="{% static 'css/login.css' %}" rel="stylesheet">
 </head>
 <body>
-    <h1>Iniciar Sesión</h1>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Login</button>
-    </form>
-    <p>¿No tienes una cuenta? <a href="{% url 'registro' %}">Regístrate aquí</a></p>
+    <div class="login-container row g-0">
+        <!-- Izquierrda-->
+        <div class="col-md-6 brand-section">
+            <img src="{% static 'img/carrito-logo.png' %}" alt="" class="brand-logo">
+            <!-- Encima iria el logo cuando lo tenga -->
+            <h1 class="mb-4">CarritoScout</h1>
+            <p class="brand-tagline">Compara precios, ahorra dinero y encuentra las mejores ofertas en tus supermercados favoritos.</p>
+        </div>
+        
+        <!-- Parte derecha - Formulario de login -->
+        <div class="col-md-6 form-section">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card shadow border-0">
+                        <div class="card-header bg-white text-center pt-4">
+                            <h2 class="fs-4 fw-bold">Iniciar Sesión</h2>
+                            <p class="text-muted mb-0">Ingresa tus datos para continuar</p>
+                        </div>
+                        <div class="card-body p-4">
+                            {% if form.errors %}
+                                <div class="alert alert-danger" role="alert">
+                                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                    Usuario o contraseña incorrectos. Por favor intenta nuevamente.
+                                </div>
+                            {% endif %}
+                            
+                            <form method="post">
+                                {% csrf_token %}
+                                <div class="mb-3">
+                                    <label for="{{ form.username.id_for_label }}" class="form-label">Nombre de usuario</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
+                                        <input type="text" name="{{ form.username.name }}" id="{{ form.username.id_for_label }}" 
+                                               class="form-control {% if form.username.errors %}is-invalid{% endif %}" 
+                                               placeholder="Ingresa tu nombre de usuario" required autofocus>
+                                    </div>
+                                    {% if form.username.errors %}
+                                        <div class="invalid-feedback d-block">{{ form.username.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label for="{{ form.password.id_for_label }}" class="form-label">Contraseña</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                                        <input type="password" name="{{ form.password.name }}" id="{{ form.password.id_for_label }}" 
+                                               class="form-control {% if form.password.errors %}is-invalid{% endif %}" 
+                                               placeholder="Ingresa tu contraseña" required>
+                                    </div>
+                                    {% if form.password.errors %}
+                                        <div class="invalid-feedback d-block">{{ form.password.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="d-grid gap-2">
+                                    <button type="submit" class="btn btn-primary btn-lg">
+                                        <i class="bi bi-box-arrow-in-right me-2"></i>Iniciar sesión
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="card-footer bg-white text-center py-3">
+                            <div class="text-muted">
+                                ¿No tienes una cuenta? <a href="{% url 'usuarios:registro' %}" class="text-decoration-none" style="color: #FF6A88;">Regístrate aquí</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-text">
+                <span>© 2025 FjReinoso</span>
+                <a href="https://github.com/FjReinoso" target="_blank" rel="noopener noreferrer">
+                    <i class="bi bi-github footer-icon"></i>GitHub
+                </a>
+                <a href="https://linkedin.com/in/ifjre" target="_blank" rel="noopener noreferrer">
+                    <i class="bi bi-linkedin footer-icon"></i>LinkedIn
+                </a>
+                <a href="https://twitter.com/FjReinoso" target="_blank" rel="noopener noreferrer">
+                    <i class="bi bi-twitter footer-icon"></i>Twitter
+                </a>
+            </div>
+            <div class="footer-project">
+                Proyecto Final CFGS Desarrollo de Aplicaciones Web para IES Abdera
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

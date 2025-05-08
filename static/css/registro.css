@@ -1,0 +1,233 @@
+/* Estilos para la página de registro practicamente se han reutilizado
+Completamente los estilos de login.css pero se ha tenido que hacer otra hoja
+Porque los elementos son totalmente diferentes (especialmente features) */
+body {
+    background-color: #ffffff;
+    height: 100vh; 
+    margin: 0;
+    overflow: hidden; 
+    display: flex;
+    flex-direction: column;
+}
+
+html {
+    overflow: hidden; 
+}
+
+.registro-container {
+    height: 100vh; 
+    display: flex;
+    overflow: hidden; 
+}
+
+.form-section {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 1.5rem; 
+    height: 100%;
+    overflow-y: hidden; /
+}
+
+.features-section {
+    background-color: #FF9A8B;
+    background-image: linear-gradient(90deg, #FF9A8B 0%, #FF6A88 55%, #FF99AC 100%);
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 1.5rem; 
+    height: 100%;
+    overflow-y: hidden; 
+}
+
+.card {
+    border: none;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    border-radius: 1rem;
+    max-height: none; 
+    overflow: hidden;
+}
+
+.card-header {
+    background-color: transparent;
+    border-bottom: none;
+    padding: 1rem 1rem 0; 
+}
+/*Fix para los estilos de bootstrap*/
+.card-body {
+    padding: 1rem !important;
+}
+
+.card-footer {
+    padding: 0.75rem !important; 
+}
+
+.form-control {
+    border-radius: 0.5rem;
+    padding: 0.6rem 1.25rem; 
+}
+
+.form-control:focus {
+    box-shadow: 0 0 0 0.25rem rgba(255, 154, 139, 0.25);
+    border-color: #FF9A8B;
+}
+
+.btn-primary {
+    background-color: #FF6A88;
+    border-color: #FF6A88;
+    border-radius: 0.5rem;
+    padding: 0.6rem 1.25rem; 
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-primary:hover {
+    background-color: #FF99AC;
+    border-color: #FF99AC;
+    transform: translateY(-2px);
+}
+
+.input-group-text {
+    background-color: #f8f9fa;
+    border-radius: 0.5rem 0 0 0.5rem;
+}
+
+.feature-icon {
+    font-size: 2.25rem; 
+    margin-bottom: 0.75rem; 
+}
+
+.feature-item {
+    margin-bottom: 1.5rem; 
+}
+
+.feature-title {
+    font-size: 1.1rem; 
+    font-weight: 600;
+    margin-bottom: 0.4rem; 
+}
+
+.feature-description {
+    font-size: 0.95rem; 
+    opacity: 0.9;
+    margin-bottom: 0.5rem; 
+}
+
+.features-section .btn-register {
+    background-color: #ffffff;
+    color: #FF6A88;
+    border: none;
+    padding: 0.6rem 2rem; 
+    font-weight: bold;
+    border-radius: 2rem;
+    margin-top: 1.25rem; 
+    transition: all 0.2s ease-in-out;
+}
+
+.features-section .btn-register:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.mb-3 {
+    margin-bottom: 0.75rem !important; 
+}
+
+.mb-4 {
+    margin-bottom: 1rem !important; 
+}
+
+.form-text {
+    margin-top: 0.25rem !important; /* Texto de ayuda mas pequeño*/
+    font-size: 0.75rem; 
+}
+
+/* Footer styles */
+.footer {
+    background-color: #000000;
+    color: #ffffff;
+    padding: 0.6rem 0; 
+    width: 100%;
+    text-align: center;
+    flex-shrink: 0;
+    font-size: 0.85rem;
+}
+
+.footer a {
+    color: #ffffff;
+    text-decoration: none;
+    transition: color 0.2s ease-in-out;
+    margin: 0 0.4rem; /*Espaciado entre los links*/
+}
+
+.footer a:hover {
+    color: #FF6A88;
+}
+
+.footer-icon {
+    font-size: 1rem;
+    margin-right: 0.2rem; 
+}
+
+.footer-text {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap; 
+}
+
+.footer-project {
+    margin-top: 0.3rem;
+    font-size: 0.8rem;
+    opacity: 0.9;
+    display: block; 
+}
+
+/* Intento de arreglar en pantañas pequeñas */
+@media (max-width: 767.98px) {
+    .registro-container {
+        flex-direction: column;
+    }
+    
+    .features-section, .form-section {
+        height: 50vh; 
+        padding: 1rem;
+    }
+    
+    .feature-icon {
+        font-size: 1.75rem;
+    }
+    
+    .feature-item {
+        margin-bottom: 1rem;
+    }
+    
+    .card {
+        max-height: 45vh; 
+    }
+    
+    .footer {
+        padding: 0.5rem 0;
+    }
+    
+    .footer a {
+        margin: 0 0.3rem;
+    }
+}
+
+/* Ajustes para que las lineas queden cuadradas y no tenga saltos feos */
+.fs-4 {
+    font-size: 1.25rem !important;
+}
+
+.py-3 {
+    padding-top: 0.75rem !important;
+    padding-bottom: 0.75rem !important;
+}
+
+.p-4 {
+    padding: 1rem !important;
+}

@@ -1,14 +1,78 @@
-<!-- This is the main page template for the user after login -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Página Principal</title>
-</head>
-<body>
-    <h1>Bienvenido, {{ user.username }}</h1>
-    <p>Esta es la página principal.</p>
-    <a href="{% url 'logout' %}">Cerrar sesión</a>
-</body>
-</html>
+{% extends 'usuarios/baseConNavbar.html' %}
+{% load static %}
+
+{% block title %}Inicio - CarritoScout{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero-section {
+        background-image: linear-gradient(135deg, #FF9A8B 0%, #FF6A88 55%, #FF99AC 100%);
+        padding: 4rem 2rem;
+        border-radius: 1rem;
+        color: white;
+        margin-bottom: 2rem;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+    
+    .feature-card {
+        transition: all 0.3s ease;
+        margin-bottom: 1.5rem;
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-10px);
+    }
+    
+    .feature-icon {
+        font-size: 2rem;
+        color: #FF6A88;
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="hero-section text-center">
+    <h1 class="display-4 fw-bold">Bienvenido a CarritoScout</h1>
+    <p class="lead">Compara precios, ahorra dinero y encuentra las mejores ofertas en tus supermercados favoritos</p>
+    <div class="mt-4">
+        <a href="#" class="btn btn-light btn-lg px-4 me-md-2">Comenzar</a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card feature-card h-100">
+            <div class="card-body text-center">
+                <div class="feature-icon">
+                    <i class="bi bi-search"></i>
+                </div>
+                <h5 class="card-title">Busca Productos</h5>
+                <p class="card-text">Encuentra fácilmente cualquier producto y compara sus precios en diferentes supermercados.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card feature-card h-100">
+            <div class="card-body text-center">
+                <div class="feature-icon">
+                    <i class="bi bi-graph-up"></i>
+                </div>
+                <h5 class="card-title">Analiza Precios</h5>
+                <p class="card-text">Visualiza el historial de precios y detecta cuándo es el mejor momento para comprar.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card feature-card h-100">
+            <div class="card-body text-center">
+                <div class="feature-icon">
+                    <i class="bi bi-cart-check"></i>
+                </div>
+                <h5 class="card-title">Crea Listas de Compras</h5>
+                <p class="card-text">Organiza tus compras y encuentra el supermercado con el total más económico.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

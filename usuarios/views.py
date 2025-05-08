@@ -9,7 +9,7 @@ def login_view(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            return redirect('pagina_principal')  # Redirige a la página principal
+            return redirect('usuarios:pagina_principal')
     else:
         form = AuthenticationForm()
     return render(request, 'usuarios/login.html', {'form': form})
@@ -19,7 +19,7 @@ def registro_view(request):
         form = UserCreationForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('login')  # Redirige al login después de registrarse
+            return redirect('usuarios:login')
     else:
         form = UserCreationForm()
     return render(request, 'usuarios/registro.html', {'form': form})
