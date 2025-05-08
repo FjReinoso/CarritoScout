@@ -27,3 +27,11 @@ def registro_view(request):
 @login_required
 def pagina_principal(request):
     return render(request, 'usuarios/pagina_principal.html')
+
+@login_required
+def perfil_view(request):
+    """
+    Vista para mostrar y editar el perfil del usuario.
+    Incluye información personal, carritos activos y favoritos.
+    """
+    return render(request, 'usuarios/perfil.html')
