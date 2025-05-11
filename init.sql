@@ -18,8 +18,8 @@ CREATE TABLE IF NOT EXISTS Usuarios (
     email VARCHAR(100) UNIQUE NOT NULL,
     contraseña VARCHAR(255) NOT NULL,
     fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    first_name VARCHAR(100) NOT NULL,
-    last_name VARCHAR(100) NOT NULL,
+    first_name VARCHAR(100) ,
+    last_name VARCHAR(100) ,
     direccion VARCHAR(255),
     telefono VARCHAR(15),
     fecha_nacimiento DATE

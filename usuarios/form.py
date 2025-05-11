@@ -6,17 +6,17 @@ from .models import PerfilUsuario
 class PerfilUsuarioForm(forms.ModelForm):
     direccion = forms.CharField(
         required=False,
-        widget=forms.TextInput(attrs={'placeholder': 'Vacío'}),
+        widget=forms.TextInput(attrs={'placeholder': 'Vacío', 'class': 'form-control'}),
         label="Dirección"
     )
     telefono = forms.CharField(
         required=False,
-        widget=forms.TextInput(attrs={'placeholder': 'Vacío'}),
+        widget=forms.TextInput(attrs={'placeholder': 'Vacío', 'class': 'form-control'}),
         label="Teléfono"
     )
     fecha_nacimiento = forms.DateField(
         required=False,
-        widget=forms.DateInput(attrs={'type': 'date', 'placeholder': 'Vacío'}),
+        widget=forms.DateInput(attrs={'type': 'date', 'placeholder': 'Vacío', 'class': 'form-control'}),
         label="Fecha de Nacimiento"
     )
 
@@ -26,7 +26,7 @@ class PerfilUsuarioForm(forms.ModelForm):
 
 class PerfilUsuarioCorreoForm(forms.ModelForm):
     email = forms.EmailField(
-        widget=forms.EmailInput(attrs={'readonly': 'readonly'}),
+        widget=forms.EmailInput(attrs={'readonly': 'readonly', 'class': 'form-control'}),
         label="Correo Electrónico"
     )
 
@@ -35,8 +35,8 @@ class PerfilUsuarioCorreoForm(forms.ModelForm):
         fields = ['email']
 
 class RegistroBasicoForm(UserCreationForm):
-    first_name = forms.CharField(max_length=30, required=True, label="Nombre")
-    last_name = forms.CharField(max_length=30, required=True, label="Apellidos")
+    first_name = forms.CharField(max_length=30, required=False, label="Nombre")
+    last_name = forms.CharField(max_length=30, required=False, label="Apellidos")
 
     class Meta:
         model = User

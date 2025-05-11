@@ -22,16 +22,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Validación del campo de correo electrónico
-    campoCorreo.addEventListener('input', function () {
-        const regexCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!regexCorreo.test(campoCorreo.value)) {
-            mostrarError(campoCorreo, 'Por favor, introduce un correo electrónico válido.');
-        } else {
-            limpiarError(campoCorreo);
-        }
-    });
-
     // Validación del campo de nombre
     campoNombre.addEventListener('input', function () {
         if (campoNombre.value.trim() === '') {

@@ -48,25 +48,26 @@
                         <h5 class="mb-0">Datos Personales</h5>
                     </div>
                     <div class="card-body">
-                        <form>
+                        <form method="post">
+                            {% csrf_token %}
                             <div class="mb-3">
                                 <label for="username" class="form-label">Nombre de usuario</label>
                                 <input type="text" class="form-control" id="username" value="{{ request.user.username }}" readonly>
                             </div>
                             <div class="mb-3">
                                 <label for="email" class="form-label">Correo electrónico</label>
-                                <input type="email" class="form-control" id="email" value="{{ request.user.email }}">
-                                <div class="invalid-feedback"></div> 
+                                {{ correo_form.email }}
+                                {% if correo_form.email.errors %}
+                                    <div class="invalid-feedback d-block">{{ correo_form.email.errors }}</div>
+                                {% endif %}
                             </div>
                             <div class="mb-3">
                                 <label for="first_name" class="form-label">Nombre</label>
-                                <input type="text" class="form-control" id="first_name" value="{{ request.user.first_name }}">
-                                <div class="invalid-feedback"></div>
+                                <input type="text" class="form-control" name="first_name" id="first_name" value="{{ request.user.first_name }}">
                             </div>
                             <div class="mb-3">
                                 <label for="last_name" class="form-label">Apellidos</label>
-                                <input type="text" class="form-control" id="last_name" value="{{ request.user.last_name }}">
-                                <div class="invalid-feedback"></div>
+                                <input type="text" class="form-control" name="last_name" id="last_name" value="{{ request.user.last_name }}">
                             </div>
                             <button type="submit" class="btn btn-primary">Guardar cambios</button>
                         </form>
@@ -76,21 +77,31 @@
             <div class="col-md-6">
                 <div class="card mb-4">
                     <div class="card-header bg-light">
-                        <h5 class="mb-0">Dirección</h5>
+                        <h5 class="mb-0">Información Adicional</h5>
                     </div>
                     <div class="card-body">
-                        <form>
+                        <form method="post">
+                            {% csrf_token %}
                             <div class="mb-3">
                                 <label for="direccion" class="form-label">Dirección</label>
-                                <input type="text" class="form-control" id="direccion" value="{{ request.user.perfil.direccion }}">
+                                {{ perfil_form.direccion }}
+                                {% if perfil_form.direccion.errors %}
+                                    <div class="invalid-feedback d-block">{{ perfil_form.direccion.errors }}</div>
+                                {% endif %}
                             </div>
                             <div class="mb-3">
                                 <label for="telefono" class="form-label">Teléfono</label>
-                                <input type="text" class="form-control" id="telefono" value="{{ request.user.perfil.telefono }}">
+                                {{ perfil_form.telefono }}
+                                {% if perfil_form.telefono.errors %}
+                                    <div class="invalid-feedback d-block">{{ perfil_form.telefono.errors }}</div>
+                                {% endif %}
                             </div>
                             <div class="mb-3">
                                 <label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento</label>
-                                <input type="date" class="form-control" id="fecha_nacimiento" value="{{ request.user.perfil.fecha_nacimiento|date:'Y-m-d' }}">
+                                {{ perfil_form.fecha_nacimiento }}
+                                {% if perfil_form.fecha_nacimiento.errors %}
+                                    <div class="invalid-feedback d-block">{{ perfil_form.fecha_nacimiento.errors }}</div>
+                                {% endif %}
                             </div>
                             <button type="submit" class="btn btn-primary">Guardar cambios</button>
                         </form>

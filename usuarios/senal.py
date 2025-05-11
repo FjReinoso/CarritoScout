@@ -10,63 +10,66 @@ import sys
 def crear_perfil_usuario(sender, instance, created, **kwargs):
     """
     Señal que se activa cuando se guarda un usuario.
-    Crea un perfil para el usuario y lo registra en la tabla SQL personalizada.
+    Crea un perfil para el usuario y lo registra en la tabla SQL personalizada Usuarios
+    usando el modelo UsuarioLegacy de Django.
     """
+    print("\n--- INICIO SEÑAL crear_perfil_usuario ---")
+    print(f"Usuario: {instance.username}, Creado: {created}")
+    
     if created:
-        # Crear el perfil del usuario en Django
+        # Solo crear el perfil del usuario si es un nuevo usuario
         try:
-            PerfilUsuario.objects.create(usuario=instance)
-        except IntegrityError:
-            # Si el perfil ya existe, no necesitamos crear uno nuevo
-            pass
+            PerfilUsuario.objects.get_or_create(usuario=instance)
+            print(f"Perfil creado para el usuario: {instance.username}")
+        except Exception as e:
+            print(f"Error al crear perfil para {instance.username}: {e}")
         
         # Verificar si estamos en un entorno de prueba
         is_test = 'test' in sys.argv or connection.settings_dict['NAME'].startswith('test_')
         
-        # En entorno de prueba, omitir operaciones SQL directas
+        # En entorno de prueba, omitir operaciones con Usuarios Legacy
         if is_test:
-            print("Omitiendo operaciones SQL directas en entorno de prueba")
+            print("Omitiendo operaciones con Usuarios Legacy en entorno de prueba")
+            print("--- FIN SEÑAL crear_perfil_usuario ---\n")
             return
         
-        # Ejecutar SQL directo solo en entorno normal (no de prueba)
+        # Importamos aquí para evitar problemas de importación circular
+        from .models import UsuarioLegacy
+        
+        # Insertar usuario en la tabla Usuarios personalizada usando el ORM de Django
+        print("\n--- INICIO INSERCIÓN EN TABLA USUARIOS CON ORM ---")
+        print(f"Intento de inserción para usuario: {instance.username} ({instance.email})")
         try:
-            with connection.cursor() as cursor:
-                cursor.execute(
-                    """
-                    INSERT INTO Usuarios (nombre, email, contraseña, fecha_registro)
-                    VALUES (%s, %s, %s, NOW())
-                    """,
-                    [instance.username, instance.email, instance.password]
-                )
-        except ProgrammingError:
-            # La tabla Usuarios no existe, intentamos crearla primero
-            try:
-                with connection.cursor() as cursor:
-                    cursor.execute(
-                        """
-                        CREATE TABLE IF NOT EXISTS Usuarios (
-                            id_usuario INT AUTO_INCREMENT PRIMARY KEY,
-                            nombre VARCHAR(100) NOT NULL,
-                            email VARCHAR(100) UNIQUE NOT NULL,
-                            contraseña VARCHAR(255) NOT NULL,
-                            fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                        )
-                        """
-                    )
-                    # Ahora intentamos la inserción nuevamente
-                    cursor.execute(
-                        """
-                        INSERT INTO Usuarios (nombre, email, contraseña, fecha_registro)
-                        VALUES (%s, %s, %s, NOW())
-                        """,
-                        [instance.username, instance.email, instance.password]
-                    )
-            except Exception as e:
-                print(f"Error al crear la tabla Usuarios: {e}")
+            # Verificar si el usuario ya existe en la tabla
+            if UsuarioLegacy.objects.filter(email=instance.email).exists():
+                print(f"El usuario {instance.email} ya existe en la tabla Usuarios")
+                print("--- FIN INSERCIÓN EN TABLA USUARIOS CON ORM ---\n")
+                return
+              # Crear el nuevo usuario en la tabla Usuarios legacy
+            usuario_legacy = UsuarioLegacy(
+                nombre=instance.username,
+                email=instance.email,
+                contraseña='[CONTRASEÑA HASHEADA]',
+                first_name=instance.first_name if instance.first_name else None,
+                last_name=instance.last_name if instance.last_name else None
+            )
+            usuario_legacy.save()
+            print(f"¡ÉXITO! Usuario {instance.username} insertado en tabla Usuarios con ORM")
         except Exception as e:
-            # Capturar cualquier otra excepción
-            print(f"Error al insertar usuario en la tabla Usuarios: {e}")
+            print(f"Error al insertar usuario en tabla Usuarios con ORM: {e}")
+            print("--- FIN INSERCIÓN EN TABLA USUARIOS CON ORM ---\n")
+            return
+        
+        print("--- FIN INSERCIÓN EN TABLA USUARIOS CON ORM ---\n")
+    
+    print("--- FIN SEÑAL crear_perfil_usuario ---\n")
 
 @receiver(post_save, sender=User)
 def guardar_perfil_usuario(sender, instance, **kwargs):
-    instance.perfilusuario.save()
+    # Verificar si existe el perfil antes de guardar
+    try:
+        if hasattr(instance, 'perfilusuario'):
+            instance.perfilusuario.save()
+            print(f"Guardado perfil de usuario: {instance.username}")
+    except Exception as e:
+        print(f"Error al guardar perfil de usuario: {e}")

@@ -18,12 +18,34 @@ def login_view(request):
 
 def registro_view(request):
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = RegistroBasicoForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('usuarios:login')
+            # Crear el usuario y guardarlo en la base de datos
+            user = form.save(commit=True)
+            
+            # Iniciar sesión automáticamente
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                  # Verificar que se haya creado el perfil
+                try:
+                    perfil = user.perfilusuario
+                except:
+                    perfil = PerfilUsuario.objects.create(usuario=user)
+                    
+                return redirect('usuarios:pagina_principal')
+            else:
+                # Si hay problemas con la autenticación, añadimos un error al formulario
+                form.add_error(None, "Error de autenticación. Por favor intenta nuevamente.")
     else:
-        form = UserCreationForm()
+        form = RegistroBasicoForm()
+    
+    # Aquí añadimos print para depuración
+    if form.errors:
+        print(f"Errores del formulario: {form.errors}")
+        
     return render(request, 'usuarios/registro.html', {'form': form})
 
 def registro_basico(request):
@@ -41,9 +63,18 @@ def registro_opcional(request):
     if request.method == 'POST':
         form = RegistroOpcionalForm(request.POST)
         if form.is_valid():
-            perfil = form.save(commit=False)
-            perfil.user = request.user
+            # Buscar o crear el perfil del usuario
+            try:
+                perfil = request.user.perfilusuario
+            except:
+                perfil = PerfilUsuario(usuario=request.user)
+            
+            # Actualizar los campos del perfil con los datos del formulario
+            perfil.direccion = form.cleaned_data['direccion']
+            perfil.telefono = form.cleaned_data['telefono']
+            perfil.fecha_nacimiento = form.cleaned_data['fecha_nacimiento']
             perfil.save()
+            
             return redirect('usuarios:pagina_principal')
     else:
         form = RegistroOpcionalForm()
@@ -63,6 +94,7 @@ def perfil_view(request):
         correo_form = PerfilUsuarioCorreoForm(request.POST, instance=user)
         if perfil_form.is_valid() and correo_form.is_valid():
             perfil_form.save()
+            correo_form.save()
             return redirect('usuarios:perfil')
     else:
         perfil_form = PerfilUsuarioForm(instance=perfil)
@@ -71,4 +103,5 @@ def perfil_view(request):
     return render(request, 'usuarios/perfil.html', {
         'perfil_form': perfil_form,
         'correo_form': correo_form,
+        'user': user,  # Pasamos el usuario para acceder a su información en la plantilla
     })
