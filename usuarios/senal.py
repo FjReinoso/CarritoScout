@@ -66,3 +66,7 @@ def crear_perfil_usuario(sender, instance, created, **kwargs):
         except Exception as e:
             # Capturar cualquier otra excepción
             print(f"Error al insertar usuario en la tabla Usuarios: {e}")
+
+@receiver(post_save, sender=User)
+def guardar_perfil_usuario(sender, instance, **kwargs):
+    instance.perfilusuario.save()
