@@ -19,6 +19,13 @@ class PerfilUsuarioForm(forms.ModelForm):
         widget=forms.DateInput(attrs={'type': 'date', 'placeholder': 'Vacío', 'class': 'form-control'}),
         label="Fecha de Nacimiento"
     )
+    
+    def __init__(self, *args, **kwargs):
+        super(PerfilUsuarioForm, self).__init__(*args, **kwargs)
+        # Si hay un valor de fecha_nacimiento, asegurar que se muestre en el formato correcto
+        if self.instance and self.instance.fecha_nacimiento:
+            # Convertir a string con formato YYYY-MM-DD para el widget de fecha
+            self.initial['fecha_nacimiento'] = self.instance.fecha_nacimiento.strftime('%Y-%m-%d')
 
     class Meta:
         model = PerfilUsuario
@@ -33,6 +40,24 @@ class PerfilUsuarioCorreoForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['email']
+        
+class DatosPersonalesForm(forms.ModelForm):
+    first_name = forms.CharField(
+        required=False,
+        max_length=30,
+        widget=forms.TextInput(attrs={'class': 'form-control'}),
+        label="Nombre"
+    )
+    last_name = forms.CharField(
+        required=False,
+        max_length=30,
+        widget=forms.TextInput(attrs={'class': 'form-control'}),
+        label="Apellidos"
+    )
+    
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name']
 
 class RegistroBasicoForm(UserCreationForm):
     first_name = forms.CharField(max_length=30, required=False, label="Nombre")

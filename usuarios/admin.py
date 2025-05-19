@@ -8,9 +8,10 @@ class PerfilUsuarioAdmin(admin.ModelAdmin):
 
 @admin.register(UsuarioLegacy)
 class UsuarioLegacyAdmin(admin.ModelAdmin):
-    list_display = ('id_usuario', 'nombre', 'email', 'first_name', 'last_name', 'fecha_registro')
-    search_fields = ('nombre', 'email', 'first_name', 'last_name')
-    readonly_fields = ('id_usuario', 'nombre', 'email', 'contraseña', 'first_name', 'last_name', 'fecha_registro')
+    list_display = ('id_usuario', 'nombre', 'email', 'first_name', 'last_name', 'direccion', 'telefono', 'fecha_registro')
+    search_fields = ('nombre', 'email', 'first_name', 'last_name', 'direccion', 'telefono')
+    readonly_fields = ('id_usuario', 'nombre', 'email', 'contraseña', 'first_name', 'last_name', 
+                      'direccion', 'telefono', 'fecha_nacimiento', 'fecha_registro')
     
     def has_add_permission(self, request):
         return False  # Desactiva la capacidad de agregar nuevos registros desde el admin

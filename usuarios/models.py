@@ -23,6 +23,9 @@ class UsuarioLegacy(models.Model):
     contraseña = models.CharField(max_length=255)
     first_name = models.CharField(max_length=100, null=True, blank=True)  # Campo opcional
     last_name = models.CharField(max_length=100, null=True, blank=True)   # Campo opcional
+    direccion = models.CharField(max_length=255, null=True, blank=True)    # Información adicional
+    telefono = models.CharField(max_length=15, null=True, blank=True)      # Información adicional
+    fecha_nacimiento = models.DateField(null=True, blank=True)             # Información adicional
     fecha_registro = models.DateTimeField(default=timezone.now)
 
     class Meta:
