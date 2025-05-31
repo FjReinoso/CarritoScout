@@ -22,16 +22,27 @@
     </div>
 </div>
 
-<!-- Barra de pestañas -->
+<!-- Mensajes de alerta -->
+{% if messages %}
+<div class="row mt-3">
+    <div class="col-12">
+        {% for message in messages %}
+            <div class="alert alert-{% if message.tags == 'success' %}success{% elif message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Barra de pestañas modificada (sin pestaña de seguridad) -->
 <ul class="nav nav-tabs" id="profileTabs" role="tablist">
     <li class="nav-item" role="presentation">
         <button class="nav-link active" id="mi-perfil-tab" data-bs-toggle="tab" data-bs-target="#mi-perfil" type="button" role="tab" aria-controls="mi-perfil" aria-selected="true">Mi Perfil</button>
     </li>
     <li class="nav-item" role="presentation">
         <button class="nav-link" id="estadisticas-tab" data-bs-toggle="tab" data-bs-target="#estadisticas" type="button" role="tab" aria-controls="estadisticas" aria-selected="false">Estadísticas y Resumen</button>
-    </li>
-    <li class="nav-item" role="presentation">
-        <button class="nav-link" id="seguridad-tab" data-bs-toggle="tab" data-bs-target="#seguridad" type="button" role="tab" aria-controls="seguridad" aria-selected="false">Seguridad y Privacidad</button>
     </li>
     <li class="nav-item" role="presentation">
         <button class="nav-link" id="soporte-tab" data-bs-toggle="tab" data-bs-target="#soporte" type="button" role="tab" aria-controls="soporte" aria-selected="false">Soporte y Ayuda</button>
@@ -43,38 +54,92 @@
     <div class="tab-pane fade show active" id="mi-perfil" role="tabpanel" aria-labelledby="mi-perfil-tab">
         <div class="row mt-3">
             <div class="col-md-6">
-                <div class="card">
+                <!-- Datos Personales -->
+                <div class="card mb-4">
                     <div class="card-header bg-light">
                         <h5 class="mb-0">Datos Personales</h5>
                     </div>
                     <div class="card-body">
                         <form method="post">
                             {% csrf_token %}
+                            <input type="hidden" name="datos_personales" value="1">
                             <div class="mb-3">
                                 <label for="username" class="form-label">Nombre de usuario</label>
                                 <input type="text" class="form-control" id="username" value="{{ request.user.username }}" readonly>
                             </div>
                             <div class="mb-3">
-                                <label for="email" class="form-label">Correo electrónico</label>
-                                {{ correo_form.email }}
-                                {% if correo_form.email.errors %}
-                                    <div class="invalid-feedback d-block">{{ correo_form.email.errors }}</div>
-                                {% endif %}
-                            </div>
-                            <div class="mb-3">
                                 <label for="first_name" class="form-label">Nombre</label>
                                 <input type="text" class="form-control" name="first_name" id="first_name" value="{{ request.user.first_name }}">
+                                {% if datos_personales_form.first_name.errors %}
+                                    <div class="invalid-feedback d-block">{{ datos_personales_form.first_name.errors }}</div>
+                                {% endif %}
                             </div>
                             <div class="mb-3">
                                 <label for="last_name" class="form-label">Apellidos</label>
                                 <input type="text" class="form-control" name="last_name" id="last_name" value="{{ request.user.last_name }}">
+                                {% if datos_personales_form.last_name.errors %}
+                                    <div class="invalid-feedback d-block">{{ datos_personales_form.last_name.errors }}</div>
+                                {% endif %}
                             </div>
-                            <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                            <button type="submit" class="btn btn-primary">Guardar datos personales</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Cambio de Contraseña (movido de la pestaña de seguridad) -->
+                <div class="card">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Cambio de Contraseña</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="cambiar_password" value="1">
+                            <div class="mb-3">
+                                <label for="current_password" class="form-label">Contraseña actual</label>
+                                <input type="password" 
+                                    class="form-control {% if password_form.current_password.errors %}is-invalid{% endif %}" 
+                                    id="current_password" 
+                                    name="current_password">
+                                {% if password_form.current_password.errors %}
+                                    <div class="invalid-feedback d-block">{{ password_form.current_password.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="mb-3">
+                                <label for="new_password" class="form-label">Nueva contraseña</label>
+                                <input type="password" 
+                                    class="form-control {% if password_form.new_password.errors %}is-invalid{% endif %}" 
+                                    id="new_password" 
+                                    name="new_password">
+                                {% if password_form.new_password.errors %}
+                                    <div class="invalid-feedback d-block">{{ password_form.new_password.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="mb-3">
+                                <label for="confirm_password" class="form-label">Confirmar nueva contraseña</label>
+                                <input type="password" 
+                                    class="form-control {% if password_form.confirm_password.errors %}is-invalid{% endif %}" 
+                                    id="confirm_password" 
+                                    name="confirm_password">
+                                {% if password_form.confirm_password.errors %}
+                                    <div class="invalid-feedback d-block">{{ password_form.confirm_password.errors }}</div>
+                                {% endif %}
+                            </div>
+                            {% if password_form.non_field_errors %}
+                                <div class="alert alert-danger">
+                                    {% for error in password_form.non_field_errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <button type="submit" class="btn btn-primary">Cambiar contraseña</button>
                         </form>
                     </div>
                 </div>
             </div>
+
             <div class="col-md-6">
+                <!-- Información Adicional -->
                 <div class="card mb-4">
                     <div class="card-header bg-light">
                         <h5 class="mb-0">Información Adicional</h5>
@@ -82,28 +147,45 @@
                     <div class="card-body">
                         <form method="post">
                             {% csrf_token %}
+                            <input type="hidden" name="info_adicional" value="1">
                             <div class="mb-3">
                                 <label for="direccion" class="form-label">Dirección</label>
-                                {{ perfil_form.direccion }}
+                                <input type="text" 
+                                    class="form-control" 
+                                    name="direccion" 
+                                    id="direccion" 
+                                    value="{{ user.perfilusuario.direccion|default:'' }}">
                                 {% if perfil_form.direccion.errors %}
                                     <div class="invalid-feedback d-block">{{ perfil_form.direccion.errors }}</div>
                                 {% endif %}
                             </div>
                             <div class="mb-3">
                                 <label for="telefono" class="form-label">Teléfono</label>
-                                {{ perfil_form.telefono }}
+                                <input type="tel" 
+                                    class="form-control" 
+                                    name="telefono" 
+                                    id="telefono" 
+                                    value="{{ user.perfilusuario.telefono|default:'' }}"
+                                    pattern="[0-9]{9}" 
+                                    maxlength="9"
+                                    minlength="9"
+                                    oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                                 {% if perfil_form.telefono.errors %}
                                     <div class="invalid-feedback d-block">{{ perfil_form.telefono.errors }}</div>
                                 {% endif %}
                             </div>
                             <div class="mb-3">
                                 <label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento</label>
-                                {{ perfil_form.fecha_nacimiento }}
+                                <input type="date" 
+                                    class="form-control" 
+                                    name="fecha_nacimiento" 
+                                    id="fecha_nacimiento" 
+                                    value="{% if user.perfilusuario.fecha_nacimiento %}{{ user.perfilusuario.fecha_nacimiento|date:'Y-m-d' }}{% endif %}">
                                 {% if perfil_form.fecha_nacimiento.errors %}
                                     <div class="invalid-feedback d-block">{{ perfil_form.fecha_nacimiento.errors }}</div>
                                 {% endif %}
                             </div>
-                            <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                            <button type="submit" class="btn btn-primary">Guardar información adicional</button>
                         </form>
                     </div>
                 </div>
@@ -122,36 +204,6 @@
                     <div class="card-body">
                         <p class="text-muted">Aquí puedes ver un resumen de tus actividades y estadísticas.</p>
                         <!-- Contenido adicional de estadísticas -->
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Seguridad y Privacidad -->
-    <div class="tab-pane fade" id="seguridad" role="tabpanel" aria-labelledby="seguridad-tab">
-        <div class="row mt-3">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header bg-light">
-                        <h5 class="mb-0">Seguridad y Privacidad</h5>
-                    </div>
-                    <div class="card-body">
-                        <form>
-                            <div class="mb-3">
-                                <label for="current_password" class="form-label">Contraseña actual</label>
-                                <input type="password" class="form-control" id="current_password">
-                            </div>
-                            <div class="mb-3">
-                                <label for="new_password" class="form-label">Nueva contraseña</label>
-                                <input type="password" class="form-control" id="new_password">
-                            </div>
-                            <div class="mb-3">
-                                <label for="confirm_password" class="form-label">Confirmar nueva contraseña</label>
-                                <input type="password" class="form-control" id="confirm_password">
-                            </div>
-                            <button type="submit" class="btn btn-primary">Cambiar contraseña</button>
-                        </form>
                     </div>
                 </div>
             </div>

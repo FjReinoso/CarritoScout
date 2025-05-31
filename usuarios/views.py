@@ -3,7 +3,9 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .form import RegistroBasicoForm, RegistroOpcionalForm, PerfilUsuarioForm, PerfilUsuarioCorreoForm, DatosPersonalesForm
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.hashers import check_password
+from .form import RegistroBasicoForm, RegistroOpcionalForm, PerfilUsuarioForm, PerfilUsuarioCorreoForm, DatosPersonalesForm, CambioPasswordForm
 from .models import PerfilUsuario, UsuarioLegacy
 
 def login_view(request):
@@ -91,6 +93,33 @@ def perfil_view(request):
     user = request.user
     perfil = user.perfilusuario
     
+    # Identificamos qué formulario se está enviando comprobando los botones y procesamos el cambio de contraseña
+    if request.method == 'POST' and 'cambiar_password' in request.POST:
+        password_form = CambioPasswordForm(request.POST)
+        datos_personales_form = DatosPersonalesForm(instance=user)
+        correo_form = PerfilUsuarioCorreoForm(instance=user)
+        perfil_form = PerfilUsuarioForm(instance=perfil)
+        
+        if password_form.is_valid():
+            current_password = password_form.cleaned_data['current_password']
+            new_password = password_form.cleaned_data['new_password']
+            
+            # Verificar la contraseña actual
+            if check_password(current_password, user.password):
+                # Cambiar la contraseña
+                user.set_password(new_password)
+                user.save()
+                
+                # Actualizar la sesión para evitar cerrar sesión
+                update_session_auth_hash(request, user)
+                
+                messages.success(request, "¡Tu contraseña ha sido actualizada correctamente!")
+                return redirect('usuarios:perfil')
+            else:
+                messages.error(request, "La contraseña actual no es correcta.")
+                return redirect('usuarios:perfil')
+    else:
+        password_form = CambioPasswordForm()
     # Identificamos qué formulario se está enviando comprobando los botones
     if request.method == 'POST':
         # Comprobamos si existe el formulario personal (first_name, last_name)
@@ -154,11 +183,11 @@ def perfil_view(request):
                 return redirect('usuarios:perfil')
         
         # Si no reconocemos el formulario, asumimos que es el correo
-            else:
-                correo_form = PerfilUsuarioCorreoForm(request.POST, instance=user)
-                datos_personales_form = DatosPersonalesForm(instance=user)
-                perfil_form = PerfilUsuarioForm(instance=perfil)
-                
+        else:
+            correo_form = PerfilUsuarioCorreoForm(request.POST, instance=user)
+            datos_personales_form = DatosPersonalesForm(instance=user)
+            perfil_form = PerfilUsuarioForm(instance=perfil)
+            
             if correo_form.is_valid():
                 correo_form.save()
                 messages.success(request, "¡El correo electrónico se ha actualizado correctamente!")
@@ -174,5 +203,6 @@ def perfil_view(request):
         'datos_personales_form': datos_personales_form,
         'perfil_form': perfil_form,
         'correo_form': correo_form,
+        'password_form': password_form,
         'user': user,  # Pasamos el usuario para acceder a su información en la plantilla
     })

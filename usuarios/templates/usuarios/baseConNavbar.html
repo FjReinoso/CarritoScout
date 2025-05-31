@@ -55,8 +55,34 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
         
+        /* Estilos específicos para botones de perfil y salir */
+        .btn-icon-only {
+            width: 38px;
+            height: 38px;
+            padding: 0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-profile {
+            background-color: #F8E9A1;
+            color: #FF6A88;
+        }
+        
+        .btn-logout {
+            background-color: #F76C6C;
+            color: white;
+        }
+        
+        .btn-icon-only i {
+            font-size: 1.1rem !important;
+            margin-right: 0 !important;
+        }
+        
         .cart-icon {
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             position: relative;
         }
         
@@ -80,21 +106,33 @@
             background: none;
             border: none;
             color: #fff;
-            font-size: 1.25rem;
+            font-size: 1.1rem;
             padding: 0.5rem;
             transition: color 0.3s ease;
+            margin-right: 15px;
         }
 
         .btn-dark-mode:hover {
             color: #FF99AC;
+        }
+        
+        /* Estilo para iconos más pequeños */
+        .navbar .btn i {
+            font-size: 0.9rem;
+            margin-right: 4px;
         }
     </style>
 </head>
 <body>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg">
-        <div class="container">
-            <!-- Lado izq -->
+        <div class="container position-relative">
+            <!-- Botón de modo oscuro (ahora al extremo izquierda) -->
+            <button id="darkModeToggle" class="btn-dark-mode">
+                <i class="bi bi-moon"></i>
+            </button>
+            
+            <!-- Logo en el centro-izquierda -->
             <a class="navbar-brand me-auto" href="#">
                 <img src="{% static 'img/carrito-logo.png' %}" alt="">
                 CarritoScout
@@ -117,24 +155,24 @@
             <!-- Zona derecha -->
             <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
                 <div class="navbar-nav ms-auto">
+                    <a href="{% url 'usuarios:pagina_principal' %}" class="btn">
+                        <i class="bi bi-house-door"></i> Inicio
+                    </a>
                     <a href="#" class="btn">
                         <i class="bi bi-box"></i> Productos
                     </a>
                     <a href="#" class="btn">
                         <i class="bi bi-graph-up"></i> Análisis
                     </a>
-                    <a href="{% url 'usuarios:perfil' %}" class="btn">
-                        <i class="bi bi-person-circle"></i> Perfil
+                    <a href="{% url 'usuarios:perfil' %}" class="btn btn-icon-only btn-profile" title="Mi Perfil">
+                        <i class="bi bi-person-circle"></i>
                     </a>
                     <form action="{% url 'usuarios:logout' %}" method="post" style="display: inline;">
                         {% csrf_token %}
-                        <button type="submit" class="btn">
-                            <i class="bi bi-box-arrow-right"></i> Salir
+                        <button type="submit" class="btn btn-icon-only btn-logout" title="Cerrar Sesión">
+                            <i class="bi bi-box-arrow-right"></i>
                         </button>
                     </form>
-                    <button id="darkModeToggle" class="btn btn-dark-mode">
-                        <i class="bi bi-moon"></i>
-                    </button>
                 </div>
             </div>
         </div>
@@ -156,8 +194,31 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const darkModeToggle = document.getElementById('darkModeToggle');
+            const icon = darkModeToggle.querySelector('i');
+            
+            // Verificar si hay una preferencia guardada
+            const isDarkMode = localStorage.getItem('darkMode') === 'true';
+            
+            // Aplicar modo oscuro si estaba activo
+            if (isDarkMode) {
+                document.body.classList.add('dark-mode');
+                icon.classList.remove('bi-moon');
+                icon.classList.add('bi-sun');
+            }
+            
             darkModeToggle.addEventListener('click', function () {
                 document.body.classList.toggle('dark-mode');
+                
+                // Cambiar el icono según el modo
+                if (document.body.classList.contains('dark-mode')) {
+                    icon.classList.remove('bi-moon');
+                    icon.classList.add('bi-sun');
+                    localStorage.setItem('darkMode', 'true');
+                } else {
+                    icon.classList.remove('bi-sun');
+                    icon.classList.add('bi-moon');
+                    localStorage.setItem('darkMode', 'false');
+                }
             });
         });
     </script>
