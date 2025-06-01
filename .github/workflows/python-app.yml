@@ -55,6 +55,9 @@ jobs:
     - name: Run migrations
       env:
         DB_HOST: 127.0.0.1
+        DB_USER: root
+        DB_PASSWORD: root_password
+        DB_NAME: carrito_db
       run: |
         python manage.py makemigrations
         python manage.py migrate
@@ -62,5 +65,8 @@ jobs:
     - name: Run tests
       env:
         DB_HOST: 127.0.0.1
+        DB_USER: root
+        DB_PASSWORD: root_password
+        DB_NAME: carrito_db
       run: |
         python manage.py test --noinput
