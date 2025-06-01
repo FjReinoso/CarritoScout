@@ -205,8 +205,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('precio_max').value = '';
         document.getElementById('order_by').selectedIndex = 0;
     });
-    
-    // Manejador de clic en el botón de búsqueda
+      // Manejador de clic en el botón de búsqueda
     document.getElementById('search-btn').addEventListener('click', function() {
         document.getElementById('filter-form').submit();
         closeSidebar(); // Cerrar sidebar después de buscar
@@ -214,12 +213,24 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Inicializar filtros existentes
     initializeFilters();
-    
-    // ===============================
-    // SCROLL INFINITO Y CARGA DE PRODUCTOS
+      // ===============================
+    // BOTÓN "CARGAR MÁS" PRODUCTOS
     // ===============================
     let loading = false;
-    let scrollDebounceTimer;
+    
+    // Función para actualizar la información de paginación
+    const updatePaginationInfo = function(data) {
+        const paginationInfo = document.querySelector('.pagination-info');
+        if (paginationInfo && data.total_products) {
+            const currentProductsCount = document.querySelectorAll('#productos-container .col').length;
+            const pageInfo = data.total_pages > 1 ? ` (Página ${data.current_page} de ${data.total_pages})` : '';
+            paginationInfo.innerHTML = `
+                <small>
+                    Mostrando ${currentProductsCount} de ${data.total_products} productos${pageInfo}
+                </small>
+            `;
+        }
+    };
     
     const loadMoreProducts = function() {
         // Si ya estamos cargando o no hay más productos, no hacer nada
@@ -244,7 +255,16 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Mostrar indicador de carga
         loading = true;
-        document.getElementById('loading-indicator').style.display = 'block';
+        const loadMoreBtn = document.getElementById('load-more-btn');
+        const loadingIndicator = document.getElementById('loading-indicator');
+        
+        if (loadMoreBtn) {
+            loadMoreBtn.disabled = true;
+            loadMoreBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Cargando...';
+        }
+        if (loadingIndicator) {
+            loadingIndicator.style.display = 'block';
+        }
         
         // Realizar la petición
         fetch(url, {
@@ -258,14 +278,44 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             return response.json();
         })
-        .then(data => {
-            if (data && data.html) {
+        .then(data => {            if (data && data.html) {                
+                // Crear un elemento temporal para parsear el HTML
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = data.html;
+                
+                // Agregar clase de animación a los nuevos productos
+                const newProducts = tempDiv.querySelectorAll('.col');
+                newProducts.forEach(product => {
+                    const productCard = product.querySelector('.product-card');
+                    if (productCard) {
+                        productCard.classList.add('newly-loaded');
+                    }
+                });
+                
                 // Agregar los nuevos productos al contenedor
-                document.getElementById('productos-container').insertAdjacentHTML('beforeend', data.html);
+                document.getElementById('productos-container').insertAdjacentHTML('beforeend', tempDiv.innerHTML);
                 
                 // Actualizar el estado de paginación
                 document.getElementById('current-page').value = nextPage;
                 document.getElementById('has-more').value = data.has_next;
+                
+                // Actualizar información de paginación
+                updatePaginationInfo(data);
+                
+                // Actualizar el botón "Cargar Más"
+                if (loadMoreBtn) {
+                    if (data.has_next) {
+                        loadMoreBtn.disabled = false;
+                        loadMoreBtn.innerHTML = '<i class="fas fa-plus me-2"></i>Cargar Más Productos';
+                    } else {
+                        loadMoreBtn.style.display = 'none';
+                        // Mostrar mensaje de "No hay más productos"
+                        const noMoreMsg = document.createElement('div');
+                        noMoreMsg.className = 'all-products-loaded';
+                        noMoreMsg.innerHTML = '<i class="fas fa-check-circle"></i>Todos los productos han sido cargados';
+                        loadMoreBtn.parentElement.appendChild(noMoreMsg);
+                    }
+                }
                 
                 // Verificar si hay productos en la respuesta
                 if (!data.html.trim()) {
@@ -284,39 +334,30 @@ document.addEventListener('DOMContentLoaded', function() {
             container.insertAdjacentHTML('beforeend', 
                 `<div class="col-12 text-center mt-3">
                     <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
                         Error al cargar más productos. Por favor, intenta recargar la página.
                     </div>
                 </div>`
             );
+            
+            // Restaurar botón en caso de error
+            if (loadMoreBtn) {
+                loadMoreBtn.disabled = false;
+                loadMoreBtn.innerHTML = '<i class="fas fa-redo me-2"></i>Reintentar';
+            }
         })
         .finally(() => {
             // Siempre ocultar el indicador de carga y restablecer el estado
             loading = false;
-            document.getElementById('loading-indicator').style.display = 'none';
+            if (loadingIndicator) {
+                loadingIndicator.style.display = 'none';
+            }
         });
     };
     
-    // Mejorar el manejo del evento de scroll con debounce
-    const handleScroll = function() {
-        clearTimeout(scrollDebounceTimer);
-        scrollDebounceTimer = setTimeout(() => {
-            // Comprobar si estamos cerca del final de la página
-            const scrollPosition = window.scrollY + window.innerHeight;
-            const pageHeight = document.documentElement.scrollHeight;
-            
-            // Si estamos a 500px o menos del final, cargar más productos
-            if (pageHeight - scrollPosition <= 500) {
-                loadMoreProducts();
-            }
-        }, 100); // 100ms de debounce
-    };
-    
-    window.addEventListener('scroll', handleScroll);
-    
-    // Cargar productos inicialmente si hay pocos en la página
-    setTimeout(() => {
-        if (document.documentElement.scrollHeight <= window.innerHeight) {
-            loadMoreProducts();
-        }
-    }, 500);
+    // Agregar event listener al botón "Cargar Más" si existe
+    const loadMoreBtn = document.getElementById('load-more-btn');
+    if (loadMoreBtn) {
+        loadMoreBtn.addEventListener('click', loadMoreProducts);
+    }
 });
