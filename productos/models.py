@@ -27,6 +27,31 @@ class Producto(models.Model):
         
     def __str__(self):
         return self.nombre
+    
+    @property
+    def precio_minimo(self):
+        """Retorna el precio mínimo de este producto"""
+        precio_min = self.precios.aggregate(models.Min('precio'))['precio__min']
+        return precio_min
+    
+    @property
+    def precio_maximo(self):
+        """Retorna el precio máximo de este producto"""
+        precio_max = self.precios.aggregate(models.Max('precio'))['precio__max']
+        return precio_max
+    
+    @property
+    def rango_precios(self):
+        """Retorna un string con el rango de precios"""
+        min_precio = self.precio_minimo
+        max_precio = self.precio_maximo
+        
+        if min_precio is None:
+            return "Precio no disponible"
+        elif min_precio == max_precio:
+            return f"€{min_precio}"
+        else:
+            return f"€{min_precio} - €{max_precio}"
 
 class Precio(models.Model):
     id_precio = models.AutoField(primary_key=True)

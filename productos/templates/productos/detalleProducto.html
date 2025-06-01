@@ -1,130 +1,271 @@
-{% extends 'base.html' %}
+{% extends 'usuarios/baseConNavbar.html' %}
 {% load static %}
 
 {% block title %}{{ producto.nombre }} | CarritoScout{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/baseProducto.css' %}">
+<link rel="stylesheet" href="{% static 'css/detalleProducto.css' %}">
+<!-- Font Awesome para iconos -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% endblock %}
+
 {% block content %}
-<div class="container py-4">
-    <nav aria-label="breadcrumb" class="mb-4">
+<div class="container-fluid py-4">
+    <!-- Mapa (breadcrumb) -->
+    <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{% url 'home' %}">Inicio</a></li>
-            <li class="breadcrumb-item"><a href="{% url 'productos:producto_list' %}">Productos</a></li>
+            <li class="breadcrumb-item">
+                <a href="{% url 'usuarios:pagina_principal' %}">
+                    <i class="fas fa-home me-1"></i>Inicio
+                </a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{% url 'productos:producto_list' %}">
+                    <i class="fas fa-shopping-basket me-1"></i>Productos
+                </a>
+            </li>
             {% if producto.categoria %}
-            <li class="breadcrumb-item"><a href="{% url 'productos:producto_list' %}?categoria={{ producto.categoria|urlencode }}">{{ producto.categoria|title }}</a></li>
+            <li class="breadcrumb-item">
+                <a href="{% url 'productos:producto_list' %}?categorias={{ producto.categoria|urlencode }}">
+                    <i class="fas fa-tags me-1"></i>{{ producto.categoria|title }}
+                </a>
+            </li>
             {% endif %}
-            <li class="breadcrumb-item active">{{ producto.nombre }}</li>
+            <li class="breadcrumb-item active" aria-current="page">{{ producto.nombre }}</li>
         </ol>
     </nav>
 
-    <div class="card shadow-sm">
-        <div class="card-body">
-            <div class="row">
-                <!-- Product image -->
-                <div class="col-lg-4 mb-4 mb-lg-0 text-center">
-                    {% if producto.imagen %}
-                    <img src="{{ producto.imagen.url }}" class="img-fluid rounded product-detail-img" alt="{{ producto.nombre }}">
-                    {% else %}
-                    <img src="{% static 'img/producto-default.png' %}" class="img-fluid rounded product-detail-img" alt="{{ producto.nombre }}">
-                    {% endif %}
-                </div>
-                
-                <!-- Product details -->
-                <div class="col-lg-8">
-                    <h1 class="mb-3">{{ producto.nombre }}</h1>
-                    
-                    {% if producto.categoria %}
-                    <p class="badge bg-secondary mb-3">{{ producto.categoria|title }}</p>
-                    {% endif %}
-                    
-                    {% if producto.descripcion %}
-                    <div class="mb-4">
-                        <h5>Descripción</h5>
-                        <p>{{ producto.descripcion }}</p>
-                    </div>
-                    {% endif %}
-                    
-                    {% if producto.unidad_medida %}
-                    <p><strong>Unidad de medida:</strong> {{ producto.unidad_medida }}</p>
-                    {% endif %}
-                    
-                    <!-- Price comparison section -->
-                    <div class="mt-4">
-                        <h4 class="mb-3">Comparativa de precios</h4>
-                        <div class="table-responsive">
-                            <table class="table table-striped">
-                                <thead class="table-primary">
-                                    <tr>
-                                        <th>Supermercado</th>
-                                        <th>Precio</th>
-                                        <th>Actualizado</th>
-                                        <th>Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for precio in precios|dictsort:"precio" %}
-                                    <tr {% if forloop.first %}class="table-success"{% endif %}>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                {% if precio.id_supermercado.logo %}
-                                                <img src="{{ precio.id_supermercado.logo.url }}" class="supermarket-logo me-2" alt="{{ precio.id_supermercado.nombre }}">
+    <!-- Sección principal del producto -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card product-main-card">
+                <div class="card-body p-0">
+                    <div class="row g-0">
+                        <!-- Imagen del producto -->
+                        <div class="col-lg-4">
+                            <div class="product-image-container h-100 d-flex align-items-center">
+                                {% if producto.imagen %}
+                                <img src="{{ producto.imagen.url }}" 
+                                     class="img-fluid product-detail-img w-100" 
+                                     alt="{{ producto.nombre }}">
+                                {% else %}
+                                <img src="{% static 'img/producto-default.png' %}" 
+                                     class="img-fluid product-detail-img w-100" 
+                                     alt="{{ producto.nombre }}">
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Detalles del producto -->
+                        <div class="col-lg-8">
+                            <div class="product-details-section">
+                                <h1 class="product-title-main">{{ producto.nombre }}</h1>
+                                
+                                {% if producto.categoria %}
+                                <span class="badge product-category-badge mb-3">
+                                    <i class="fas fa-tag me-1"></i>{{ producto.categoria|title }}
+                                </span>
+                                {% endif %}
+                                
+                                <!-- Resumen de precios -->
+                                <div class="row mb-3">
+                                    <div class="col-md-6 mb-3">
+                                        <div class="card price-summary-card">
+                                            <div class="card-body text-center py-3">
+                                                <h5 class="card-title">
+                                                    <i class="fas fa-euro-sign me-1"></i>Rango de Precios
+                                                </h5>
+                                                {% if producto.precio_minimo %}
+                                                <h3>{{ producto.rango_precios }}</h3>
+                                                {% else %}
+                                                <p class="text-muted mb-0">Precio no disponible</p>
                                                 {% endif %}
-                                                {{ precio.id_supermercado.nombre }}
                                             </div>
-                                        </td>
-                                        <td class="fw-bold">${{ precio.precio }}</td>
-                                        <td>{{ precio.fecha_actualizacion|date:"d/m/Y" }}</td>
-                                        <td>
-                                            <button class="btn btn-sm btn-primary add-to-cart-btn" 
-                                                    data-producto-id="{{ producto.id_producto }}"
-                                                    data-supermercado-id="{{ precio.id_supermercado.id_supermercado }}"
-                                                    data-precio="{{ precio.precio }}">
-                                                <i class="fas fa-cart-plus"></i> Agregar
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    {% empty %}
-                                    <tr>
-                                        <td colspan="4" class="text-center">No hay información de precios disponible para este producto</td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <div class="card availability-card">
+                                            <div class="card-body text-center py-3">
+                                                <h5 class="card-title">
+                                                    <i class="fas fa-store me-1"></i>Disponible en
+                                                </h5>
+                                                <h3>{{ precios.count }} supermercado{{ precios.count|pluralize }}</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                {% if producto.descripcion %}
+                                <div class="description-section">
+                                    <h5><i class="fas fa-info-circle me-1"></i>Descripción</h5>
+                                    <p>{{ producto.descripcion }}</p>
+                                </div>
+                                {% endif %}
+                                
+                                {% if producto.unidad_medida %}
+                                <div class="unit-measure-section">
+                                    <strong><i class="fas fa-balance-scale me-1"></i>Unidad de medida:</strong> 
+                                    <span class="badge bg-secondary ms-1">{{ producto.unidad_medida }}</span>
+                                </div>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    
-    <!-- Related products -->
-    <div class="mt-5">
-        <h3 class="mb-3">Productos relacionados</h3>
-        <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
-            <!-- This would be populated with products of the same category -->
-            <!-- You could add a view method to fetch related products -->
+
+    <!-- Sección de comparativa de precios -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card price-comparison-card">
+                <div class="card-header price-comparison-header">
+                    <h4><i class="fas fa-chart-line me-2"></i>Comparativa de Precios</h4>
+                    <small>Encuentra el mejor precio para este producto</small>
+                </div>
+                <div class="card-body p-0">
+                    {% if precios %}
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th><i class="fas fa-store me-1"></i>Supermercado</th>
+                                    <th><i class="fas fa-euro-sign me-1"></i>Precio</th>
+                                    <th><i class="fas fa-calendar-alt me-1"></i>Actualizado</th>
+                                    <th class="text-center"><i class="fas fa-shopping-cart me-1"></i>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for precio in precios %}
+                                <tr {% if forloop.first %}class="price-best"{% endif %}>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            {% if precio.id_supermercado.logo %}
+                                            <img src="{{ precio.id_supermercado.logo.url }}" 
+                                                 class="supermarket-logo me-2" 
+                                                 alt="{{ precio.id_supermercado.nombre }}">
+                                            {% else %}
+                                            <i class="fas fa-shopping-cart me-2"></i>
+                                            {% endif %}
+                                            <div>
+                                                <span class="fw-bold">{{ precio.id_supermercado.nombre }}</span>
+                                                {% if forloop.first %}
+                                                <br><span class="badge bg-success">Mejor Precio</span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="fw-bold">€{{ precio.precio }}</span>
+                                    </td>
+                                    <td class="text-muted">
+                                        <small>
+                                            <i class="fas fa-clock me-1"></i>
+                                            {{ precio.fecha_actualizacion|date:"d/m/Y" }}
+                                        </small>
+                                    </td>
+                                    <td class="text-center">
+                                        <button class="btn btn-success btn-sm add-to-cart-btn" 
+                                                data-product-id="{{ producto.id_producto }}"
+                                                data-product-name="{{ producto.nombre }}"
+                                                data-supermercado-id="{{ precio.id_supermercado.id_supermercado }}"
+                                                data-precio="{{ precio.precio }}">
+                                            <i class="fas fa-cart-plus me-1"></i>Añadir
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-exclamation-triangle text-warning mb-3" style="font-size: 3rem;"></i>
+                        <h5>No hay información de precios disponible</h5>
+                        <p class="text-muted">Este producto aún no tiene precios registrados.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
         </div>
     </div>
+
+    <!-- Sección de productos relacionados -->
+    {% if productos_relacionados %}
+    <div class="row">
+        <div class="col-12">
+            <div class="related-products">
+                <h3>
+                    <i class="fas fa-layer-group me-2"></i>Productos Relacionados
+                    <small class="d-block mt-1">Categoría: {{ producto.categoria|title }}</small>
+                </h3>
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-3">
+                    {% for producto_relacionado in productos_relacionados %}
+                    <div class="col">
+                        <div class="card h-100 product-card">
+                            <!-- Imagen del producto relacionado -->
+                            <div class="p-3 text-center">
+                                {% if producto_relacionado.imagen %}
+                                <img src="{{ producto_relacionado.imagen.url }}" 
+                                     class="card-img-top" 
+                                     alt="{{ producto_relacionado.nombre }}"
+                                     style="height: 120px; object-fit: contain;">
+                                {% else %}
+                                <img src="{% static 'img/producto-default.png' %}" 
+                                     class="card-img-top" 
+                                     alt="{{ producto_relacionado.nombre }}"
+                                     style="height: 120px; object-fit: contain;">
+                                {% endif %}
+                            </div>
+                            
+                            <div class="card-body pt-0">
+                                <h6 class="card-title">{{ producto_relacionado.nombre }}</h6>
+                                
+                                <!-- Rango de precios -->
+                                {% if producto_relacionado.precio_minimo %}
+                                <p class="price-range mb-2">
+                                    <span>{{ producto_relacionado.rango_precios }}</span>
+                                </p>
+                                {% else %}
+                                <p class="text-muted small mb-2">Precio no disponible</p>
+                                {% endif %}
+                                
+                                <!-- Badges de supermercados -->
+                                <div class="supermarket-badges mb-3">
+                                    {% for precio in producto_relacionado.precios.all|slice:":2" %}
+                                    <span class="badge bg-light me-1 mb-1">{{ precio.id_supermercado.nombre }}</span>
+                                    {% endfor %}
+                                    {% if producto_relacionado.precios.all.count > 2 %}
+                                    <span class="badge bg-secondary">+{{ producto_relacionado.precios.all.count|add:"-2" }}</span>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="d-grid gap-2">
+                                    <a href="{% url 'productos:producto_detail' producto_relacionado.id_producto %}" 
+                                       class="btn btn-outline-primary btn-sm">
+                                        <i class="fas fa-info-circle me-1"></i>Ver Detalles
+                                    </a>
+                                    <button type="button" 
+                                            class="btn btn-success btn-sm add-to-cart-btn" 
+                                            data-product-id="{{ producto_relacionado.id_producto }}"
+                                            data-product-name="{{ producto_relacionado.nombre }}">
+                                        <i class="fas fa-cart-plus me-1"></i>Añadir
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}
 
 {% block extra_js %}
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Add to cart functionality
-        const addToCartButtons = document.querySelectorAll('.add-to-cart-btn');
-        addToCartButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                const productoId = this.getAttribute('data-producto-id');
-                const supermercadoId = this.getAttribute('data-supermercado-id');
-                const precio = this.getAttribute('data-precio');
-                
-                // You would implement your cart functionality here
-                // For example, using fetch to call an API endpoint
-                
-                // Show success message
-                alert('Producto agregado al carrito!');
-            });
-        });
-    });
-</script>
+<script src="{% static 'js/detalleProducto.js' %}"></script>
 {% endblock %}

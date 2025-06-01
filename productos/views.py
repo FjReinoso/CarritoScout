@@ -1,5 +1,5 @@
 # productos/views.py
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
 from django.template.loader import render_to_string
 from django.db.models import Min, Max
@@ -83,7 +83,7 @@ def producto_list(request):
         precio_global_min, precio_global_max = 0, 100
     
     # Configurar paginación
-    items_per_page = 12
+    items_per_page = 15
     paginator = Paginator(productos, items_per_page)
     page = request.GET.get('page', 1)
     
@@ -136,12 +136,20 @@ def producto_list(request):
     return render(request, 'productos/index.html', context)
 
 def producto_detail(request, producto_id):
-    producto = Producto.objects.get(id_producto=producto_id)
-    precios = Precio.objects.filter(id_producto=producto_id).select_related('id_supermercado')
+    producto = get_object_or_404(Producto, id_producto=producto_id)
+    precios = Precio.objects.filter(id_producto=producto).select_related('id_supermercado').order_by('precio')
+    
+    # Productos relacionados de la misma categoría
+    productos_relacionados = Producto.objects.filter(
+        categoria=producto.categoria
+    ).exclude(
+        id_producto=producto.id_producto
+    ).prefetch_related('precios__id_supermercado')[:8]  # Limitar a 8 productos
     
     context = {
         'producto': producto,
         'precios': precios,
+        'productos_relacionados': productos_relacionados,
     }
     
     return render(request, 'productos/detalleProducto.html', context)

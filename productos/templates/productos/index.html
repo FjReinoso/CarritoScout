@@ -47,7 +47,7 @@
             
             <!-- Contenedor acordeón de filtros -->
             <div class="accordion mb-3" id="filterAccordion">
-                <!-- Filtro de Supermercados -->
+                <!-- Filtro de Supermercados (ESTÁTICO) -->
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="headingSupermercados">
                         <button class="accordion-button" type="button" data-bs-toggle="collapse" 
@@ -60,25 +60,95 @@
                          aria-labelledby="headingSupermercados" data-bs-parent="#filterAccordion">
                         <div class="accordion-body">
                             <div class="row row-cols-2 g-2">
-                                {% for supermercado in supermercados %}
+                                <!-- Mercadona -->
                                 <div class="col">
                                     <div class="card filter-card supermarket-filter h-100 text-center p-2" 
-                                         data-id="{{ supermercado.id_supermercado }}" 
-                                         data-name="{{ supermercado.nombre }}">
+                                         data-name="Mercadona">
                                         <div class="filter-indicator"></div>
-                                        <img src="{% static 'img/supermarkets/'|add:supermercado.nombre|lower|cut:' '|add:'.png' %}" 
-                                             alt="{{ supermercado.nombre }}" 
-                                             class="filter-icon mx-auto">
-                                        <h6 class="card-title mb-0">{{ supermercado.nombre }}</h6>
+                                        <img src="{% static 'img/supermercados/mercadona.png' %}" 
+                                             alt="Mercadona" 
+                                             class="filter-icon mx-auto"
+                                             onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                        <i class="fas fa-shopping-cart filter-icon mx-auto" style="display: none; font-size: 2rem; color: #28a745;"></i>
+                                        <h6 class="card-title mb-0">Mercadona</h6>
                                     </div>
                                 </div>
-                                {% endfor %}
+                                
+                                <!-- Dia -->
+                                <div class="col">
+                                    <div class="card filter-card supermarket-filter h-100 text-center p-2" 
+                                         data-name="Dia">
+                                        <div class="filter-indicator"></div>
+                                        <img src="{% static 'img/supermercados/dia.png' %}" 
+                                             alt="Dia" 
+                                             class="filter-icon mx-auto"
+                                             onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                        <i class="fas fa-shopping-cart filter-icon mx-auto" style="display: none; font-size: 2rem; color: #dc3545;"></i>
+                                        <h6 class="card-title mb-0">Dia</h6>
+                                    </div>
+                                </div>
+                                
+                                <!-- Lidl -->
+                                <div class="col">
+                                    <div class="card filter-card supermarket-filter h-100 text-center p-2" 
+                                         data-name="Lidl">
+                                        <div class="filter-indicator"></div>
+                                        <img src="{% static 'img/supermercados/lidl.png' %}" 
+                                             alt="Lidl" 
+                                             class="filter-icon mx-auto"
+                                             onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                        <i class="fas fa-shopping-cart filter-icon mx-auto" style="display: none; font-size: 2rem; color: #0066cc;"></i>
+                                        <h6 class="card-title mb-0">Lidl</h6>
+                                    </div>
+                                </div>
+                                
+                                <!-- Alcampo -->
+                                <div class="col">
+                                    <div class="card filter-card supermarket-filter h-100 text-center p-2" 
+                                         data-name="Alcampo">
+                                        <div class="filter-indicator"></div>
+                                        <img src="{% static 'img/supermercados/alcampo.jpg' %}" 
+                                             alt="Alcampo" 
+                                             class="filter-icon mx-auto"
+                                             onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                        <i class="fas fa-shopping-cart filter-icon mx-auto" style="display: none; font-size: 2rem; color: #ff6600;"></i>
+                                        <h6 class="card-title mb-0">Alcampo</h6>
+                                    </div>
+                                </div>
+                                
+                                <!-- Consum -->
+                                <div class="col">
+                                    <div class="card filter-card supermarket-filter h-100 text-center p-2" 
+                                         data-name="Consum">
+                                        <div class="filter-indicator"></div>
+                                        <img src="{% static 'img/supermercados/consum.png' %}" 
+                                             alt="Consum" 
+                                             class="filter-icon mx-auto"
+                                             onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                        <i class="fas fa-shopping-cart filter-icon mx-auto" style="display: none; font-size: 2rem; color: #ff9900;"></i>
+                                        <h6 class="card-title mb-0">Consum</h6>
+                                    </div>
+                                </div>
+                                
+                                <!-- Ahorramas -->
+                                <div class="col">
+                                    <div class="card filter-card supermarket-filter h-100 text-center p-2" 
+                                         data-name="Ahorramas">
+                                        <div class="filter-indicator"></div>
+                                        <img src="{% static 'img/supermercados/ahorramas.png' %}" 
+                                             alt="Ahorramas" 
+                                             class="filter-icon mx-auto"
+                                             onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                        <i class="fas fa-shopping-cart filter-icon mx-auto" style="display: none; font-size: 2rem; color: #006633;"></i>
+                                        <h6 class="card-title mb-0">Ahorramas</h6>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Filtro de Categorías -->
+                <!-- Filtro de Categorías (ESTÁTICO) -->
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="headingCategorias">
                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
@@ -90,17 +160,105 @@
                     <div id="collapseCategorias" class="accordion-collapse collapse" 
                          aria-labelledby="headingCategorias" data-bs-parent="#filterAccordion">
                         <div class="accordion-body">
-                            <div class="row row-cols-2 g-2">
-                                {% for categoria in categorias %}
+                            <div class="row row-cols-1 g-2">
+                                <!-- Alimentación fresca -->
                                 <div class="col">
                                     <div class="card filter-card category-filter h-100 text-center p-2" 
-                                         data-category="{{ categoria }}">
+                                         data-category="Alimentación fresca">
                                         <div class="filter-indicator"></div>
-                                        <i class="fas fa-tag filter-icon mx-auto"></i>
-                                        <h6 class="card-title mb-0">{{ categoria|title }}</h6>
+                                        <i class="fas fa-apple-alt filter-icon mx-auto" style="font-size: 2rem; color: #28a745;"></i>
+                                        <h6 class="card-title mb-0">Alimentación fresca</h6>
+                                        <small class="text-muted">Frutas, verduras, carnes, pescados</small>
                                     </div>
                                 </div>
-                                {% endfor %}
+                                
+                                <!-- Alimentación seca y no perecedera -->
+                                <div class="col">
+                                    <div class="card filter-card category-filter h-100 text-center p-2" 
+                                         data-category="Alimentación seca y no perecedera">
+                                        <div class="filter-indicator"></div>
+                                        <i class="fas fa-box filter-icon mx-auto" style="font-size: 2rem; color: #8B4513;"></i>
+                                        <h6 class="card-title mb-0">Alimentación seca</h6>
+                                        <small class="text-muted">Arroces, pastas, legumbres, conservas</small>
+                                    </div>
+                                </div>
+                                
+                                <!-- Congelados -->
+                                <div class="col">
+                                    <div class="card filter-card category-filter h-100 text-center p-2" 
+                                         data-category="Congelados">
+                                        <div class="filter-indicator"></div>
+                                        <i class="fas fa-snowflake filter-icon mx-auto" style="font-size: 2rem; color: #17a2b8;"></i>
+                                        <h6 class="card-title mb-0">Congelados</h6>
+                                        <small class="text-muted">Verduras, carnes, platos preparados</small>
+                                    </div>
+                                </div>
+                                
+                                <!-- Dulces y aperitivos -->
+                                <div class="col">
+                                    <div class="card filter-card category-filter h-100 text-center p-2" 
+                                         data-category="Dulces y aperitivos">
+                                        <div class="filter-indicator"></div>
+                                        <i class="fas fa-candy-cane filter-icon mx-auto" style="font-size: 2rem; color: #e83e8c;"></i>
+                                        <h6 class="card-title mb-0">Dulces y aperitivos</h6>
+                                        <small class="text-muted">Chocolates, galletas, snacks</small>
+                                    </div>
+                                </div>
+                                
+                                <!-- Bebidas -->
+                                <div class="col">
+                                    <div class="card filter-card category-filter h-100 text-center p-2" 
+                                         data-category="Bebidas">
+                                        <div class="filter-indicator"></div>
+                                        <i class="fas fa-glass-whiskey filter-icon mx-auto" style="font-size: 2rem; color: #007bff;"></i>
+                                        <h6 class="card-title mb-0">Bebidas</h6>
+                                        <small class="text-muted">Agua, refrescos, zumos, cervezas</small>
+                                    </div>
+                                </div>
+                                
+                                <!-- Higiene personal y salud -->
+                                <div class="col">
+                                    <div class="card filter-card category-filter h-100 text-center p-2" 
+                                         data-category="Higiene personal y salud">
+                                        <div class="filter-indicator"></div>
+                                        <i class="fas fa-heart filter-icon mx-auto" style="font-size: 2rem; color: #dc3545;"></i>
+                                        <h6 class="card-title mb-0">Higiene y salud</h6>
+                                        <small class="text-muted">Gel, champú, medicamentos</small>
+                                    </div>
+                                </div>
+                                
+                                <!-- Limpieza del hogar -->
+                                <div class="col">
+                                    <div class="card filter-card category-filter h-100 text-center p-2" 
+                                         data-category="Limpieza del hogar">
+                                        <div class="filter-indicator"></div>
+                                        <i class="fas fa-broom filter-icon mx-auto" style="font-size: 2rem; color: #6c757d;"></i>
+                                        <h6 class="card-title mb-0">Limpieza del hogar</h6>
+                                        <small class="text-muted">Lejía, detergentes, multiusos</small>
+                                    </div>
+                                </div>
+                                
+                                <!-- Bebé y maternidad -->
+                                <div class="col">
+                                    <div class="card filter-card category-filter h-100 text-center p-2" 
+                                         data-category="Bebé y maternidad">
+                                        <div class="filter-indicator"></div>
+                                        <i class="fas fa-baby filter-icon mx-auto" style="font-size: 2rem; color: #ffc107;"></i>
+                                        <h6 class="card-title mb-0">Bebé y maternidad</h6>
+                                        <small class="text-muted">Pañales, comida infantil</small>
+                                    </div>
+                                </div>
+                                
+                                <!-- Mascotas -->
+                                <div class="col">
+                                    <div class="card filter-card category-filter h-100 text-center p-2" 
+                                         data-category="Mascotas">
+                                        <div class="filter-indicator"></div>
+                                        <i class="fas fa-paw filter-icon mx-auto" style="font-size: 2rem; color: #6f42c1;"></i>
+                                        <h6 class="card-title mb-0">Mascotas</h6>
+                                        <small class="text-muted">Alimentación para perros y gatos</small>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

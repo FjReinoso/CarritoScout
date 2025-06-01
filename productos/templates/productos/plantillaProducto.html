@@ -18,19 +18,13 @@
             {% endif %}
             
             <!-- Price range -->
-            {% with min_price=producto.precios.all|dictsort:"precio"|first max_price=producto.precios.all|dictsort:"-precio"|first %}
-            {% if min_price %}
+            {% if producto.precio_minimo %}
             <p class="price-range">
-                {% if min_price.precio == max_price.precio %}
-                <span class="fw-bold">${{ min_price.precio }}</span>
-                {% else %}
-                <span class="fw-bold">${{ min_price.precio }} - ${{ max_price.precio }}</span>
-                {% endif %}
+                <span class="fw-bold">{{ producto.rango_precios }}</span>
             </p>
             {% else %}
             <p class="text-muted">Precio no disponible</p>
             {% endif %}
-            {% endwith %}
             
             <!-- Available at supermarkets badges -->
             <div class="supermarket-badges mt-2">
@@ -43,8 +37,22 @@
             </div>
         </div>
         
-        <div class="card-footer bg-transparent border-top-0">
-            <a href="{% url 'productos:producto_detail' producto.id_producto %}" class="btn btn-primary w-100">Ver detalles</a>
+        <div class="card-footer bg-transparent border-top-0 p-2">
+            <div class="d-grid gap-2">
+                <!-- Botón Ver detalles -->
+                <a href="{% url 'productos:producto_detail' producto.id_producto %}" 
+                   class="btn btn-outline-primary btn-sm">
+                    <i class="fas fa-info-circle me-1"></i>Ver detalles
+                </a>
+                
+                <!-- Botón Añadir -->
+                <button type="button" 
+                        class="btn btn-success btn-sm add-to-cart-btn" 
+                        data-product-id="{{ producto.id_producto }}"
+                        data-product-name="{{ producto.nombre }}">
+                    <i class="fas fa-cart-plus me-1"></i>Añadir
+                </button>
+            </div>
         </div>
     </div>
 </div>

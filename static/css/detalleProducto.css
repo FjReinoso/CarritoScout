@@ -1,0 +1,358 @@
+/* Variables de color principales */
+:root {
+    --color-primary: #ff7675;
+    --color-primary-light: #fab1a0;
+    --color-secondary: #fd79a8;
+    --color-accent: #e17055;
+    --color-text: #2d3436;
+    --color-text-muted: #636e72;
+    --color-bg: #ffeaa7;
+    --color-bg-light: #fff5f5;
+    --color-border: #ddd6fe;
+}
+
+/* Reset de fuentes - tamaño y color uniforme */
+body {
+    color: var(--color-text);
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: var(--color-text);
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+h1 { font-size: 1.75rem; }
+h2 { font-size: 1.5rem; }
+h3 { font-size: 1.25rem; }
+h4, h5, h6 { font-size: 1rem; }
+
+/* Imagen principal del producto */
+.product-detail-img {
+    max-width: 100%;
+    max-height: 350px;
+    object-fit: contain;
+    border-radius: 8px;
+    transition: transform 0.2s ease;
+}
+
+.product-detail-img:hover {
+    transform: scale(1.02);
+}
+
+/* Logo de supermercados */
+.supermarket-logo {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    border-radius: 4px;
+}
+
+/* Fila del mejor precio */
+.price-best {
+    background-color: var(--color-bg-light) !important;
+    border-left: 3px solid var(--color-primary) !important;
+}
+
+/* Breadcrumb minimalista */
+.breadcrumb {
+    background: none;
+    padding: 0;
+    margin-bottom: 2rem;
+}
+
+.breadcrumb-item a {
+    color: var(--color-text-muted);
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.breadcrumb-item a:hover {
+    color: var(--color-primary);
+}
+
+.breadcrumb-item.active {
+    color: var(--color-text);
+    font-size: 14px;
+}
+
+/* Card principal minimalista */
+.product-main-card {
+    background: white;
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    overflow: hidden;
+}
+
+/* Contenedor de imagen */
+.product-image-container {
+    background: var(--color-bg-light);
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    border: 1px solid var(--color-border);
+}
+
+/* Sección de detalles */
+.product-details-section {
+    background: white;
+    padding: 2rem;
+}
+
+/* Título principal */
+.product-title-main {
+    color: var(--color-text);
+    font-weight: 600;
+    margin-bottom: 1rem;
+    font-size: 1.75rem;
+}
+
+/* Badge de categoría */
+.product-category-badge {
+    background: var(--color-primary);
+    border: none;
+    padding: 6px 12px;
+    border-radius: 16px;
+    font-size: 12px;
+    font-weight: 500;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Cards de resumen minimalistas */
+.price-summary-card, .availability-card {
+    background: var(--color-bg-light);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    transition: transform 0.2s ease;
+}
+
+.price-summary-card:hover, .availability-card:hover {
+    transform: translateY(-2px);
+}
+
+.price-summary-card .card-title,
+.availability-card .card-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    margin-bottom: 0.5rem;
+}
+
+.price-summary-card h3,
+.availability-card h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    margin-bottom: 0;
+}
+
+/* Secciones de información */
+.description-section, .unit-measure-section {
+    background: var(--color-bg-light);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-top: 1rem;
+}
+
+.description-section h5, .unit-measure-section strong {
+    color: var(--color-text);
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.description-section p {
+    color: var(--color-text-muted);
+    font-size: 14px;
+    margin-bottom: 0;
+}
+
+/* Card de comparativa */
+.price-comparison-card {
+    background: white;
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    overflow: hidden;
+}
+
+/* Header de comparativa */
+.price-comparison-header {
+    background: var(--color-primary);
+    border: none;
+    padding: 1.5rem;
+}
+
+.price-comparison-header h4 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    color: white;
+}
+
+.price-comparison-header small {
+    font-size: 13px;
+    opacity: 0.9;
+}
+
+/* Tabla minimalista */
+.table {
+    font-size: 14px;
+    margin-bottom: 0;
+}
+
+.table th {
+    background: var(--color-bg-light);
+    color: var(--color-text);
+    font-weight: 600;
+    font-size: 13px;
+    border-bottom: 1px solid var(--color-border);
+    padding: 1rem;
+}
+
+.table td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--color-border);
+    vertical-align: middle;
+}
+
+.table td .fw-bold {
+    font-weight: 600;
+    color: var(--color-primary);
+    font-size: 1.125rem;
+}
+
+/* Productos relacionados */
+.related-products {
+    background: var(--color-bg-light);
+    border-radius: 12px;
+    padding: 2rem;
+    border: 1px solid var(--color-border);
+}
+
+.related-products h3 {
+    color: var(--color-text);
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-size: 1.25rem;
+}
+
+.related-products small {
+    color: var(--color-text-muted);
+    font-size: 13px;
+}
+
+/* Cards de productos relacionados */
+.related-products .product-card {
+    background: white;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    transition: transform 0.2s ease;
+}
+
+.related-products .product-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--color-primary);
+}
+
+.related-products .card-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: 0.5rem;
+}
+
+.related-products .price-range span {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-primary);
+}
+
+/* Botones minimalistas */
+.btn {
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 6px;
+    padding: 8px 16px;
+    transition: all 0.2s ease;
+}
+
+.btn-outline-primary {
+    border: 1px solid var(--color-primary);
+    color: var(--color-primary);
+    background: transparent;
+}
+
+.btn-outline-primary:hover {
+    background: var(--color-primary);
+    color: white;
+    transform: translateY(-1px);
+}
+
+.btn-success {
+    background: var(--color-primary);
+    border: 1px solid var(--color-primary);
+    color: white;
+}
+
+.btn-success:hover {
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+    transform: translateY(-1px);
+}
+
+/* Badges minimalistas */
+.badge {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.badge.bg-light {
+    background: var(--color-bg-light) !important;
+    color: var(--color-text-muted) !important;
+    border: 1px solid var(--color-border);
+}
+
+.badge.bg-success {
+    background: var(--color-primary) !important;
+    color: white !important;
+}
+
+.badge.bg-secondary {
+    background: var(--color-text-muted) !important;
+    color: white !important;
+}
+
+/* Animaciones suaves */
+.product-main-card, .price-comparison-card, .related-products {
+    animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .product-title-main {
+        font-size: 1.5rem;
+    }
+    
+    .product-details-section, .price-comparison-header {
+        padding: 1.5rem;
+    }
+
+    .related-products {
+        padding: 1.5rem;
+    }
+}
