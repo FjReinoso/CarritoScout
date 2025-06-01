@@ -121,6 +121,10 @@
             font-size: 0.9rem;
             margin-right: 4px;
         }
+        body {
+            background-color: #fff5f7; /* Base actual */
+
+        }
     </style>
 </head>
 <body>
@@ -137,12 +141,11 @@
                 <img src="{% static 'img/carrito-logo.png' %}" alt="">
                 CarritoScout
             </a>
-            
-            <!-- Centro - carrito con contador -->
+              <!-- Centro - carrito con contador -->
             <div class="d-flex justify-content-center position-absolute start-50 translate-middle-x">
-                <a href="#" class="nav-link cart-icon">
+                <a href="{% url 'carrito:ver_carrito' %}" class="nav-link cart-icon">
                     <i class="bi bi-cart3"></i>
-                    <span class="cart-badge">0</span>
+                    <span class="cart-badge" id="cart-badge">{% if request.user.is_authenticated %}{{ request.user.carritos.filter.first.total_productos|default:"0" }}{% else %}0{% endif %}</span>
                 </a>
             </div>
 
@@ -220,8 +223,67 @@
                     localStorage.setItem('darkMode', 'false');
                 }
             });
-        });
+        });    </script>
+    
+    <!-- JavaScript para funciones del carrito -->
+    <script>
+        // Función para actualizar el contador del carrito
+        function updateCartBadge(count) {
+            document.getElementById('cart-badge').textContent = count;
+        }
+        
+        // Función para mostrar mensajes de notificación
+        function showNotification(message, type = 'success') {
+            // Crear elemento para notificación
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${type} notification`;
+            notification.innerHTML = message;
+            notification.style.position = 'fixed';
+            notification.style.top = '20px';
+            notification.style.right = '20px';
+            notification.style.zIndex = '1050';
+            notification.style.maxWidth = '300px';
+            notification.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
+            
+            // Añadir al DOM
+            document.body.appendChild(notification);
+            
+            // Eliminar después de 3 segundos
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transition = 'opacity 0.5s ease';
+                setTimeout(() => notification.remove(), 500);
+            }, 3000);
+        }
+        
+        // Función para añadir producto al carrito
+        function addToCart(productId, quantity = 1) {
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            
+            fetch('{% url "carrito:agregar_al_carrito" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': csrfToken
+                },
+                body: `producto_id=${productId}&cantidad=${quantity}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.status === 'success') {
+                    updateCartBadge(data.cart_count);
+                    showNotification(data.message);
+                } else {
+                    showNotification(data.message, 'danger');
+                }
+            })
+            .catch(error => {
+                showNotification('Error al añadir el producto', 'danger');
+                console.error('Error:', error);
+            });
+        }
     </script>
+    
     {% block extra_js %}{% endblock %}
 </body>
 </html>

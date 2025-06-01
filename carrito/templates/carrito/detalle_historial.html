@@ -1,0 +1,132 @@
+{% extends 'usuarios/baseConNavbar.html' %}
+{% load static %}
+
+{% block title %}Detalle de Compra - CarritoScout{% endblock %}
+
+{% block extra_css %}
+<style>
+    .history-header {
+        background: linear-gradient(90deg, #FF9A8B 0%, #FF6A88 55%, #FF99AC 100%);
+        border-radius: 8px;
+        color: white;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .history-item {
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        background-color: #fff;
+    }
+    
+    .history-item:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+    }
+    
+    .history-item .img-container {
+        width: 80px;
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .history-item img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+    
+    .btn-back {
+        border-radius: 50px;
+        padding: 8px 20px;
+    }
+    
+    .dark-mode .history-item {
+        background-color: #2a2a2a;
+        color: #f0f0f0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <a href="{% url 'carrito:historial' %}" class="btn btn-outline-primary btn-back mb-3">
+            <i class="bi bi-arrow-left"></i> Volver al Historial
+        </a>
+        
+        <div class="history-header">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h2>Compra #{{ historial.id_historial_carrito }}</h2>
+                    <p class="mb-0">Fecha: {{ historial.fecha_finalizacion|date:"d/m/Y H:i" }}</p>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <h3>Total: ${{ historial.costo_total }}</h3>
+                    <p class="mb-0">{{ items|length }} productos</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <h3 class="mb-3">Detalle de Productos</h3>
+        
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Precio Unitario</th>
+                        <th>Cantidad</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr class="history-item shadow-sm">
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="img-container me-3">
+                                    {% if item.producto.imagen %}
+                                        <img src="{{ item.producto.imagen.url }}" alt="{{ item.producto.nombre }}" class="img-fluid">
+                                    {% else %}
+                                        <img src="{% static 'img/default-product.png' %}" alt="{{ item.producto.nombre }}" class="img-fluid">
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <strong>{{ item.producto.nombre }}</strong>
+                                    <div class="text-muted small">{{ item.producto.categoria }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>${{ item.producto.precio }}</td>
+                        <td>{{ item.cantidad }}</td>
+                        <td>${{ item.subtotal }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                        <td><strong>${{ historial.costo_total }}</strong></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <a href="{% url 'carrito:historial' %}" class="btn btn-outline-primary btn-back">
+            <i class="bi bi-arrow-left"></i> Volver al Historial
+        </a>
+    </div>
+</div>
+{% endblock %}

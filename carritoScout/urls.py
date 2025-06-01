@@ -22,6 +22,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('usuarios/', include(('usuarios.urls', 'usuarios'))),  # URLs de la aplicación de usuarios
     path('productos/', include(('productos.urls', 'productos'))),  # URLs de la aplicación de productos
+    path('carrito/', include(('carrito.urls', 'carrito'))),  # URLs de la aplicación de carrito
     path('', lambda request: redirect('usuarios:login')),  # Redirige la raíz al login
     path("__reload__/", include("django_browser_reload.urls")),
 ]

@@ -1,0 +1,108 @@
+{% extends 'usuarios/baseConNavbar.html' %}
+{% load static %}
+
+{% block title %}Historial de Compras - CarritoScout{% endblock %}
+
+{% block extra_css %}
+<style>
+    .history-item {
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        background-color: #fff;
+    }
+    
+    .history-item:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+    }
+    
+    .badge-completed {
+        background: linear-gradient(90deg, #8FD3F4 0%, #84FAB0 100%);
+        color: #333;
+    }
+    
+    .empty-history {
+        text-align: center;
+        padding: 50px 0;
+    }
+    
+    .empty-history i {
+        font-size: 5rem;
+        color: #e0e0e0;
+    }
+    
+    .dark-mode .history-item {
+        background-color: #2a2a2a;
+        color: #f0f0f0;
+    }
+    
+    .btn-back {
+        border-radius: 50px;
+        padding: 8px 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h1 class="h3 mb-2">Historial de Compras</h1>
+        <p class="text-muted">Revisa tus compras anteriores y analiza tus hábitos de consumo.</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        {% if historiales %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Fecha</th>
+                            <th>Total de Productos</th>
+                            <th>Costo Total</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for historial in historiales %}
+                            <tr class="history-item shadow-sm">
+                                <td>{{ historial.id_historial_carrito }}</td>
+                                <td>{{ historial.fecha_finalizacion|date:"d/m/Y H:i" }}</td>
+                                <td>{{ historial.carrito.total_productos }}</td>
+                                <td>${{ historial.costo_total }}</td>
+                                <td>
+                                    <a href="{% url 'carrito:detalle_historial' historial.id_historial_carrito %}" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-eye"></i> Ver Detalles
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="empty-history">
+                <i class="bi bi-clock-history mb-3"></i>
+                <h2>No tienes compras previas</h2>
+                <p class="text-muted">Cuando finalices un carrito, aparecerá en tu historial.</p>
+                <a href="{% url 'carrito:ver_carrito' %}" class="btn btn-primary btn-back mt-3">
+                    <i class="bi bi-cart"></i> Ir a Mi Carrito
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+{% if historiales %}
+<div class="row mt-4">
+    <div class="col-12">
+        <a href="{% url 'carrito:ver_carrito' %}" class="btn btn-outline-primary btn-back">
+            <i class="bi bi-arrow-left"></i> Volver al Carrito
+        </a>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}

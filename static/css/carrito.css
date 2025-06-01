@@ -1,0 +1,279 @@
+/* Estilos generales para el carrito */
+.cart-item {
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    background-color: #fff;
+}
+
+.cart-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+}
+
+.cart-item .img-container {
+    width: 100px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cart-item img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.quantity-control {
+    display: flex;
+    align-items: center;
+    max-width: 110px;
+}
+
+.quantity-btn {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: #f8f8f8;
+    border-radius: 4px;
+}
+
+.quantity-input {
+    width: 50px;
+    text-align: center;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    margin: 0 5px;
+}
+
+.remove-btn {
+    border: none;
+    background: none;
+    color: #dc3545;
+    font-size: 1.2rem;
+}
+
+.cart-summary {
+    background: linear-gradient(90deg, #FF9A8B 0%, #FF6A88 55%, #FF99AC 100%);
+    border-radius: 8px;
+    color: white;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.btn-checkout {
+    background: white;
+    color: #FF6A88;
+    border: none;
+    border-radius: 50px;
+    font-weight: 500;
+    padding: 10px 24px;
+    transition: all 0.3s ease;
+}
+
+.btn-checkout:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.btn-continue-shopping {
+    border-radius: 50px;
+    padding: 8px 20px;
+}
+
+.empty-cart {
+    text-align: center;
+    padding: 50px 0;
+}
+
+.empty-cart i {
+    font-size: 5rem;
+    color: #e0e0e0;
+}
+
+/* Estilos para estadísticas */
+.statistics-card {
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    background-color: #fff;
+}
+
+.statistics-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+}
+
+.statistics-icon {
+    font-size: 2rem;
+    color: #FF6A88;
+}
+
+/* Estilos para las pestañas - MEJORADOS */
+.cart-tabs .nav-link {
+    border-radius: 8px 8px 0 0;
+    padding: 10px 20px;
+    font-weight: 500;
+    color: #FF6A88 !important; /* Color rosa-melocotón */
+    border: 1px solid #dee2e6;
+    border-bottom: none;
+    position: relative;
+    transition: all 0.3s ease;
+    text-shadow: 0 0 1px rgba(255, 106, 136, 0.3); /* Sombra sutil para mejor visibilidad */
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05); /* Sombra ligera para pestañas inactivas */
+    background-color: rgba(255, 255, 255, 0.7); /* Fondo semitransparente */
+}
+
+.cart-tabs .nav-link:hover {
+    background-color: rgba(255, 106, 136, 0.15); /* Fondo rosa pálido al hover */
+    transform: translateY(-3px);
+    box-shadow: 0 -3px 7px rgba(255, 106, 136, 0.2); /* Sombra con tono rosa al hover */
+}
+
+.cart-tabs .nav-link.active {
+    background: linear-gradient(90deg, #FF9A8B 0%, #FF6A88 55%, #FF99AC 100%);
+    color: white !important; /* Aseguramos que el texto sea blanco */
+    border: none;
+    box-shadow: 0 -4px 8px rgba(255, 106, 136, 0.4); /* Sombra más pronunciada */
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2); /* Sombra sutil para el texto */
+    transform: translateY(-2px); /* Ligera elevación */
+}
+
+.cart-tabs .nav-link i {
+    margin-right: 6px;
+    filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.2)); /* Sombra para los iconos */
+}
+
+/* Estilos para badges de usuario */
+.user-badge {
+    background-color: #f8f9fa;
+    border-radius: 50px;
+    padding: 5px 15px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.9rem;
+}
+
+.user-badge.owner {
+    background-color: #d1e7dd;
+    color: #0f5132;
+}
+
+/* Estilos para lista de carritos */
+.cart-list-item {
+    border-left: 4px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.cart-list-item:hover {
+    border-left-color: #FF6A88;
+}
+
+.cart-list-item.active {
+    border-left-color: #FF6A88;
+    background-color: #fff2f4;
+}
+
+/* Estilos para categorías */
+.category-pill {
+    font-size: 0.8rem;
+    border-radius: 20px;
+    padding: 3px 10px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    background-color: #f8f9fa;
+}
+
+/* Estilos para lista de compra */
+.shopping-list {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    padding: 20px;
+}
+
+.shopping-list-header {
+    text-align: center;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #FF6A88;
+    padding-bottom: 10px;
+}
+
+.shopping-list-section {
+    margin-bottom: 15px;
+}
+
+.shopping-list-section h4 {
+    background: linear-gradient(90deg, #FF9A8B 0%, #FF6A88 55%, #FF99AC 100%);
+    color: white;
+    padding: 5px 15px;
+    border-radius: 5px;
+    display: inline-block;
+    font-size: 1.1rem;
+}
+
+.shopping-list-item {
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+}
+
+.shopping-list-checkbox {
+    margin-right: 10px;
+}
+
+/* Modo oscuro */
+.dark-mode .cart-item {
+    background-color: #2a2a2a;
+    color: #f0f0f0;
+}
+
+.dark-mode .quantity-btn {
+    background-color: #3a3a3a;
+    color: #f0f0f0;
+}
+
+.dark-mode .quantity-input {
+    background-color: #333;
+    border-color: #555;
+    color: #f0f0f0;
+}
+
+.dark-mode .statistics-card,
+.dark-mode .cart-list-item.active {
+    background-color: #2a2a2a;
+}
+
+.dark-mode .user-badge {
+    background-color: #3a3a3a;
+    color: #f0f0f0;
+}
+
+.dark-mode .user-badge.owner {
+    background-color: #0f5132;
+    color: #d1e7dd;
+}
+
+/* Modo oscuro para pestañas - MEJORADO */
+.dark-mode .cart-tabs .nav-link {
+    color: #FF99AC;
+    border-color: #444;
+    background-color: #2a2a2a;
+    text-shadow: 0 0 2px rgba(255, 153, 172, 0.5);
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.dark-mode .cart-tabs .nav-link:hover {
+    background-color: rgba(255, 153, 172, 0.25);
+    box-shadow: 0 -3px 7px rgba(255, 106, 136, 0.3);
+}
+
+.dark-mode .cart-tabs .nav-link.active {
+    background: linear-gradient(90deg, #FF9A8B 0%, #FF6A88 55%, #FF99AC 100%);
+    box-shadow: 0 -4px 8px rgba(255, 153, 172, 0.5);
+}
