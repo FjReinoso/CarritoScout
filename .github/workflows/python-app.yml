@@ -2,11 +2,9 @@ name: Django CI
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
-    branches:
-      - main
+    branches: [main]
 
 jobs:
   test:
@@ -18,8 +16,6 @@ jobs:
         env:
           MYSQL_ROOT_PASSWORD: root_password
           MYSQL_DATABASE: carrito_db
-          MYSQL_USER: usuario_carrito
-          MYSQL_PASSWORD: contrasena_carrito
         ports:
           - 3306:3306
         options: >-
