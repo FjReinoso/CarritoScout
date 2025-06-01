@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ producto.nombre }} | CarritoScout{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Inicio</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'productos:producto_list' %}">Productos</a></li>
+            {% if producto.categoria %}
+            <li class="breadcrumb-item"><a href="{% url 'productos:producto_list' %}?categoria={{ producto.categoria|urlencode }}">{{ producto.categoria|title }}</a></li>
+            {% endif %}
+            <li class="breadcrumb-item active">{{ producto.nombre }}</li>
+        </ol>
+    </nav>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="row">
+                <!-- Product image -->
+                <div class="col-lg-4 mb-4 mb-lg-0 text-center">
+                    {% if producto.imagen %}
+                    <img src="{{ producto.imagen.url }}" class="img-fluid rounded product-detail-img" alt="{{ producto.nombre }}">
+                    {% else %}
+                    <img src="{% static 'img/producto-default.png' %}" class="img-fluid rounded product-detail-img" alt="{{ producto.nombre }}">
+                    {% endif %}
+                </div>
+                
+                <!-- Product details -->
+                <div class="col-lg-8">
+                    <h1 class="mb-3">{{ producto.nombre }}</h1>
+                    
+                    {% if producto.categoria %}
+                    <p class="badge bg-secondary mb-3">{{ producto.categoria|title }}</p>
+                    {% endif %}
+                    
+                    {% if producto.descripcion %}
+                    <div class="mb-4">
+                        <h5>Descripción</h5>
+                        <p>{{ producto.descripcion }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    {% if producto.unidad_medida %}
+                    <p><strong>Unidad de medida:</strong> {{ producto.unidad_medida }}</p>
+                    {% endif %}
+                    
+                    <!-- Price comparison section -->
+                    <div class="mt-4">
+                        <h4 class="mb-3">Comparativa de precios</h4>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead class="table-primary">
+                                    <tr>
+                                        <th>Supermercado</th>
+                                        <th>Precio</th>
+                                        <th>Actualizado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for precio in precios|dictsort:"precio" %}
+                                    <tr {% if forloop.first %}class="table-success"{% endif %}>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                {% if precio.id_supermercado.logo %}
+                                                <img src="{{ precio.id_supermercado.logo.url }}" class="supermarket-logo me-2" alt="{{ precio.id_supermercado.nombre }}">
+                                                {% endif %}
+                                                {{ precio.id_supermercado.nombre }}
+                                            </div>
+                                        </td>
+                                        <td class="fw-bold">${{ precio.precio }}</td>
+                                        <td>{{ precio.fecha_actualizacion|date:"d/m/Y" }}</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-primary add-to-cart-btn" 
+                                                    data-producto-id="{{ producto.id_producto }}"
+                                                    data-supermercado-id="{{ precio.id_supermercado.id_supermercado }}"
+                                                    data-precio="{{ precio.precio }}">
+                                                <i class="fas fa-cart-plus"></i> Agregar
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="4" class="text-center">No hay información de precios disponible para este producto</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Related products -->
+    <div class="mt-5">
+        <h3 class="mb-3">Productos relacionados</h3>
+        <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
+            <!-- This would be populated with products of the same category -->
+            <!-- You could add a view method to fetch related products -->
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add to cart functionality
+        const addToCartButtons = document.querySelectorAll('.add-to-cart-btn');
+        addToCartButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const productoId = this.getAttribute('data-producto-id');
+                const supermercadoId = this.getAttribute('data-supermercado-id');
+                const precio = this.getAttribute('data-precio');
+                
+                // You would implement your cart functionality here
+                // For example, using fetch to call an API endpoint
+                
+                // Show success message
+                alert('Producto agregado al carrito!');
+            });
+        });
+    });
+</script>
+{% endblock %}

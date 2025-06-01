@@ -1,0 +1,453 @@
+{% extends 'usuarios/baseConNavbar.html' %}
+{% load static %}
+
+{% block title %}Productos | CarritoScout{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/baseProducto.css' %}">
+<!-- Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+    /* Custom styles for sidebar */    .sidebar {
+        position: fixed;
+        top: 0;
+        left: -380px;
+        height: 100vh;
+        width: 380px;
+        background-color: white;
+        transition: all 0.3s;
+        z-index: 1050;
+        overflow-y: auto;
+        box-shadow: 3px 0 10px rgba(0,0,0,0.1);
+        padding-top: 20px;
+    }
+      .sidebar.show {
+        left: 0;
+    }
+    
+    .sidebar-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: rgba(0,0,0,0.5);
+        z-index: 1040;
+        display: none;
+    }
+    
+    .sidebar-backdrop.show {
+        display: block;
+    }
+      .filter-btn {
+        position: fixed;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 1030;
+        border-radius: 0 4px 4px 0;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+      .sidebar-header {
+        border-bottom: 1px solid #e9ecef;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: sticky;
+        top: 0;
+        background-color: white;
+        z-index: 1;
+    }
+    
+    .sidebar-footer {
+        border-top: 1px solid #e9ecef;
+        padding: 1rem;
+        position: sticky;
+        bottom: 0;
+        background-color: white;
+    }
+    
+    /* Accordion styles */
+    .accordion-button:not(.collapsed) {
+        background-color: rgba(255, 106, 136, 0.1);
+        color: #FF6A88;
+    }
+    
+    .accordion-button::after {
+        margin-left: 10px;
+    }
+    
+    /* Card styles */
+    .card {
+        border-radius: 8px !important;
+        overflow: hidden;
+    }
+    
+    .card-header {
+        text-align: center;
+        background-image: linear-gradient(90deg, #FF9A8B 0%, #FF6A88 55%, #FF99AC 100%);
+        color: white;
+        padding: 0.5rem;
+    }
+    
+    .card-header h5 {
+        font-size: 1rem;
+        margin: 0;
+    }
+    
+    /* Filter cards */
+    .filter-icon {
+        width: 50px;
+        height: 50px;
+        object-fit: contain;
+        margin-bottom: 5px;
+    }
+    
+    .filter-card {
+        cursor: pointer;
+        transition: all 0.2s;
+        border-radius: 6px !important;
+    }
+    
+    .filter-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .filter-card.selected {
+        border-color: #FF6A88;
+        background-color: rgba(255, 106, 136, 0.1);
+    }
+    
+    .filter-card.selected .card-title {
+        color: #FF6A88;
+    }
+    
+    .category-icon {
+        font-size: 2rem;
+        margin-bottom: 10px;
+        color: #6c757d;
+    }
+    
+    .filter-card.selected .category-icon {
+        color: #FF6A88;
+    }
+    
+    .filter-indicator {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        width: 15px;
+        height: 15px;
+        border-radius: 50%;
+        background-color: #FF6A88;
+        display: none;
+    }
+    
+    .filter-card.selected .filter-indicator {
+        display: block;
+    }
+    
+    /* Active filters */
+    #active-filters {
+        transition: all 0.3s;
+    }
+    
+    /* Color scheme */
+    .badge.bg-primary {
+        background-color: #FF6A88 !important;
+    }
+    
+    .badge.bg-info {
+        background-color: #FF99AC !important;
+        color: white;
+    }
+    
+    .btn-primary {
+        background-color: #FF6A88;
+        border-color: #FF6A88;
+    }
+    
+    .btn-primary:hover {
+        background-color: #FF5A78;
+        border-color: #FF5A78;
+    }
+    
+    .btn-outline-primary {
+        color: #FF6A88;
+        border-color: #FF6A88;
+    }
+    
+    .btn-outline-primary:hover {
+        background-color: #FF6A88;
+        border-color: #FF6A88;
+        color: white;
+    }
+    
+    .text-primary {
+        color: #FF6A88 !important;
+    }
+    
+    /* Product title size adjustment */
+    .productos-title {
+        font-size: 1.5rem;
+        margin: 0;
+    }
+      /* Adjust content when sidebar is open */
+    @media (min-width: 992px) {
+        .content-wrapper {
+            transition: margin-left 0.3s;
+        }
+        
+        .content-wrapper.shifted {
+            margin-left: 380px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Filter button -->
+<button id="filter-btn" class="filter-btn btn btn-primary">
+    <i class="fas fa-filter me-2"></i> Filtros <i class="fas fa-chevron-right"></i>
+</button>
+
+<!-- Sidebar backdrop -->
+<div id="sidebar-backdrop" class="sidebar-backdrop"></div>
+
+<!-- Sidebar panel for filters -->
+<div id="sidebar" class="sidebar">    <div class="sidebar-header">
+        <h4 class="mb-0 fw-bold"><i class="fas fa-filter me-2"></i> Filtros</h4>
+        <button id="close-sidebar" class="btn-close fs-5" aria-label="Close"></button>
+    </div>
+    
+    <div class="px-3">        <!-- Active filters badges strip -->
+        <div id="active-filters" class="mb-3 p-3 bg-light rounded" style="display: none;">
+            <div class="d-flex flex-column">
+                <span class="mb-2 fw-bold">Filtros activos:</span>
+                <div id="filter-badges" class="d-flex flex-wrap gap-3">
+                    <!-- Active filter badges will be added here dynamically -->
+                </div>
+                <button id="clear-all-filters" class="btn btn-sm btn-outline-secondary mt-3">
+                    <i class="fas fa-times"></i> Limpiar todos
+                </button>
+            </div>
+        </div>
+        
+        <!-- Accordion filter container -->
+        <div class="accordion mb-3" id="filterAccordion">
+            <!-- Supermarkets Filter -->
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingSupermercados">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" 
+                            data-bs-target="#collapseSupermercados" aria-expanded="true" 
+                            aria-controls="collapseSupermercados">
+                        <i class="fas fa-shopping-cart me-2"></i> Supermercados
+                    </button>
+                </h2>
+                <div id="collapseSupermercados" class="accordion-collapse collapse show" 
+                     aria-labelledby="headingSupermercados" data-bs-parent="#filterAccordion">
+                    <div class="accordion-body">
+                        <div class="row row-cols-2 g-2">
+                            {% for supermercado in supermercados %}
+                            <div class="col">
+                                <div class="card filter-card supermarket-filter h-100 text-center p-2" 
+                                     data-id="{{ supermercado.id_supermercado }}" 
+                                     data-name="{{ supermercado.nombre }}">
+                                    <div class="filter-indicator"></div>
+                                    <img src="{% static 'img/supermarkets/'|add:supermercado.nombre|lower|cut:' '|add:'.png' %}" 
+                                         alt="{{ supermercado.nombre }}" 
+                                         class="filter-icon mx-auto"
+                                    <h6 class="card-title mb-0">{{ supermercado.nombre }}</h6>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Categories Filter -->
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingCategorias">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                            data-bs-target="#collapseCategorias" aria-expanded="false" 
+                            aria-controls="collapseCategorias">
+                        <i class="fas fa-tags me-2"></i> Categorías
+                    </button>
+                </h2>
+                <div id="collapseCategorias" class="accordion-collapse collapse" 
+                     aria-labelledby="headingCategorias" data-bs-parent="#filterAccordion">
+                    <div class="accordion-body">
+                        <div class="row row-cols-2 g-2">
+                            <!-- Categories with corresponding icons -->
+                            <div class="col">
+                                <div class="card filter-card category-filter h-100 text-center p-2" 
+                                     data-category="Lacteos">
+                                    <div class="filter-indicator"></div>
+                                    <i class="fas fa-cheese category-icon"></i>
+                                    <h6 class="card-title mb-0">Lácteos</h6>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="card filter-card category-filter h-100 text-center p-2" 
+                                     data-category="Pan">
+                                    <div class="filter-indicator"></div>
+                                    <i class="fas fa-bread-slice category-icon"></i>
+                                    <h6 class="card-title mb-0">Pan</h6>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="card filter-card category-filter h-100 text-center p-2" 
+                                     data-category="Limpieza">
+                                    <div class="filter-indicator"></div>
+                                    <i class="fas fa-spray-can-sparkles category-icon"></i>
+                                    <h6 class="card-title mb-0">Limpieza</h6>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="card filter-card category-filter h-100 text-center p-2" 
+                                     data-category="Frutas">
+                                    <div class="filter-indicator"></div>
+                                    <i class="fas fa-apple-whole category-icon"></i>
+                                    <h6 class="card-title mb-0">Frutas</h6>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="card filter-card category-filter h-100 text-center p-2" 
+                                     data-category="Verduras">
+                                    <div class="filter-indicator"></div>
+                                    <i class="fas fa-carrot category-icon"></i>
+                                    <h6 class="card-title mb-0">Verduras</h6>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="card filter-card category-filter h-100 text-center p-2" 
+                                     data-category="Bebidas">
+                                    <div class="filter-indicator"></div>
+                                    <i class="fas fa-bottle-water category-icon"></i>
+                                    <h6 class="card-title mb-0">Bebidas</h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Advanced Search Filter -->
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingAdvanced">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                            data-bs-target="#collapseAdvanced" aria-expanded="false" 
+                            aria-controls="collapseAdvanced">
+                        <i class="fas fa-search-plus me-2"></i> Búsqueda Avanzada
+                    </button>
+                </h2>
+                <div id="collapseAdvanced" class="accordion-collapse collapse" 
+                     aria-labelledby="headingAdvanced" data-bs-parent="#filterAccordion">
+                    <div class="accordion-body">
+                        <form id="filter-form" method="get" action="{% url 'productos:producto_list' %}">
+                            <!-- Hidden fields for supermarket and category filters -->
+                            <input type="hidden" id="selected-supermarkets" name="supermercados" value="">
+                            <input type="hidden" id="selected-categories" name="categorias" value="">
+                            
+                            <!-- Search by name -->
+                            <div class="mb-3">
+                                <label for="search" class="form-label">Buscar por nombre</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="search" name="search" 
+                                           value="{{ search_query }}" placeholder="Buscar...">
+                                    <button type="button" class="btn btn-outline-primary" id="search-btn">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Order by -->
+                            <div class="mb-3">
+                                <label for="order_by" class="form-label">Ordenar por</label>
+                                <select class="form-select" id="order_by" name="order_by">
+                                    <option value="nombre" {% if selected_order == 'nombre' %}selected{% endif %}>Nombre (A-Z)</option>
+                                    <option value="nombre_desc" {% if selected_order == 'nombre_desc' %}selected{% endif %}>Nombre (Z-A)</option>
+                                    <option value="precio_asc" {% if selected_order == 'precio_asc' %}selected{% endif %}>Precio (menor a mayor)</option>
+                                    <option value="precio_desc" {% if selected_order == 'precio_desc' %}selected{% endif %}>Precio (mayor a menor)</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Price range -->
+                            <div class="mb-3">
+                                <label class="form-label">Rango de precio</label>
+                                <div class="d-flex align-items-center">
+                                    <input type="number" class="form-control me-2" id="precio_min" name="precio_min" 
+                                           value="{{ precio_min }}" min="{{ precio_global_min }}" max="{{ precio_global_max }}" step="0.01">
+                                    <span>a</span>
+                                    <input type="number" class="form-control ms-2" id="precio_max" name="precio_max" 
+                                           value="{{ precio_max }}" min="{{ precio_global_min }}" max="{{ precio_global_max }}" step="0.01">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="sidebar-footer">
+        <button id="apply-filters" class="btn btn-primary w-100">
+            Aplicar filtros
+        </button>
+    </div>
+</div>
+
+<!-- Main content area -->
+<div id="content-wrapper" class="content-wrapper container-fluid pt-2 pb-4">
+    <!-- Products section -->
+    <div class="row justify-content-center">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header py-2">
+                    <div class="d-flex justify-content-center align-items-center">
+                        <h2 class="productos-title mb-0">Productos</h2>
+                        {% if search_query %}
+                        <div class="text-muted ms-3">
+                            Búsqueda: "{{ search_query }}"
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Product grid -->
+                    <div id="productos-container" class="row row-cols-1 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-3">
+                        {% include "productos/plantillaProducto.html" with productos=productos %}
+                    </div>
+                    
+                    <!-- Loading indicator -->
+                    <div id="loading-indicator" class="text-center my-4" style="display: none;">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Cargando...</span>
+                        </div>
+                    </div>
+                    
+                    <!-- If no products found -->
+                    {% if not productos %}
+                    <div class="alert alert-info text-center">
+                        No se encontraron productos que coincidan con los criterios de búsqueda.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden field to track pagination state -->
+<input type="hidden" id="current-page" value="{{ current_page }}">
+<input type="hidden" id="has-more" value="{{ has_more|lower }}">
+<input type="hidden" id="current-url" value="{{ request.get_full_path|urlencode }}">
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/productosIndex.js' %}"></script>
+{% endblock %}

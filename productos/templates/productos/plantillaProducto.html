@@ -1,0 +1,51 @@
+{% load static %}
+{% for producto in productos %}
+<div class="col">
+    <div class="card h-100 shadow-sm product-card">
+        <!-- Product image -->
+        <div class="product-img-container">
+            {% if producto.imagen %}
+            <img src="{{ producto.imagen.url }}" class="card-img-top product-img" alt="{{ producto.nombre }}">
+            {% else %}
+            <img src="{% static 'img/producto-default.png' %}" class="card-img-top product-img" alt="{{ producto.nombre }}">
+            {% endif %}
+        </div>
+        
+        <div class="card-body">
+            <h5 class="card-title mb-1 product-title">{{ producto.nombre }}</h5>
+            {% if producto.categoria %}
+            <p class="text-muted small mb-2">{{ producto.categoria|title }}</p>
+            {% endif %}
+            
+            <!-- Price range -->
+            {% with min_price=producto.precios.all|dictsort:"precio"|first max_price=producto.precios.all|dictsort:"-precio"|first %}
+            {% if min_price %}
+            <p class="price-range">
+                {% if min_price.precio == max_price.precio %}
+                <span class="fw-bold">${{ min_price.precio }}</span>
+                {% else %}
+                <span class="fw-bold">${{ min_price.precio }} - ${{ max_price.precio }}</span>
+                {% endif %}
+            </p>
+            {% else %}
+            <p class="text-muted">Precio no disponible</p>
+            {% endif %}
+            {% endwith %}
+            
+            <!-- Available at supermarkets badges -->
+            <div class="supermarket-badges mt-2">
+                {% for precio in producto.precios.all|slice:":3" %}
+                <span class="badge bg-light text-dark me-1 mb-1">{{ precio.id_supermercado.nombre }}</span>
+                {% endfor %}
+                {% if producto.precios.all.count > 3 %}
+                <span class="badge bg-light text-dark me-1 mb-1">+{{ producto.precios.all.count|add:"-3" }}</span>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card-footer bg-transparent border-top-0">
+            <a href="{% url 'productos:producto_detail' producto.id_producto %}" class="btn btn-primary w-100">Ver detalles</a>
+        </div>
+    </div>
+</div>
+{% endfor %}

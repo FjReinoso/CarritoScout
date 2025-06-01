@@ -1,0 +1,71 @@
+/* Product card styling */
+.product-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+.product-img-container {
+    height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    padding: 1rem;
+}
+
+.product-img {
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.product-title {
+    height: 48px;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+}
+
+.price-range {
+    font-size: 1.1rem;
+    color: #212529;
+}
+
+.supermarket-badges {
+    min-height: 30px;
+}
+
+/* Product detail styling */
+.product-detail-img {
+    max-height: 400px;
+    object-fit: contain;
+}
+
+.supermarket-logo {
+    height: 24px;
+    width: auto;
+}
+
+/* Filter styling */
+#filter-form label {
+    font-weight: 500;
+    color: #495057;
+}
+
+/* Loading indicator */
+#loading-indicator {
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Responsive adjustments */
+@media (max-width: 767px) {
+    .product-img-container {
+        height: 150px;
+    }
+}
