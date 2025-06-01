@@ -203,17 +203,17 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('search').value = '';
         document.getElementById('precio_min').value = '';
         document.getElementById('precio_max').value = '';
-        document.getElementById('order_by').selectedIndex = 0;
-    });
-      // Manejador de clic en el botón de búsqueda
+        document.getElementById('order_by').selectedIndex = 0;    });
+    
+    // Manejador de clic en el botón de búsqueda
     document.getElementById('search-btn').addEventListener('click', function() {
         document.getElementById('filter-form').submit();
         closeSidebar(); // Cerrar sidebar después de buscar
-    });
-    
+    });    
     // Inicializar filtros existentes
     initializeFilters();
-      // ===============================
+    
+    // ===============================
     // BOTÓN "CARGAR MÁS" PRODUCTOS
     // ===============================
     let loading = false;
@@ -277,8 +277,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 throw new Error('Error en la respuesta del servidor: ' + response.status);
             }
             return response.json();
-        })
-        .then(data => {            if (data && data.html) {                
+        })        .then(data => {
+            if (data && data.html) {
                 // Crear un elemento temporal para parsear el HTML
                 const tempDiv = document.createElement('div');
                 tempDiv.innerHTML = data.html;
@@ -315,12 +315,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         noMoreMsg.innerHTML = '<i class="fas fa-check-circle"></i>Todos los productos han sido cargados';
                         loadMoreBtn.parentElement.appendChild(noMoreMsg);
                     }
-                }
-                
-                // Verificar si hay productos en la respuesta
-                if (!data.html.trim()) {
-                    document.getElementById('has-more').value = 'false';
-                    console.log('No más productos disponibles');
                 }
             } else {
                 console.error('Formato de respuesta incorrecto:', data);

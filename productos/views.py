@@ -1,3 +1,4 @@
+# productos/views.py
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.template.loader import render_to_string
@@ -6,7 +7,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import Producto, Supermercado, Precio
 
 def producto_list(request):
-    # Get filter parameters
+    # Obtener parámetros de filtro
     categoria = request.GET.get('categoria')
     supermercado_id = request.GET.get('supermercado')
     search_query = request.GET.get('search', '')
@@ -14,63 +15,74 @@ def producto_list(request):
     precio_min = request.GET.get('precio_min')
     precio_max = request.GET.get('precio_max')
     
-    # Get multiple selections for filters (from sidebar)
+    # Obtener selecciones múltiples para filtros (desde sidebar)
     supermercados_ids = request.GET.get('supermercados', '').split(',') if request.GET.get('supermercados') else []
     categorias_list = request.GET.get('categorias', '').split(',') if request.GET.get('categorias') else []
     
-    # Clean empty values
+    # Limpiar valores vacíos
     supermercados_ids = [id for id in supermercados_ids if id.strip()]
     categorias_list = [cat for cat in categorias_list if cat.strip()]
     
-    # Base queryset with price annotations
-    productos = Producto.objects.all()
+    # QuerySet base - usar prefetch_related para optimizar
+    productos = Producto.objects.prefetch_related('precios__id_supermercado')
     
-    # Apply filters
+    # Aplicar filtros
     if categoria and categoria != 'todas':
         productos = productos.filter(categoria=categoria)
     
-    # Apply multiple category filter if available
+    # Aplicar filtro de categorías múltiples si está disponible
     if categorias_list:
         productos = productos.filter(categoria__in=categorias_list)
     
     if search_query:
         productos = productos.filter(nombre__icontains=search_query)
         
-    # Filter by price range (requires joining with Precio)
+    # Filtrar por supermercado específico
     if supermercado_id:
         productos = productos.filter(precios__id_supermercado=supermercado_id)
         
-    # Apply multiple supermarket filter if available
+    # Aplicar filtro de supermercados múltiples si está disponible
     if supermercados_ids:
         productos = productos.filter(precios__id_supermercado__in=supermercados_ids)
         
+    # Filtrar por rango de precios
     if precio_min:
-        productos = productos.filter(precios__precio__gte=float(precio_min))
+        try:
+            productos = productos.filter(precios__precio__gte=float(precio_min))
+        except ValueError:
+            pass
     
     if precio_max:
-        productos = productos.filter(precios__precio__lte=float(precio_max))
-    
-    # Remove duplicates that might occur due to multiple price entries
+        try:
+            productos = productos.filter(precios__precio__lte=float(precio_max))
+        except ValueError:
+            pass
+            
+    # Eliminar duplicados que pueden ocurrir debido a múltiples entradas de precios
     productos = productos.distinct()
     
-    # Apply ordering
+    # Aplicar ordenamiento
     if order_by == 'precio_asc':
         productos = productos.annotate(min_precio=Min('precios__precio')).order_by('min_precio')
     elif order_by == 'precio_desc':
         productos = productos.annotate(max_precio=Max('precios__precio')).order_by('-max_precio')
     elif order_by == 'nombre_desc':
         productos = productos.order_by('-nombre')
-    else:  # Default to name ascending
+    else:  # Por defecto ordenar por nombre ascendente
         productos = productos.order_by('nombre')
-      # Get filters data
+        
+    # Obtener datos de filtros
     supermercados = Supermercado.objects.all().order_by('nombre')
     categorias = Producto.objects.values_list('categoria', flat=True).distinct().order_by('categoria')
     
-    # Price range for filters
-    precio_global_min = Precio.objects.all().aggregate(Min('precio'))['precio__min']
-    precio_global_max = Precio.objects.all().aggregate(Max('precio'))['precio__max']
+    # Rango de precios para filtros
+    try:
+        precio_global_min = Precio.objects.all().aggregate(Min('precio'))['precio__min'] or 0
+        precio_global_max = Precio.objects.all().aggregate(Max('precio'))['precio__max'] or 100
+    except:
+        precio_global_min, precio_global_max = 0, 100
     
-    # Setup pagination
+    # Configurar paginación
     items_per_page = 12
     paginator = Paginator(productos, items_per_page)
     page = request.GET.get('page', 1)
@@ -82,14 +94,14 @@ def producto_list(request):
     except EmptyPage:
         productos_page = paginator.page(paginator.num_pages)
     
-    # AJAX request for "Load More" button
+    # Petición AJAX para botón "Cargar Más"
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        # Check if partial parameter is present (for Load More)
+        # Verificar si el parámetro partial está presente (para Cargar Más)
         if request.GET.get('partial') == 'true':
-            # Render only the product items for AJAX response
+            # Renderizar solo los items de productos para respuesta AJAX
             html = render_to_string(
-                'productos/product_list_items.html',
-                {'productos': productos_page.object_list, 'request': request}
+                'productos/plantillaProducto.html',
+                {'productos': productos_page.object_list}
             )
             
             return JsonResponse({
@@ -101,7 +113,7 @@ def producto_list(request):
                 'total_products': paginator.count
             })
     
-    # Initial page load or regular navigation
+    # Carga inicial de página o navegación regular
     context = {
         'productos': productos_page.object_list,
         'supermercados': supermercados,
@@ -132,4 +144,4 @@ def producto_detail(request, producto_id):
         'precios': precios,
     }
     
-    return render(request, 'productos/detalleProductos.html', context)
+    return render(request, 'productos/detalleProducto.html', context)

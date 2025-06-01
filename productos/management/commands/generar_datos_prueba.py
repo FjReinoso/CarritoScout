@@ -9,7 +9,7 @@ from django.conf import settings
 import csv
 from django.db import transaction
 
-#docker exec -it nombre_del_contenedor bash
+#docker exec -it carrito_django bash
 #python manage.py generar_datos_prueba --productos 500 --borrar
 class Command(BaseCommand):
     help = 'Genera un set completo de datos de prueba para Supermercados, Productos y Precios'
@@ -27,19 +27,12 @@ class Command(BaseCommand):
         # Definir supermercados principales en España
         supermercados = [
             {"nombre": "Mercadona", "direccion": "Calle Valencia 123, Madrid", "geolocalizacion": "40.416775,-3.703790"},
-            {"nombre": "Carrefour", "direccion": "Avenida Diagonal 456, Barcelona", "geolocalizacion": "41.385064,2.173404"},
             {"nombre": "Dia", "direccion": "Calle Gran Vía 789, Madrid", "geolocalizacion": "40.420160,-3.704700"},
             {"nombre": "Lidl", "direccion": "Avenida Andalucía 321, Sevilla", "geolocalizacion": "37.389092,-5.984459"},
-            {"nombre": "Aldi", "direccion": "Paseo Castellana 654, Madrid", "geolocalizacion": "40.433852,-3.690780"},
-            {"nombre": "Eroski", "direccion": "Calle Urbieta 987, San Sebastián", "geolocalizacion": "43.312527,-1.981634"},
-            {"nombre": "El Corte Inglés", "direccion": "Plaza Cataluña 5, Barcelona", "geolocalizacion": "41.386874,2.170047"},
             {"nombre": "Alcampo", "direccion": "Avenida Constitución 234, Zaragoza", "geolocalizacion": "41.648823,-0.889085"},
             {"nombre": "Consum", "direccion": "Avenida del Puerto 567, Valencia", "geolocalizacion": "39.469907,-0.376288"},
             {"nombre": "Ahorramas", "direccion": "Calle Orense 890, Madrid", "geolocalizacion": "40.456321,-3.694560"},
-            {"nombre": "Hipercor", "direccion": "Avenida Maisonnave 432, Alicante", "geolocalizacion": "38.345996,-0.490686"},
-            {"nombre": "BonArea", "direccion": "Carretera Nacional II, Km 510, Lleida", "geolocalizacion": "41.617583,0.620020"},
-            {"nombre": "MAS", "direccion": "Avenida de la Palmera 789, Sevilla", "geolocalizacion": "37.371490,-5.988380"},
-            {"nombre": "Condis", "direccion": "Rambla Catalunya 321, Barcelona", "geolocalizacion": "41.396234,2.160844"}
+
         ]
 
         # Definir categorías según los filtros de la interfaz

@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.hashers import check_password
 from .form import RegistroBasicoForm, RegistroOpcionalForm, PerfilUsuarioForm, PerfilUsuarioCorreoForm, DatosPersonalesForm, CambioPasswordForm
-from .models import PerfilUsuario, UsuarioLegacy
+from .models import PerfilUsuario
 
 def login_view(request):
     if request.method == 'POST':
@@ -91,7 +91,7 @@ def pagina_principal(request):
 @login_required
 def perfil_view(request):
     user = request.user
-    perfil = user.perfilusuario
+    perfil, created = PerfilUsuario.objects.get_or_create(usuario=user)
     
     # Identificamos qué formulario se está enviando comprobando los botones y procesamos el cambio de contraseña
     if request.method == 'POST' and 'cambiar_password' in request.POST:
@@ -120,6 +120,7 @@ def perfil_view(request):
                 return redirect('usuarios:perfil')
     else:
         password_form = CambioPasswordForm()
+    
     # Identificamos qué formulario se está enviando comprobando los botones
     if request.method == 'POST':
         # Comprobamos si existe el formulario personal (first_name, last_name)
@@ -131,20 +132,6 @@ def perfil_view(request):
             if datos_personales_form.is_valid():
                 # Guardar cambios en el modelo User
                 user_updated = datos_personales_form.save()
-                
-                # Sincronizar cambios con la tabla Usuarios legacy
-                try:
-                    # Buscar el usuario en la tabla Usuarios legacy
-                    usuario_legacy = UsuarioLegacy.objects.filter(email=user.email).first()
-                    if usuario_legacy:
-                        usuario_legacy.first_name = user.first_name
-                        usuario_legacy.last_name = user.last_name
-                        usuario_legacy.save()
-                        print(f"Datos personales actualizados en tabla legacy para {user.email}")
-                    else:
-                        print(f"No se encontró el usuario {user.email} en la tabla Usuarios legacy")
-                except Exception as e:
-                    print(f"Error al actualizar datos en tabla legacy: {e}")
                 
                 # Añadir mensaje de éxito
                 messages.success(request, "¡Los datos personales se han actualizado correctamente!")
@@ -161,22 +148,6 @@ def perfil_view(request):
                 
                 # Obtener el perfil actualizado nuevamente para tener los datos más recientes
                 perfil = perfil_actualizado
-                
-                # Sincronizar cambios con la tabla Usuarios legacy para la información adicional
-                try:
-                    # Buscar el usuario en la tabla Usuarios legacy
-                    usuario_legacy = UsuarioLegacy.objects.filter(email=user.email).first()
-                    if usuario_legacy:
-                        # Actualizar los campos en la tabla Usuarios
-                        usuario_legacy.direccion = perfil.direccion
-                        usuario_legacy.telefono = perfil.telefono
-                        usuario_legacy.fecha_nacimiento = perfil.fecha_nacimiento
-                        usuario_legacy.save()
-                        print(f"Información adicional actualizada en tabla legacy para {user.email}")
-                    else:
-                        print(f"No se encontró el usuario {user.email} en la tabla Usuarios legacy")
-                except Exception as e:
-                    print(f"Error al actualizar información adicional en tabla legacy: {e}")
                 
                 # Añadir mensaje de éxito
                 messages.success(request, "¡La información adicional se ha actualizado correctamente!")
