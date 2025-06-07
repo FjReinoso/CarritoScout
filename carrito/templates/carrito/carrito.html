@@ -10,11 +10,20 @@
 {% block content %}
 <!-- Título y navegación de pestañas -->
 <div class="row mb-3">
-    <div class="col">
+    <div class="col-md-8">
         <h1 class="h3 mb-2">Mis Carritos de Compras</h1>
         <p class="text-muted">Gestiona tus carritos de compras y comparte con otros usuarios.</p>
-        
-        <!-- Pestañas de navegación -->
+    </div>
+    <div class="col-md-4 text-end">
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createCartModal">
+            <i class="bi bi-cart-plus"></i> Crear Nuevo Carrito
+        </button>
+    </div>
+</div>
+
+<!-- Pestañas de navegación -->
+<div class="row mb-3">
+    <div class="col">
         <ul class="nav nav-tabs cart-tabs" id="cartTabs" role="tablist">
             <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="active-cart-tab" data-bs-toggle="tab" data-bs-target="#active-cart" type="button" role="tab" aria-controls="active-cart" aria-selected="true">
@@ -247,7 +256,7 @@
                         </a>
                     </div>
                     <div class="card-footer bg-white text-center">
-                        <button class="btn btn-outline-primary btn-sm">
+                        <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#createCartModal">
                             <i class="bi bi-plus-circle"></i> Crear Nuevo Carrito
                         </button>
                     </div>
@@ -393,6 +402,42 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para crear nuevo carrito -->
+<div class="modal fade" id="createCartModal" tabindex="-1" aria-labelledby="createCartModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createCartModalLabel">Crear Nuevo Carrito</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="createCartForm">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="cartName" class="form-label">Nombre del carrito (opcional)</label>
+                        <input type="text" class="form-control" id="cartName" placeholder="Ej: Compras de la semana">
+                        <div class="form-text">Si no especificas un nombre, se generará automáticamente.</div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="setAsActive">
+                            <label class="form-check-label" for="setAsActive">
+                                Establecer como carrito activo
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="createCartBtn">
+                    <i class="bi bi-cart-plus"></i> Crear Carrito
+                </button>
             </div>
         </div>
     </div>
@@ -675,6 +720,58 @@
                 if (confirm('¿Estás seguro que deseas vaciar el carrito?')) {
                     emptyCart();
                 }
+            });
+        }
+
+        // Funcionalidad para crear nuevo carrito
+        const createCartBtn = document.getElementById('createCartBtn');
+        if (createCartBtn) {
+            createCartBtn.addEventListener('click', function() {
+                const cartName = document.getElementById('cartName').value;
+                const setAsActive = document.getElementById('setAsActive').checked;
+                
+                showNotification('Creando nuevo carrito...', 'info');
+                
+                fetch('{% url "carrito:crear_carrito" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: `nombre=${encodeURIComponent(cartName)}&activo=${setAsActive}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if(data.status === 'success') {
+                        // Cerrar modal
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('createCartModal'));
+                        modal.hide();
+                        
+                        showNotification(data.message, 'success');
+                        
+                        // Redirigir al nuevo carrito o recargar la página
+                        if (data.redirect_url) {
+                            window.location.href = data.redirect_url;
+                        } else {
+                            location.reload();
+                        }
+                    } else {
+                        showNotification(data.message, 'danger');
+                    }
+                })
+                .catch(error => {
+                    showNotification('Error al crear el carrito', 'danger');
+                    console.error('Error:', error);
+                });
+            });
+        }
+        
+        // Limpiar formulario cuando se cierre el modal
+        const createCartModal = document.getElementById('createCartModal');
+        if (createCartModal) {
+            createCartModal.addEventListener('hidden.bs.modal', function() {
+                document.getElementById('cartName').value = '';
+                document.getElementById('setAsActive').checked = false;
             });
         }
 

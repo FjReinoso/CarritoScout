@@ -6,9 +6,47 @@ from django.utils import timezone
 from django.db import transaction
 from django.db.models import F, Sum, Count
 from django.views.decorators.http import require_POST
+from django.urls import reverse
 from .models import Carrito, CarritoProducto, HistorialCarrito
 from productos.models import Producto
-
+@login_required
+@require_POST
+def crear_carrito(request):
+    """Vista para crear un nuevo carrito vía AJAX desde el modal"""
+    try:
+        nombre = request.POST.get('nombre', '').strip()
+        activo = request.POST.get('activo') == 'true'
+        
+        # Si el usuario quiere establecer este carrito como activo,
+        # desactivar todos los demás carritos del usuario
+        if activo:
+            Carrito.objects.filter(usuario=request.user, activo=True).update(activo=False)
+        
+        # Crear el nuevo carrito
+        carrito = Carrito.objects.create(
+            usuario=request.user,
+            activo=activo,
+            fecha_creacion=timezone.now()
+        )
+        
+        # Preparar el mensaje
+        mensaje = f"Carrito #{carrito.id_carrito} creado exitosamente"
+        if nombre:
+            mensaje = f"Carrito '{nombre}' creado exitosamente"
+        
+        return JsonResponse({
+            'status': 'success',
+            'message': mensaje,
+            'carrito_id': carrito.id_carrito,
+            'redirect_url': reverse('carrito:ver_carrito') if activo else None
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Error al crear el carrito. Inténtalo de nuevo.'
+        })
+    
 @login_required
 def ver_carrito(request):
     """Vista para mostrar el contenido del carrito del usuario"""
