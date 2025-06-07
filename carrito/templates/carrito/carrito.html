@@ -48,179 +48,211 @@
 <div class="tab-content" id="cartTabsContent">
     <!-- Pestaña de Carrito Activo -->
     <div class="tab-pane fade show active" id="active-cart" role="tabpanel" aria-labelledby="active-cart-tab">
-        <div class="row">
-            <!-- Productos en el Carrito -->
-            <div class="col-lg-8 mb-4">
-                <!-- Información del carrito y usuarios compartidos -->
-                <div class="card mb-4 shadow-sm">
-                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">Carrito #{{ carrito.id_carrito }}</h5>
-                        <span class="badge bg-success">Activo</span>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-6 mb-3 mb-md-0">
-                                <h6><i class="bi bi-calendar3"></i> Creado: {{ carrito.fecha_creacion|date:"d/m/Y" }}</h6>
-                                <h6><i class="bi bi-person"></i> Creador: {{ carrito.usuario.username }}</h6>
-                            </div>
-                            <div class="col-md-6">
-                                <h6 class="mb-2">Usuarios compartidos:</h6>
-                                <div class="user-badges">
-                                    <span class="user-badge owner">
-                                        <i class="bi bi-person-check me-1"></i> {{ carrito.usuario.username }} (Dueño)
-                                    </span>
-                                    <!-- Aquí irían los usuarios adicionales compartidos -->
-                                    <!-- <span class="user-badge">
-                                        <i class="bi bi-person me-1"></i> Usuario2
-                                        <button class="btn-close ms-2 btn-sm" style="font-size: 0.6rem;"></button>
-                                    </span> -->
-                                </div>
-                                <button class="btn btn-sm btn-outline-primary mt-2" data-bs-toggle="modal" data-bs-target="#inviteUserModal">
-                                    <i class="bi bi-person-plus"></i> Invitar usuario
-                                </button>
-                            </div>
+        {% if not carrito %}
+            <!-- Mensaje cuando no hay carrito activo -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="empty-cart text-center py-5">
+                        <i class="bi bi-cart-x mb-4" style="font-size: 5rem; color: #ccc;"></i>
+                        <h2 class="mb-3">No tienes un carrito activo</h2>
+                        <p class="text-muted mb-4">Crea tu primer carrito para comenzar a agregar productos y gestionar tus compras.</p>
+                        <button class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#createCartModal">
+                            <i class="bi bi-cart-plus me-2"></i> Crear Mi Primer Carrito
+                        </button>
+                        {% if todos_carritos.count > 0 %}
+                        <div class="mt-4">
+                            <p class="text-muted">O activa uno de tus carritos existentes en la pestaña "Todos los Carritos"</p>
                         </div>
+                        {% endif %}
                     </div>
                 </div>
-
-                {% if carrito.items_count == 0 %}
-                    <div class="empty-cart">
-                        <i class="bi bi-cart-x mb-3"></i>
-                        <h2>Tu carrito está vacío</h2>
-                        <p class="text-muted">No has agregado productos a tu carrito todavía.</p>
-                        <a href="{% url 'productos:producto_list' %}" class="btn btn-primary btn-continue-shopping mt-3">
-                            <i class="bi bi-box"></i> Explorar Productos
-                        </a>
-                    </div>
-                {% else %}
-                    <div class="mb-3 d-flex justify-content-between align-items-center">
-                        <span><strong>{{ carrito.total_productos }}</strong> producto(s) en tu carrito</span>
-                        <div>
-                            <a href="{% url 'productos:producto_list' %}" class="btn btn-outline-primary btn-sm me-2">
-                                <i class="bi bi-plus-circle"></i> Añadir productos
-                            </a>
-                            <button id="vaciarCarrito" class="btn btn-outline-danger btn-sm">
-                                <i class="bi bi-trash"></i> Vaciar Carrito
-                            </button>
+            </div>
+        {% else %}
+            <!-- Contenido del carrito activo existente -->
+            <div class="row">
+                <!-- Productos en el Carrito -->
+                <div class="col-lg-8 mb-4">
+                    <!-- Información del carrito y usuarios compartidos -->
+                    <div class="card mb-4 shadow-sm">
+                        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">{{ carrito.nombre_display }}</h5>
+                            <span class="badge bg-success">Activo</span>
                         </div>
-                    </div>
-                    
-                    <div class="cart-items">
-                        {% for item in items %}
-                        <div class="cart-item p-3 mb-3 shadow-sm border" id="item-{{ item.id }}">
-                            <div class="row align-items-center">
-                                <!-- Imagen del producto -->
-                                <div class="col-md-2 col-sm-3 mb-2 mb-md-0">
-                                    <div class="img-container">
-                                        {% if item.producto.imagen %}
-                                            <img src="{{ item.producto.imagen.url }}" alt="{{ item.producto.nombre }}" class="img-fluid">
-                                        {% else %}
-                                            <img src="{% static 'img/default-product.png' %}" alt="{{ item.producto.nombre }}" class="img-fluid">
-                                        {% endif %}
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3 mb-md-0">
+                                    <h6><i class="bi bi-calendar3"></i> Creado: {{ carrito.fecha_creacion|date:"d/m/Y" }}</h6>
+                                    <h6><i class="bi bi-person"></i> Creador: {{ carrito.usuario.username }}</h6>
+                                    {% if carrito.nombre %}
+                                    <h6><i class="bi bi-tag"></i> Nombre: {{ carrito.nombre }}</h6>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <h6 class="mb-2">Usuarios compartidos:</h6>
+                                    <div class="user-badges">
+                                        <span class="user-badge owner">
+                                            <i class="bi bi-person-check me-1"></i> {{ carrito.usuario.username }} (Dueño)
+                                        </span>
+                                        {% for usuario in carrito.usuarios_compartidos.all %}
+                                        <span class="user-badge">
+                                            <i class="bi bi-person me-1"></i> {{ usuario.username }}
+                                        </span>
+                                        {% endfor %}
+                                        {% for invitacion in carrito.invitaciones.all %}
+                                            {% if invitacion.estado == 'pendiente' %}
+                                            <span class="user-badge pending">
+                                                <i class="bi bi-person me-1"></i> {{ invitacion.usuario.username }} (Pendiente)
+                                            </span>
+                                            {% endif %}
+                                        {% endfor %}
                                     </div>
-                                </div>
-                                
-                                <!-- Información del producto -->
-                                <div class="col-md-4 col-sm-9 mb-2 mb-md-0">
-                                    <h5>{{ item.producto.nombre }}</h5>
-                                    <div>
-                                        <span class="category-pill">{{ item.producto.categoria }}</span>
-                                        <span class="category-pill">{{ item.producto.unidad_medida }}</span>
-                                    </div>
-                                </div>
-                                
-                                <!-- Control de cantidad -->
-                                <div class="col-md-3 col-sm-6 mb-2 mb-md-0">
-                                    <div class="quantity-control">
-                                        <button class="quantity-btn decrease-btn" data-item-id="{{ item.id }}">-</button>
-                                        <input type="number" min="1" class="quantity-input" value="{{ item.cantidad }}" data-item-id="{{ item.id }}">
-                                        <button class="quantity-btn increase-btn" data-item-id="{{ item.id }}">+</button>
-                                    </div>
-                                </div>
-                                
-                                <!-- Precio -->
-                                <div class="col-md-2 col-sm-3 mb-2 mb-md-0 text-end">
-                                    <h5>${{ item.subtotal }}</h5>
-                                    <small class="text-muted">${{ item.producto.precio }} / unidad</small>
-                                </div>
-                                
-                                <!-- Eliminar -->
-                                <div class="col-md-1 col-sm-3 text-end">
-                                    <button class="remove-btn" data-item-id="{{ item.id }}">
-                                        <i class="bi bi-x-circle"></i>
+                                    <button class="btn btn-sm btn-outline-primary mt-2" data-bs-toggle="modal" data-bs-target="#inviteUserModal">
+                                        <i class="bi bi-person-plus"></i> Invitar usuario
                                     </button>
                                 </div>
                             </div>
                         </div>
-                        {% endfor %}
                     </div>
-                {% endif %}
-            </div>
-            
-            <!-- Columna derecha: Resumen y acciones -->
-            <div class="col-lg-4">
-                <!-- Resumen del Carrito -->
-                <div class="cart-summary p-4">
-                    <h3>Resumen del Carrito</h3>
-                    <hr>
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Productos ({{ carrito.total_productos }}):</span>
-                        <span>${{ carrito.precio_total }}</span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Descuentos:</span>
-                        <span>$0.00</span>
-                    </div>
-                    <hr>
-                    <div class="d-flex justify-content-between mb-3">
-                        <strong>Total:</strong>
-                        <strong>${{ carrito.precio_total }}</strong>
-                    </div>
-                    
-                    {% if carrito.items_count > 0 %}
-                    <button type="button" class="btn btn-checkout w-100" data-bs-toggle="modal" data-bs-target="#shoppingListModal">
-                        Generar Lista de Compra <i class="bi bi-list-check"></i>
-                    </button>
+
+                    {% if carrito.items_count == 0 %}
+                        <div class="empty-cart">
+                            <i class="bi bi-cart-x mb-3"></i>
+                            <h2>Tu carrito está vacío</h2>
+                            <p class="text-muted">No has agregado productos a tu carrito todavía.</p>
+                            <a href="{% url 'productos:producto_list' %}" class="btn btn-primary btn-continue-shopping mt-3">
+                                <i class="bi bi-box"></i> Explorar Productos
+                            </a>
+                        </div>
                     {% else %}
-                    <button class="btn btn-checkout w-100" disabled>
-                        Generar Lista de Compra <i class="bi bi-list-check"></i>
-                    </button>
+                        <div class="mb-3 d-flex justify-content-between align-items-center">
+                            <span><strong>{{ carrito.total_productos }}</strong> producto(s) en tu carrito</span>
+                            <div>
+                                <a href="{% url 'productos:producto_list' %}" class="btn btn-outline-primary btn-sm me-2">
+                                    <i class="bi bi-plus-circle"></i> Añadir productos
+                                </a>
+                                <button id="vaciarCarrito" class="btn btn-outline-danger btn-sm">
+                                    <i class="bi bi-trash"></i> Vaciar Carrito
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="cart-items">
+                            {% for item in items %}
+                            <div class="cart-item p-3 mb-3 shadow-sm border" id="item-{{ item.id }}">
+                                <div class="row align-items-center">
+                                    <!-- Imagen del producto -->
+                                    <div class="col-md-2 col-sm-3 mb-2 mb-md-0">
+                                        <div class="img-container">
+                                            {% if item.producto.imagen %}
+                                                <img src="{{ item.producto.imagen.url }}" alt="{{ item.producto.nombre }}" class="img-fluid">
+                                            {% else %}
+                                                <img src="{% static 'img/default-product.png' %}" alt="{{ item.producto.nombre }}" class="img-fluid">
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Información del producto -->
+                                    <div class="col-md-4 col-sm-9 mb-2 mb-md-0">
+                                        <h5>{{ item.producto.nombre }}</h5>
+                                        <div>
+                                            <span class="category-pill">{{ item.producto.categoria }}</span>
+                                            <span class="category-pill">{{ item.producto.unidad_medida }}</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Control de cantidad -->
+                                    <div class="col-md-3 col-sm-6 mb-2 mb-md-0">
+                                        <div class="quantity-control">
+                                            <button class="quantity-btn decrease-btn" data-item-id="{{ item.id }}">-</button>
+                                            <input type="number" min="1" class="quantity-input" value="{{ item.cantidad }}" data-item-id="{{ item.id }}">
+                                            <button class="quantity-btn increase-btn" data-item-id="{{ item.id }}">+</button>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Precio -->
+                                    <div class="col-md-2 col-sm-3 mb-2 mb-md-0 text-end">
+                                        <h5>${{ item.subtotal }}</h5>
+                                        <small class="text-muted">${{ item.producto.precio }} / unidad</small>
+                                    </div>
+                                    
+                                    <!-- Eliminar -->
+                                    <div class="col-md-1 col-sm-3 text-end">
+                                        <button class="remove-btn" data-item-id="{{ item.id }}">
+                                            <i class="bi bi-x-circle"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
                     {% endif %}
                 </div>
                 
-                <!-- Estadísticas del carrito actual -->
-                <div class="card statistics-card mb-4">
-                    <div class="card-header bg-white">
-                        <h5 class="mb-0">Estadísticas Rápidas</h5>
+                <!-- Columna derecha: Resumen y acciones -->
+                <div class="col-lg-4">
+                    <!-- Resumen del Carrito -->
+                    <div class="cart-summary p-4">
+                        <h3>Resumen del Carrito</h3>
+                        <hr>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Productos ({{ carrito.total_productos }}):</span>
+                            <span>${{ carrito.precio_total }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Descuentos:</span>
+                            <span>$0.00</span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between mb-3">
+                            <strong>Total:</strong>
+                            <strong>${{ carrito.precio_total }}</strong>
+                        </div>
+                        
+                        {% if carrito.items_count > 0 %}
+                        <button type="button" class="btn btn-checkout w-100" data-bs-toggle="modal" data-bs-target="#shoppingListModal">
+                            Generar Lista de Compra <i class="bi bi-list-check"></i>
+                        </button>
+                        {% else %}
+                        <button class="btn btn-checkout w-100" disabled>
+                            Generar Lista de Compra <i class="bi bi-list-check"></i>
+                        </button>
+                        {% endif %}
                     </div>
-                    <div class="card-body">
-                        <div class="row g-3">
-                            <div class="col-6">
-                                <div class="text-center mb-2">
-                                    <i class="bi bi-tags statistics-icon"></i>
-                                    <h6>Categorías</h6>
-                                    <h3>{{ items|length }}</h3>
+                    
+                    <!-- Estadísticas del carrito actual -->
+                    <div class="card statistics-card mb-4">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0">Estadísticas Rápidas</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-6">
+                                    <div class="text-center mb-2">
+                                        <i class="bi bi-tags statistics-icon"></i>
+                                        <h6>Categorías</h6>
+                                        <h3>{{ items|length }}</h3>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="text-center mb-2">
-                                    <i class="bi bi-cash-coin statistics-icon"></i>
-                                    <h6>Promedio</h6>
-                                    <h3>${{ carrito.precio_total|default:0|floatformat:2 }}</h3>
+                                <div class="col-6">
+                                    <div class="text-center mb-2">
+                                        <i class="bi bi-cash-coin statistics-icon"></i>
+                                        <h6>Promedio</h6>
+                                        <h3>${{ carrito.precio_total|default:0|floatformat:2 }}</h3>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                
-                <!-- Acciones adicionales del carrito -->
-                <div class="d-grid gap-2">
-                    <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteCartModal">
-                        <i class="bi bi-trash"></i> Eliminar este carrito
-                    </button>
+                    
+                    <!-- Acciones adicionales del carrito -->
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteCartModal">
+                            <i class="bi bi-trash"></i> Eliminar este carrito
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
+        {% endif %}
     </div>
     
     <!-- Pestaña de Todos los Carritos -->
@@ -232,28 +264,31 @@
                         <h5 class="mb-0">Mis Carritos</h5>
                     </div>
                     <div class="list-group list-group-flush">
-                        <!-- Lista de todos los carritos del usuario -->
-                        <a href="#" class="list-group-item list-group-item-action cart-list-item active d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="mb-1">Carrito Principal</h6>
-                                <small class="text-muted">Creado el: 01/06/2025</small>
+                        {% if todos_carritos.count > 0 %}
+                            {% for cart in todos_carritos %}
+                            <a href="#" class="list-group-item list-group-item-action cart-list-item {% if cart.activo %}active{% endif %} d-flex justify-content-between align-items-center" data-cart-id="{{ cart.id_carrito }}">
+                                <div>
+                                    <h6 class="mb-1">{{ cart.nombre_display }}</h6>
+                                    <small class="text-muted">Creado el: {{ cart.fecha_creacion|date:"d/m/Y" }}</small>
+                                    <br><small class="text-muted">{{ cart.total_productos }} productos - ${{ cart.precio_total }}</small>
+                                    {% if cart.nombre %}
+                                    <br><small class="badge bg-info text-dark">{{ cart.nombre }}</small>
+                                    {% endif %}
+                                </div>
+                                {% if cart.activo %}
+                                    <span class="badge bg-success rounded-pill">Activo</span>
+                                {% else %}
+                                    <span class="badge bg-secondary rounded-pill">Inactivo</span>
+                                {% endif %}
+                            </a>
+                            {% endfor %}
+                        {% else %}
+                            <div class="list-group-item text-center py-4">
+                                <i class="bi bi-cart-x mb-3" style="font-size: 2rem; color: #ccc;"></i>
+                                <p class="text-muted mb-0">No tienes carritos creados</p>
+                                <small class="text-muted">Crea tu primer carrito para comenzar</small>
                             </div>
-                            <span class="badge bg-success rounded-pill">Activo</span>
-                        </a>
-                        <a href="#" class="list-group-item list-group-item-action cart-list-item d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="mb-1">Carrito Secundario</h6>
-                                <small class="text-muted">Creado el: 28/05/2025</small>
-                            </div>
-                            <span class="badge bg-secondary rounded-pill">Inactivo</span>
-                        </a>
-                        <a href="#" class="list-group-item list-group-item-action cart-list-item d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="mb-1">Carrito Compartido</h6>
-                                <small class="text-muted">Creado el: 15/05/2025</small>
-                            </div>
-                            <span class="badge bg-secondary rounded-pill">Inactivo</span>
-                        </a>
+                        {% endif %}
                     </div>
                     <div class="card-footer bg-white text-center">
                         <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#createCartModal">
@@ -264,146 +299,202 @@
             </div>
             
             <div class="col-md-8">
-                <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">Detalle del Carrito</h5>
-                        <div>
-                            <button class="btn btn-sm btn-outline-success me-2">
-                                <i class="bi bi-arrow-clockwise"></i> Activar
-                            </button>
-                            <button class="btn btn-sm btn-outline-danger">
-                                <i class="bi bi-trash"></i> Eliminar
-                            </button>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <h6><i class="bi bi-calendar3"></i> Creado: 01/06/2025</h6>
-                                <h6><i class="bi bi-person"></i> Creador: {{ carrito.usuario.username }}</h6>
-                            </div>
-                            <div class="col-md-6">
-                                <h6 class="mb-2">Usuarios compartidos:</h6>
-                                <div class="user-badges">
-                                    <span class="user-badge owner">
-                                        <i class="bi bi-person-check me-1"></i> {{ carrito.usuario.username }} (Dueño)
-                                    </span>
-                                    <span class="user-badge">
-                                        <i class="bi bi-person me-1"></i> Usuario2
-                                    </span>
+                {% if todos_carritos.count > 0 %}
+                    {% if carrito %}
+                        <!-- Contenido del carrito seleccionado -->
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">{{ carrito.nombre_display }}</h5>
+                                <div>
+                                    {% if not carrito.activo %}
+                                    <button class="btn btn-sm btn-outline-success me-2 activar-carrito-btn" data-carrito-id="{{ carrito.id_carrito }}">
+                                        <i class="bi bi-arrow-clockwise"></i> Activar
+                                    </button>
+                                    {% endif %}
+                                    <button class="btn btn-sm btn-outline-danger eliminar-carrito-btn" data-carrito-id="{{ carrito.id_carrito }}">
+                                        <i class="bi bi-trash"></i> Eliminar
+                                    </button>
                                 </div>
                             </div>
+                            <div class="card-body">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <h6><i class="bi bi-calendar3"></i> Creado: {{ carrito.fecha_creacion|date:"d/m/Y" }}</h6>
+                                        <h6><i class="bi bi-person"></i> Creador: {{ carrito.usuario.username }}</h6>
+                                        {% if carrito.nombre %}
+                                        <h6><i class="bi bi-tag"></i> Nombre personalizado: {{ carrito.nombre }}</h6>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6 class="mb-2">Usuarios compartidos:</h6>
+                                        <div class="user-badges">
+                                            <span class="user-badge owner">
+                                                <i class="bi bi-person-check me-1"></i> {{ carrito.usuario.username }} (Dueño)
+                                            </span>
+                                            {% for usuario in carrito.usuarios_compartidos.all %}
+                                            <span class="user-badge">
+                                                <i class="bi bi-person me-1"></i> {{ usuario.username }}
+                                            </span>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <h6 class="mb-3">Productos en este carrito:</h6>
+                                {% if items %}
+                                <table class="table table-sm table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Producto</th>
+                                            <th>Cantidad</th>
+                                            <th class="text-end">Subtotal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for item in items %}
+                                        <tr>
+                                            <td>{{ item.producto.nombre }}</td>
+                                            <td>{{ item.cantidad }} {{ item.producto.unidad_medida }}</td>
+                                            <td class="text-end">${{ item.subtotal }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td colspan="2" class="text-end"><strong>Total:</strong></td>
+                                            <td class="text-end"><strong>${{ carrito.precio_total }}</strong></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                                {% else %}
+                                <div class="text-center py-4">
+                                    <i class="bi bi-cart-x" style="font-size: 2rem; color: #ccc;"></i>
+                                    <p class="text-muted mt-2 mb-0">Este carrito está vacío</p>
+                                </div>
+                                {% endif %}
+                            </div>
                         </div>
-                        
-                        <h6 class="mb-3">Productos en este carrito:</h6>
-                        <table class="table table-sm table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Producto</th>
-                                    <th>Cantidad</th>
-                                    <th class="text-end">Subtotal</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for item in items %}
-                                <tr>
-                                    <td>{{ item.producto.nombre }}</td>
-                                    <td>{{ item.cantidad }} {{ item.producto.unidad_medida }}</td>
-                                    <td class="text-end">${{ item.subtotal }}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    <td colspan="2" class="text-end"><strong>Total:</strong></td>
-                                    <td class="text-end"><strong>${{ carrito.precio_total }}</strong></td>
-                                </tr>
-                            </tfoot>
-                        </table>
+                    {% else %}
+                        <!-- Mensaje cuando no hay carrito seleccionado pero hay carritos -->
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-body text-center py-5">
+                                <i class="bi bi-cart-dash mb-4" style="font-size: 4rem; color: #ccc;"></i>
+                                <h4 class="mb-3">Selecciona un carrito</h4>
+                                <p class="text-muted mb-4">Haz clic en uno de tus carritos de la izquierda para ver sus detalles</p>
+                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createCartModal">
+                                    <i class="bi bi-cart-plus me-2"></i> Crear Nuevo Carrito
+                                </button>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <!-- Mensaje cuando no hay carritos creados -->
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body text-center py-5">
+                            <i class="bi bi-cart-x mb-4" style="font-size: 4rem; color: #ccc;"></i>
+                            <h4 class="mb-3">No tienes carritos creados</h4>
+                            <p class="text-muted mb-4">Crea tu primer carrito para comenzar a gestionar tus compras.</p>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createCartModal">
+                                <i class="bi bi-cart-plus me-2"></i> Crear Mi Primer Carrito
+                            </button>
+                        </div>
                     </div>
-                </div>
+                {% endif %}
             </div>
         </div>
     </div>
     
     <!-- Pestaña de Estadísticas -->
     <div class="tab-pane fade" id="statistics" role="tabpanel" aria-labelledby="statistics-tab">
-        <div class="row mb-4">
-            <!-- Tarjetas de estadísticas -->
-            <div class="col-md-3 mb-3">
-                <div class="card statistics-card h-100">
-                    <div class="card-body text-center py-4">
-                        <i class="bi bi-cart-plus statistics-icon mb-3"></i>
-                        <h5>Total de Carritos</h5>
-                        <h2>3</h2>
+        {% if todos_carritos.count > 0 %}
+            <!-- Contenido de estadísticas cuando hay carritos -->
+            <div class="row mb-4">
+                <!-- Tarjetas de estadísticas con datos reales -->
+                <div class="col-md-3 mb-3">
+                    <div class="card statistics-card h-100">
+                        <div class="card-body text-center py-4">
+                            <i class="bi bi-cart-plus statistics-icon mb-3"></i>
+                            <h5>Total de Carritos</h5>
+                            <h2>{{ total_carritos }}</h2>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-3 mb-3">
-                <div class="card statistics-card h-100">
-                    <div class="card-body text-center py-4">
-                        <i class="bi bi-basket statistics-icon mb-3"></i>
-                        <h5>Total de Productos</h5>
-                        <h2>{{ carrito.total_productos }}</h2>
+                <div class="col-md-3 mb-3">
+                    <div class="card statistics-card h-100">
+                        <div class="card-body text-center py-4">
+                            <i class="bi bi-basket statistics-icon mb-3"></i>
+                            <h5>Total de Productos</h5>
+                            <h2>{{ carrito.total_productos|default:0 }}</h2>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-3 mb-3">
-                <div class="card statistics-card h-100">
-                    <div class="card-body text-center py-4">
-                        <i class="bi bi-cash statistics-icon mb-3"></i>
-                        <h5>Gasto Total</h5>
-                        <h2>${{ carrito.precio_total }}</h2>
+                <div class="col-md-3 mb-3">
+                    <div class="card statistics-card h-100">
+                        <div class="card-body text-center py-4">
+                            <i class="bi bi-cash statistics-icon mb-3"></i>
+                            <h5>Gasto Total</h5>
+                            <h2>${{ carrito.precio_total|default:0 }}</h2>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-3 mb-3">
-                <div class="card statistics-card h-100">
-                    <div class="card-body text-center py-4">
-                        <i class="bi bi-people statistics-icon mb-3"></i>
-                        <h5>Carritos Compartidos</h5>
-                        <h2>1</h2>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="row">
-            <!-- Gráficos y detalles estadísticos -->
-            <div class="col-md-6 mb-4">
-                <div class="card shadow-sm h-100">
-                    <div class="card-header bg-white">
-                        <h5 class="mb-0">Distribución por Categorías</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="chart-container" style="height: 300px; position: relative;">
-                            <!-- Aquí iría un gráfico de categorías -->
-                            <div class="text-center text-muted py-5">
-                                <i class="bi bi-pie-chart" style="font-size: 3rem;"></i>
-                                <p class="mt-3">Aquí se mostraría un gráfico de distribución por categorías</p>
-                            </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card statistics-card h-100">
+                        <div class="card-body text-center py-4">
+                            <i class="bi bi-people statistics-icon mb-3"></i>
+                            <h5>Carritos Compartidos</h5>
+                            <h2>{{ carritos_compartidos }}</h2>
                         </div>
                     </div>
                 </div>
             </div>
             
-            <div class="col-md-6 mb-4">
-                <div class="card shadow-sm h-100">
-                    <div class="card-header bg-white">
-                        <h5 class="mb-0">Evolución de Gastos</h5>
+            <div class="row">
+                <!-- Gráficos y detalles estadísticos -->
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0">Distribución por Categorías</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container" style="height: 300px; position: relative;">
+                                <!-- Aquí iría un gráfico de categorías -->
+                                <div class="text-center text-muted py-5">
+                                    <i class="bi bi-pie-chart" style="font-size: 3rem;"></i>
+                                    <p class="mt-3">Aquí se mostraría un gráfico de distribución por categorías</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <div class="chart-container" style="height: 300px; position: relative;">
-                            <!-- Aquí iría un gráfico de evolución de gastos -->
-                            <div class="text-center text-muted py-5">
-                                <i class="bi bi-bar-chart-line" style="font-size: 3rem;"></i>
-                                <p class="mt-3">Aquí se mostraría un gráfico de evolución de gastos</p>
+                </div>
+                
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0">Evolución de Gastos</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container" style="height: 300px; position: relative;">
+                                <!-- Aquí iría un gráfico de evolución de gastos -->
+                                <div class="text-center text-muted py-5">
+                                    <i class="bi bi-bar-chart-line" style="font-size: 3rem;"></i>
+                                    <p class="mt-3">Aquí se mostraría un gráfico de evolución de gastos</p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        {% else %}
+            <!-- Mensaje cuando no hay datos para estadísticas -->
+            <div class="text-center py-5">
+                <i class="bi bi-graph-up mb-4" style="font-size: 4rem; color: #ccc;"></i>
+                <h3 class="mb-3">Sin datos para mostrar</h3>
+                <p class="text-muted mb-4">Crea y utiliza carritos para generar estadísticas de tus compras.</p>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createCartModal">
+                    <i class="bi bi-cart-plus me-2"></i> Crear Mi Primer Carrito
+                </button>
+            </div>
+        {% endif %}
     </div>
 </div>
 
@@ -453,22 +544,19 @@
             </div>
             <div class="modal-body">
                 <form id="inviteUserForm">
+                    {% csrf_token %}
                     <div class="mb-3">
                         <label for="userEmail" class="form-label">Email del usuario</label>
-                        <input type="email" class="form-control" id="userEmail" placeholder="ejemplo@correo.com">
-                    </div>
-                    <div class="mb-3">
-                        <label for="userPermission" class="form-label">Permisos</label>
-                        <select class="form-select" id="userPermission">
-                            <option value="read">Solo lectura</option>
-                            <option value="edit">Editar</option>
-                        </select>
+                        <input type="email" class="form-control" id="userEmail" placeholder="ejemplo@correo.com" required>
+                        <div class="form-text">El usuario debe estar registrado en la plataforma.</div>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary">Invitar</button>
+                <button type="button" class="btn btn-primary" id="inviteUserBtn">
+                    <i class="bi bi-person-plus"></i> Enviar Invitación
+                </button>
             </div>
         </div>
     </div>
@@ -487,13 +575,14 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-danger">Eliminar</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteCart">Eliminar</button>
             </div>
         </div>
     </div>
 </div>
 
 <!-- Modal para generar lista de compra -->
+{% if carrito %}
 <div class="modal fade" id="shoppingListModal" tabindex="-1" aria-labelledby="shoppingListModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -504,8 +593,15 @@
             <div class="modal-body">
                 <div class="shopping-list">
                     <div class="shopping-list-header">
-                        <h3>Lista de Compra - CarritoScout</h3>
-                        <p>Generado el {{ carrito.fecha_creacion|date:"d/m/Y" }}</p>
+                        <h3>Lista de Compra - {{ carrito.nombre_display }}</h3>
+                        <p>Generado el {{ carrito.fecha_creacion|date:"d/m/Y H:i" }}</p>
+                        {% if carrito.usuarios_compartidos.all %}
+                        <p><small>Carrito compartido con: 
+                            {% for usuario in carrito.usuarios_compartidos.all %}
+                                {{ usuario.username }}{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                        </small></p>
+                        {% endif %}
                     </div>
                     
                     <!-- Agrupar productos por categoría -->
@@ -543,350 +639,29 @@
         </div>
     </div>
 </div>
+{% endif %}
+
+<!-- Variables de Django para JavaScript -->
+<script id="django-data" type="application/json">
+{
+    "csrfToken": "{{ csrf_token }}",
+    "hasActiveCart": {% if carrito %}true{% else %}false{% endif %},
+    {% if carrito %}
+    "cartId": {{ carrito.id_carrito }},
+    {% endif %}
+    "urls": {
+        "updateQuantity": "{% url 'carrito:actualizar_cantidad' %}",
+        "removeFromCart": "{% url 'carrito:eliminar_del_carrito' %}",
+        "emptyCart": "{% url 'carrito:vaciar_carrito' %}",
+        "createCart": "{% url 'carrito:crear_carrito' %}",
+        "inviteUser": "{% url 'carrito:invitar_usuario' %}",
+        "activateCart": "{% url 'carrito:activar_carrito' %}",
+        "deleteCart": "{% url 'carrito:eliminar_carrito' %}"
+    }
+}
+</script>
 {% endblock %}
 
 {% block extra_js %}
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-        
-        // Actualizar cantidad de productos
-        const updateQuantity = function(itemId, newQuantity) {
-            fetch('{% url "carrito:actualizar_cantidad" %}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-CSRFToken': csrfToken
-                },
-                body: `item_id=${itemId}&cantidad=${newQuantity}`
-            })
-            .then(response => response.json())
-            .then(data => {
-                if(data.status === 'success') {
-                    // Actualizar contador del carrito
-                    updateCartBadge(data.cart_count);
-                    
-                    // Actualizar subtotal del item
-                    const itemEl = document.getElementById(`item-${itemId}`);
-                    const priceEl = itemEl.querySelector('.col-md-2.text-end h5');
-                    priceEl.textContent = '$' + data.item_subtotal;
-                    
-                    // Actualizar total del carrito
-                    const cartTotalEl = document.querySelector('.cart-summary strong:last-child');
-                    cartTotalEl.textContent = '$' + data.cart_total;
-                    
-                    // Actualizar contadores de producto
-                    const productCountEl = document.querySelector('.mb-3 strong');
-                    productCountEl.textContent = data.cart_count;
-                    
-                    const summaryCountEl = document.querySelector('.cart-summary .mb-2 span:first-child');
-                    summaryCountEl.textContent = `Productos (${data.cart_count}):`;
-                    
-                    showNotification('Cantidad actualizada', 'success');
-                } else {
-                    showNotification(data.message, 'danger');
-                }
-            })
-            .catch(error => {
-                showNotification('Error al actualizar cantidad', 'danger');
-                console.error('Error:', error);
-            });
-        };
-        
-        // Eliminar producto del carrito
-        const removeItem = function(itemId) {
-            fetch('{% url "carrito:eliminar_del_carrito" %}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-CSRFToken': csrfToken
-                },
-                body: `item_id=${itemId}`
-            })
-            .then(response => response.json())
-            .then(data => {
-                if(data.status === 'success') {
-                    // Eliminar el item del DOM
-                    const itemEl = document.getElementById(`item-${itemId}`);
-                    itemEl.remove();
-                    
-                    // Actualizar contador del carrito
-                    updateCartBadge(data.cart_count);
-                    
-                    // Actualizar total del carrito
-                    const cartTotalEl = document.querySelector('.cart-summary strong:last-child');
-                    cartTotalEl.textContent = '$' + data.cart_total;
-                    
-                    // Actualizar contadores de producto
-                    const productCountEl = document.querySelector('.mb-3 strong');
-                    if (productCountEl) {
-                        productCountEl.textContent = data.cart_count;
-                    }
-                    
-                    const summaryCountEl = document.querySelector('.cart-summary .mb-2 span:first-child');
-                    summaryCountEl.textContent = `Productos (${data.cart_count}):`;
-                    
-                    showNotification(data.message, 'success');
-                    
-                    // Si no hay más productos, recargar para mostrar carrito vacío
-                    if (data.cart_count == 0) {
-                        location.reload();
-                    }
-                } else {
-                    showNotification(data.message, 'danger');
-                }
-            })
-            .catch(error => {
-                showNotification('Error al eliminar producto', 'danger');
-                console.error('Error:', error);
-            });
-        };
-        
-        // Vaciar carrito
-        const emptyCart = function() {
-            fetch('{% url "carrito:vaciar_carrito" %}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-CSRFToken': csrfToken
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if(data.status === 'success') {
-                    updateCartBadge(data.cart_count);
-                    showNotification(data.message, 'success');
-                    location.reload();
-                } else {
-                    showNotification(data.message, 'danger');
-                }
-            })
-            .catch(error => {
-                showNotification('Error al vaciar el carrito', 'danger');
-                console.error('Error:', error);
-            });
-        };
-        
-        // Event Listeners - Botones de carrito
-        
-        // Botones de incremento y decremento
-        document.querySelectorAll('.increase-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const itemId = this.dataset.itemId;
-                const input = document.querySelector(`.quantity-input[data-item-id="${itemId}"]`);
-                let value = parseInt(input.value);
-                input.value = value + 1;
-                updateQuantity(itemId, input.value);
-            });
-        });
-        
-        document.querySelectorAll('.decrease-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const itemId = this.dataset.itemId;
-                const input = document.querySelector(`.quantity-input[data-item-id="${itemId}"]`);
-                let value = parseInt(input.value);
-                if (value > 1) {
-                    input.value = value - 1;
-                    updateQuantity(itemId, input.value);
-                }
-            });
-        });
-        
-        // Cambio manual de cantidad
-        document.querySelectorAll('.quantity-input').forEach(input => {
-            input.addEventListener('change', function() {
-                const itemId = this.dataset.itemId;
-                if (parseInt(this.value) < 1) {
-                    this.value = 1;
-                }
-                updateQuantity(itemId, this.value);
-            });
-        });
-        
-        // Eliminar producto
-        document.querySelectorAll('.remove-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const itemId = this.dataset.itemId;
-                if (confirm('¿Estás seguro que deseas eliminar este producto del carrito?')) {
-                    removeItem(itemId);
-                }
-            });
-        });
-        
-        // Vaciar carrito
-        const vaciarBtn = document.getElementById('vaciarCarrito');
-        if (vaciarBtn) {
-            vaciarBtn.addEventListener('click', function() {
-                if (confirm('¿Estás seguro que deseas vaciar el carrito?')) {
-                    emptyCart();
-                }
-            });
-        }
-
-        // Funcionalidad para crear nuevo carrito
-        const createCartBtn = document.getElementById('createCartBtn');
-        if (createCartBtn) {
-            createCartBtn.addEventListener('click', function() {
-                const cartName = document.getElementById('cartName').value;
-                const setAsActive = document.getElementById('setAsActive').checked;
-                
-                showNotification('Creando nuevo carrito...', 'info');
-                
-                fetch('{% url "carrito:crear_carrito" %}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                        'X-CSRFToken': csrfToken
-                    },
-                    body: `nombre=${encodeURIComponent(cartName)}&activo=${setAsActive}`
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if(data.status === 'success') {
-                        // Cerrar modal
-                        const modal = bootstrap.Modal.getInstance(document.getElementById('createCartModal'));
-                        modal.hide();
-                        
-                        showNotification(data.message, 'success');
-                        
-                        // Redirigir al nuevo carrito o recargar la página
-                        if (data.redirect_url) {
-                            window.location.href = data.redirect_url;
-                        } else {
-                            location.reload();
-                        }
-                    } else {
-                        showNotification(data.message, 'danger');
-                    }
-                })
-                .catch(error => {
-                    showNotification('Error al crear el carrito', 'danger');
-                    console.error('Error:', error);
-                });
-            });
-        }
-        
-        // Limpiar formulario cuando se cierre el modal
-        const createCartModal = document.getElementById('createCartModal');
-        if (createCartModal) {
-            createCartModal.addEventListener('hidden.bs.modal', function() {
-                document.getElementById('cartName').value = '';
-                document.getElementById('setAsActive').checked = false;
-            });
-        }
-
-        // Funcionalidad de impresión de lista de compra
-        const printShoppingListBtn = document.getElementById('printShoppingList');
-        if (printShoppingListBtn) {
-            printShoppingListBtn.addEventListener('click', function() {
-                const printContents = document.querySelector('.shopping-list').innerHTML;
-                const originalContents = document.body.innerHTML;
-                
-                const printStyles = `
-                    <style>
-                        body { font-family: Arial, sans-serif; padding: 20px; }
-                        .shopping-list-header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #FF6A88; padding-bottom: 10px; }
-                        .shopping-list-section { margin-bottom: 15px; }
-                        .shopping-list-section h4 { background: linear-gradient(90deg, #FF9A8B 0%, #FF6A88 55%, #FF99AC 100%); color: white; padding: 5px 15px; border-radius: 5px; display: inline-block; font-size: 1.1rem; }
-                        .shopping-list-item { margin-bottom: 5px; display: flex; align-items: center; }
-                        .shopping-list-checkbox { margin-right: 10px; }
-                        @media print {
-                            .shopping-list-checkbox { -webkit-print-color-adjust: exact; color-adjust: exact; }
-                        }
-                    </style>
-                `;
-                
-                document.body.innerHTML = printStyles + '<div class="shopping-list">' + printContents + '</div>';
-                window.print();
-                document.body.innerHTML = originalContents;
-                
-                // Volver a agregar los event listeners después de restaurar el contenido original
-                document.addEventListener('DOMContentLoaded', function() {
-                    const printShoppingListBtn = document.getElementById('printShoppingList');
-                    if (printShoppingListBtn) {
-                        printShoppingListBtn.addEventListener('click', printShoppingList);
-                    }
-                });
-            });
-        }
-        
-        // Funcionalidad para descargar lista de compra como PDF
-        const downloadShoppingListBtn = document.getElementById('downloadShoppingList');
-        if (downloadShoppingListBtn) {
-            downloadShoppingListBtn.addEventListener('click', function() {
-                showNotification('Descargando lista de compra...', 'info');
-                // Aquí se implementaría la funcionalidad de descarga real
-                setTimeout(() => {
-                    showNotification('Lista de compra descargada', 'success');
-                }, 1500);
-            });
-        }
-        
-        // Marcar/desmarcar items de la lista de compra
-        document.querySelectorAll('.shopping-list-checkbox').forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                const parentItem = this.closest('.shopping-list-item');
-                if (this.checked) {
-                    parentItem.style.textDecoration = 'line-through';
-                    parentItem.style.color = '#999';
-                } else {
-                    parentItem.style.textDecoration = 'none';
-                    parentItem.style.color = '';
-                }
-            });
-        });
-
-        // Funcionalidad para eliminar carrito
-        const deleteCartBtn = document.querySelector('#deleteCartModal .btn-danger');
-        if (deleteCartBtn) {
-            deleteCartBtn.addEventListener('click', function() {
-                showNotification('Procesando eliminación del carrito...', 'info');
-                // Aquí se implementaría la funcionalidad real para eliminar el carrito
-                setTimeout(() => {
-                    showNotification('Carrito eliminado correctamente', 'success');
-                    // Redirigir a la lista de carritos o a la página principal
-                    // window.location.href = '{% url "carrito:ver_carrito" %}';
-                }, 1500);
-            });
-        }
-        
-        // Funcionalidad para invitar usuario
-        const inviteUserBtn = document.querySelector('#inviteUserModal .btn-primary');
-        if (inviteUserBtn) {
-            inviteUserBtn.addEventListener('click', function() {
-                const email = document.getElementById('userEmail').value;
-                const permission = document.getElementById('userPermission').value;
-                
-                if (!email) {
-                    showNotification('Por favor ingresa el email del usuario', 'warning');
-                    return;
-                }
-                
-                showNotification(`Invitando a ${email}...`, 'info');
-                // Aquí se implementaría la funcionalidad real para invitar al usuario
-                
-                setTimeout(() => {
-                    // Simulación de respuesta exitosa
-                    const userBadge = document.createElement('span');
-                    userBadge.className = 'user-badge';
-                    userBadge.innerHTML = `
-                        <i class="bi bi-person me-1"></i> ${email.split('@')[0]}
-                        <button class="btn-close ms-2 btn-sm" style="font-size: 0.6rem;"></button>
-                    `;
-                    
-                    document.querySelector('.user-badges').appendChild(userBadge);
-                    
-                    // Cerrar modal
-                    const modal = bootstrap.Modal.getInstance(document.getElementById('inviteUserModal'));
-                    modal.hide();
-                    
-                    showNotification(`Usuario ${email} invitado correctamente`, 'success');
-                    
-                    // Limpiar formulario
-                    document.getElementById('userEmail').value = '';
-                }, 1500);
-            });
-        }
-    });
-</script>
+<script src="{% static 'js/carrito.js' %}"></script>
 {% endblock %}

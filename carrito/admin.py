@@ -7,7 +7,7 @@ class CarritoProductoInline(admin.TabularInline):
 
 @admin.register(Carrito)
 class CarritoAdmin(admin.ModelAdmin):
-    list_display = ('id_carrito', 'usuario', 'fecha_creacion', 'activo', 'total_productos', 'precio_total')
+    list_display = ('id_carrito','nombre_display', 'usuario', 'fecha_creacion', 'activo', 'total_productos', 'precio_total')
     list_filter = ('activo', 'fecha_creacion')
     search_fields = ('usuario__username',)
     inlines = [CarritoProductoInline]

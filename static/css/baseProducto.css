@@ -1,6 +1,4 @@
-/* ===============================
-   ESTILOS PARA PRODUCTOS - CarritoScout
-   =============================== */
+
 
 /* Estilos de tarjetas de productos */
 .product-card {
@@ -53,9 +51,6 @@
     width: auto;
 }
 
-/* ===============================
-   ESTILOS DEL SIDEBAR DE FILTROS
-   =============================== */
 
 /* Sidebar principal */
 .sidebar {
@@ -122,7 +117,7 @@
     background-color: white;
 }
 
-/* Estilos de acordeón */
+/* Estilos de acordeón no se estan usando ATM*/
 .accordion-button:not(.collapsed) {
     background-color: rgba(255, 106, 136, 0.1);
     color: #FF6A88;
@@ -190,9 +185,7 @@
     transition: all 0.3s;
 }
 
-/* ===============================
-   ESTILOS DE PAGINACIÓN Y BOTÓN "CARGAR MÁS"
-   =============================== */
+
 
 /* Contenedor principal de productos */
 #productos-container {
@@ -298,7 +291,7 @@
     margin-right: 0.5rem;
 }
 
-/* Indicador de carga */
+/* Indicador de carga  pero no se suele ver fixear*/
 #loading-indicator {
     padding: 2rem;
     background: rgba(255, 255, 255, 0.9);
@@ -398,9 +391,6 @@
     color: #495057;
 }
 
-/* ===============================
-   ANIMACIONES
-   =============================== */
 
 /* Animación para nuevos productos cargados */
 @keyframes fadeInUp {
@@ -435,9 +425,6 @@
     z-index: 10;
 }
 
-/* ===============================
-   RESPONSIVE DESIGN
-   =============================== */
 
 /* Ajustar contenido cuando el sidebar está abierto */
 @media (min-width: 992px) {

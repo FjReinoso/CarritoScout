@@ -112,7 +112,7 @@
     color: #FF6A88;
 }
 
-/* Estilos para las pestañas - MEJORADOS */
+/* Estilos para las pestañas */
 .cart-tabs .nav-link {
     border-radius: 8px 8px 0 0;
     padding: 10px 20px;
@@ -122,23 +122,23 @@
     border-bottom: none;
     position: relative;
     transition: all 0.3s ease;
-    text-shadow: 0 0 1px rgba(255, 106, 136, 0.3); /* Sombra sutil para mejor visibilidad */
-    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05); /* Sombra ligera para pestañas inactivas */
+    text-shadow: 0 0 1px rgba(255, 106, 136, 0.3); /* Sombra porque si no no se ve*/
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05); /* Lo mismo pero inactivas */
     background-color: rgba(255, 255, 255, 0.7); /* Fondo semitransparente */
 }
 
 .cart-tabs .nav-link:hover {
-    background-color: rgba(255, 106, 136, 0.15); /* Fondo rosa pálido al hover */
+    background-color: rgba(255, 106, 136, 0.15); /* Fondo  hover */
     transform: translateY(-3px);
-    box-shadow: 0 -3px 7px rgba(255, 106, 136, 0.2); /* Sombra con tono rosa al hover */
+    box-shadow: 0 -3px 7px rgba(255, 106, 136, 0.2); 
 }
 
 .cart-tabs .nav-link.active {
     background: linear-gradient(90deg, #FF9A8B 0%, #FF6A88 55%, #FF99AC 100%);
     color: white !important; /* Aseguramos que el texto sea blanco */
     border: none;
-    box-shadow: 0 -4px 8px rgba(255, 106, 136, 0.4); /* Sombra más pronunciada */
-    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2); /* Sombra sutil para el texto */
+    box-shadow: 0 -4px 8px rgba(255, 106, 136, 0.4); 
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2); /* Sombra para el texto */
     transform: translateY(-2px); /* Ligera elevación */
 }
 
@@ -259,7 +259,7 @@
     color: #d1e7dd;
 }
 
-/* Modo oscuro para pestañas - MEJORADO */
+/* Modo oscuro para pestañas - Hay que pulir aqui.. xD */
 .dark-mode .cart-tabs .nav-link {
     color: #FF99AC;
     border-color: #444;

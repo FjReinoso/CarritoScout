@@ -81,6 +81,28 @@
             margin-right: 0 !important;
         }
         
+        /* Estilos del carrito con nombre */
+        .cart-button {
+            background-color: white;
+            color: #FF6A88 !important;
+            border: none;
+            border-radius: 20px;
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+            transition: all 0.2s ease-in-out;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .cart-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            color: #FF6A88 !important;
+            text-decoration: none;
+        }
+        
         .cart-icon {
             font-size: 1.4rem;
             position: relative;
@@ -91,10 +113,24 @@
             top: -8px;
             right: -8px;
             font-size: 0.7rem;
-            background: white;
-            color: #FF6A88;
+            background: #FF6A88;
+            color: white;
             border-radius: 50%;
             padding: 0.2rem 0.45rem;
+            min-width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .cart-name {
+            font-size: 0.9rem;
+            font-weight: 500;
+            max-width: 120px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
         }
 
         .dark-mode {
@@ -121,9 +157,22 @@
             font-size: 0.9rem;
             margin-right: 4px;
         }
+        
         body {
-            background-color: #fff5f7; /* Base actual */
-
+            background-color: #fff5f7;
+        }
+        
+        /* Responsive para el carrito */
+        @media (max-width: 768px) {
+            .cart-name {
+                display: none;
+            }
+            
+            .cart-button {
+                padding: 0.5rem;
+                min-width: 40px;
+                justify-content: center;
+            }
         }
     </style>
 </head>
@@ -141,11 +190,27 @@
                 <img src="{% static 'img/carrito-logo.png' %}" alt="">
                 CarritoScout
             </a>
-              <!-- Centro - carrito con contador -->
+            
+            <!-- Centro - carrito con contador y nombre -->
             <div class="d-flex justify-content-center position-absolute start-50 translate-middle-x">
-                <a href="{% url 'carrito:ver_carrito' %}" class="nav-link cart-icon">
-                    <i class="bi bi-cart3"></i>
-                    <span class="cart-badge" id="cart-badge">{% if request.user.is_authenticated %}{{ request.user.carritos.filter.first.total_productos|default:"0" }}{% else %}0{% endif %}</span>
+                <a href="{% url 'carrito:ver_carrito' %}" class="cart-button">
+                    <div class="cart-icon">
+                        <i class="bi bi-cart3"></i>
+                        <span class="cart-badge" id="cart-badge">
+                            {% if carrito_activo %}
+                                {{ carrito_activo.total_productos|default:"0" }}
+                            {% else %}
+                                0
+                            {% endif %}
+                        </span>
+                    </div>
+                    <span class="cart-name" id="cart-name">
+                        {% if carrito_activo %}
+                            {{ carrito_activo.nombre_display }}
+                        {% else %}
+                            Sin carrito
+                        {% endif %}
+                    </span>
                 </a>
             </div>
 
@@ -223,32 +288,51 @@
                     localStorage.setItem('darkMode', 'false');
                 }
             });
-        });    </script>
+        });
+    </script>
     
     <!-- JavaScript para funciones del carrito -->
     <script>
         // Función para actualizar el contador del carrito
         function updateCartBadge(count) {
-            document.getElementById('cart-badge').textContent = count;
+            const badge = document.getElementById('cart-badge');
+            if (badge) {
+                badge.textContent = count || '0';
+                badge.style.display = count > 0 ? 'flex' : 'flex'; // Siempre mostrar
+            }
+        }
+        
+        // Función para actualizar el nombre del carrito
+        function updateCartName(name) {
+            const cartNameEl = document.getElementById('cart-name');
+            if (cartNameEl) {
+                cartNameEl.textContent = name || 'Sin carrito';
+            }
+        }
+        
+        // Función para actualizar tanto contador como nombre
+        function updateCartInfo(count, name) {
+            updateCartBadge(count);
+            updateCartName(name);
         }
         
         // Función para mostrar mensajes de notificación
         function showNotification(message, type = 'success') {
-            // Crear elemento para notificación
             const notification = document.createElement('div');
             notification.className = `alert alert-${type} notification`;
             notification.innerHTML = message;
-            notification.style.position = 'fixed';
-            notification.style.top = '20px';
-            notification.style.right = '20px';
-            notification.style.zIndex = '1050';
-            notification.style.maxWidth = '300px';
-            notification.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 1050;
+                max-width: 300px;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+                border-radius: 8px;
+            `;
             
-            // Añadir al DOM
             document.body.appendChild(notification);
             
-            // Eliminar después de 3 segundos
             setTimeout(() => {
                 notification.style.opacity = '0';
                 notification.style.transition = 'opacity 0.5s ease';
@@ -272,6 +356,10 @@
             .then(data => {
                 if(data.status === 'success') {
                     updateCartBadge(data.cart_count);
+                    // Si tienes el nombre del carrito en la respuesta, actualízalo también
+                    if(data.cart_name) {
+                        updateCartName(data.cart_name);
+                    }
                     showNotification(data.message);
                 } else {
                     showNotification(data.message, 'danger');

@@ -1,13 +1,14 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
+from django.contrib.auth.models import User
 from django.contrib import messages
 from django.utils import timezone
 from django.db import transaction
 from django.db.models import F, Sum, Count
 from django.views.decorators.http import require_POST
 from django.urls import reverse
-from .models import Carrito, CarritoProducto, HistorialCarrito
+from .models import Carrito, CarritoProducto, HistorialCarrito, InvitacionCarrito
 from productos.models import Producto
 @login_required
 @require_POST
@@ -25,6 +26,7 @@ def crear_carrito(request):
         # Crear el nuevo carrito
         carrito = Carrito.objects.create(
             usuario=request.user,
+            nombre=nombre if nombre else None,
             activo=activo,
             fecha_creacion=timezone.now()
         )
@@ -49,23 +51,121 @@ def crear_carrito(request):
     
 @login_required
 def ver_carrito(request):
-    """Vista para mostrar el contenido del carrito del usuario"""
-    # Obtener el carrito activo del usuario o crear uno nuevo
-    carrito, created = Carrito.objects.get_or_create(
-        usuario=request.user, 
-        activo=True, 
-        defaults={'fecha_creacion': timezone.now()}
-    )
+    """Vista principal del carrito"""
+    # Buscar el carrito activo del usuario
+    carrito = Carrito.objects.filter(usuario=request.user, activo=True).first()
     
-    # Obtener todos los productos del carrito con sus relaciones
-    items = carrito.items.select_related('producto').all()
+    # Obtener todos los carritos del usuario
+    todos_carritos = Carrito.objects.filter(usuario=request.user).order_by('-fecha_creacion')
+    
+    # Si no hay carrito activo, usar variables por defecto
+    if not carrito:
+        context = {
+            'carrito': None,
+            'items': [],
+            'todos_carritos': todos_carritos,
+            'total_carritos': todos_carritos.count(),
+            'carritos_compartidos': 0,
+        }
+        return render(request, 'carrito/carrito.html', context)
+    
+    # Si hay carrito, continuar con la lógica normal
+    items = CarritoProducto.objects.filter(carrito=carrito).select_related('producto')
+    
+    # Estadísticas
+    carritos_compartidos = Carrito.objects.filter(
+        usuarios_compartidos=request.user
+    ).count()
     
     context = {
         'carrito': carrito,
         'items': items,
+        'todos_carritos': todos_carritos,
+        'total_carritos': todos_carritos.count(),
+        'carritos_compartidos': carritos_compartidos,
     }
     
     return render(request, 'carrito/carrito.html', context)
+@login_required
+@require_POST
+def activar_carrito(request):
+    """Vista para activar un carrito específico"""
+    try:
+        carrito_id = request.POST.get('carrito_id')
+        
+        if not carrito_id:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'ID de carrito no proporcionado'
+            })
+        
+        # Verificar que el carrito existe y pertenece al usuario
+        carrito = get_object_or_404(Carrito, id_carrito=carrito_id, usuario=request.user)
+        
+        # Desactivar todos los carritos del usuario
+        Carrito.objects.filter(usuario=request.user, activo=True).update(activo=False)
+        
+        # Activar el carrito seleccionado
+        carrito.activo = True
+        carrito.save()
+        
+        return JsonResponse({
+            'status': 'success',
+            'message': f'Carrito {carrito.nombre_display} activado correctamente'
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Error al activar el carrito. Inténtalo de nuevo.'
+        })
+
+@login_required
+@require_POST
+def eliminar_carrito(request):
+    """Vista para eliminar un carrito específico"""
+    try:
+        carrito_id = request.POST.get('carrito_id')
+        
+        if not carrito_id:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'ID de carrito no proporcionado'
+            })
+        
+        # Verificar que el carrito existe y pertenece al usuario
+        carrito = get_object_or_404(Carrito, id_carrito=carrito_id, usuario=request.user)
+        
+        # No permitir eliminar el carrito activo si es el único
+        if carrito.activo:
+            otros_carritos = Carrito.objects.filter(usuario=request.user).exclude(id_carrito=carrito_id)
+            if not otros_carritos.exists():
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'No puedes eliminar tu único carrito. Crea otro carrito primero.'
+                })
+        
+        carrito_nombre = carrito.nombre_display
+        was_active = carrito.activo
+        carrito.delete()
+        
+        # Si era el carrito activo, activar otro carrito
+        if was_active:
+            otro_carrito = Carrito.objects.filter(usuario=request.user).first()
+            if otro_carrito:
+                otro_carrito.activo = True
+                otro_carrito.save()
+        
+        return JsonResponse({
+            'status': 'success',
+            'message': f'Carrito {carrito_nombre} eliminado correctamente'
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Error al eliminar el carrito. Inténtalo de nuevo.'
+        })
 
 @login_required
 @require_POST
@@ -240,3 +340,111 @@ def detalle_historial(request, historial_id):
     }
     
     return render(request, 'carrito/detalle_historial.html', context)
+@login_required
+@require_POST
+def invitar_usuario(request):
+    """Vista para invitar un usuario a un carrito"""
+    try:
+        email = request.POST.get('email', '').strip()
+        carrito_id = request.POST.get('carrito_id')
+        
+        if not email:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Por favor ingresa un email válido'
+            })
+        
+        # Verificar que el carrito existe y pertenece al usuario
+        carrito = get_object_or_404(Carrito, id_carrito=carrito_id, usuario=request.user)
+        
+        # Buscar el usuario por email
+        try:
+            usuario_invitado = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'No se encontró un usuario con ese email'
+            })
+        
+        # Verificar que no sea el mismo usuario
+        if usuario_invitado == request.user:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'No puedes invitarte a ti mismo'
+            })
+        
+        # Verificar que no esté ya invitado
+        if InvitacionCarrito.objects.filter(carrito=carrito, usuario=usuario_invitado).exists():
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Este usuario ya tiene una invitación pendiente o ya está en el carrito'
+            })
+        
+        # Crear la invitación
+        invitacion = InvitacionCarrito.objects.create(
+            carrito=carrito,
+            usuario=usuario_invitado,
+            fecha_invitacion=timezone.now()
+        )
+        
+        return JsonResponse({
+            'status': 'success',
+            'message': f'Usuario {email} invitado correctamente',
+            'user_name': usuario_invitado.username,
+            'user_email': email
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Error al enviar la invitación. Inténtalo de nuevo.'
+        })
+
+@login_required
+@require_POST
+def responder_invitacion(request):
+    """Vista para aceptar o rechazar una invitación a carrito"""
+    try:
+        invitacion_id = request.POST.get('invitacion_id')
+        accion = request.POST.get('accion')  # 'aceptar' o 'rechazar'
+        
+        invitacion = get_object_or_404(
+            InvitacionCarrito, 
+            id=invitacion_id, 
+            usuario=request.user,
+            estado='pendiente'
+        )
+        
+        if accion == 'aceptar':
+            invitacion.estado = 'aceptada'
+            invitacion.fecha_respuesta = timezone.now()
+            invitacion.save()
+            
+            # Agregar el usuario al carrito compartido
+            invitacion.carrito.usuarios_compartidos.add(request.user)
+            
+            mensaje = f'Te has unido al carrito #{invitacion.carrito.id_carrito}'
+            
+        elif accion == 'rechazar':
+            invitacion.estado = 'rechazada'
+            invitacion.fecha_respuesta = timezone.now()
+            invitacion.save()
+            
+            mensaje = 'Invitación rechazada'
+            
+        else:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Acción no válida'
+            })
+        
+        return JsonResponse({
+            'status': 'success',
+            'message': mensaje
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Error al procesar la invitación'
+        })
