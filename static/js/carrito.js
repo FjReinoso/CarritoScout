@@ -24,9 +24,7 @@ class CarritoManager {
                 this.djangoData = {};
             }
         }
-    }
-
-    setupEventListeners() {
+    }    setupEventListeners() {
         // Event listeners para carrito activo (solo si existe)
         if (this.djangoData.hasActiveCart) {
             this.setupCartItemListeners();
@@ -37,6 +35,7 @@ class CarritoManager {
         // Event listeners generales
         this.setupCartManagementListeners();
         this.setupModalListeners();
+        this.setupCartSelectorListeners(); // Nueva funcionalidad para seleccionar carritos
     }
 
     setupCartItemListeners() {
@@ -140,21 +139,27 @@ class CarritoManager {
                 }
             });
         });
-    }
-
-    setupCartManagementListeners() {
+    }    setupCartManagementListeners() {
         // Botones de activar carrito
         document.querySelectorAll('.activar-carrito-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                const carritoId = e.target.dataset.carritoId;
-                this.activateCart(carritoId);
+                e.preventDefault();
+                e.stopPropagation();
+                const carritoId = btn.dataset.carritoId;
+                
+                // Confirmar la activación del carrito
+                if (confirm('¿Deseas activar este carrito? El carrito activo actual se desactivará.')) {
+                    this.activateCart(carritoId);
+                }
             });
         });
 
         // Botones de eliminar carrito
         document.querySelectorAll('.eliminar-carrito-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                const carritoId = e.target.dataset.carritoId;
+                e.preventDefault();
+                e.stopPropagation();
+                const carritoId = btn.dataset.carritoId;
                 this.showDeleteCartModal(carritoId);
             });
         });
@@ -174,9 +179,7 @@ class CarritoManager {
                 this.deleteCart();
             });
         }
-    }
-
-    setupModalListeners() {
+    }setupModalListeners() {
         const createCartModal = document.getElementById('createCartModal');
         if (createCartModal) {
             createCartModal.addEventListener('hidden.bs.modal', () => {
@@ -184,6 +187,25 @@ class CarritoManager {
                 document.getElementById('setAsActive').checked = false;
             });
         }
+    }    setupCartSelectorListeners() {
+        // Los carritos ahora solo se activan mediante botones específicos
+        // Esta función puede ser usada para futuras funcionalidades de selección visual
+        document.querySelectorAll('.cart-list-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                // Prevenir que los clics en botones activen esta función
+                if (e.target.closest('button')) {
+                    return;
+                }
+                
+                // Resaltar visualmente el carrito seleccionado (opcional)
+                document.querySelectorAll('.cart-list-item').forEach(el => {
+                    el.classList.remove('selected');
+                });
+                item.classList.add('selected');
+                
+                console.log('Cart selected for viewing:', item.dataset.cartId);
+            });
+        });
     }
 
     // === MÉTODOS DE API ===
@@ -366,9 +388,7 @@ class CarritoManager {
             this.showNotification('Error al enviar la invitación', 'danger');
             console.error('Error:', error);
         }
-    }
-
-    async activateCart(carritoId) {
+    }    async activateCart(carritoId) {
         this.showNotification('Activando carrito...', 'info');
 
         try {
@@ -387,11 +407,22 @@ class CarritoManager {
                 this.showNotification(data.message, 'success');
                 
                 // Actualizar información del carrito en la navbar
-                if (typeof updateCartInfo === 'function') {
-                    updateCartInfo(data.cart_count, data.cart_name);
-                }
+                this.updateCartName(data.cart_name);
                 
-                location.reload();
+                // Actualizar la interfaz local sin recargar toda la página
+                this.updateCartSelection(carritoId);
+                
+                // Actualizar el objeto djangoData para reflejar el nuevo carrito activo
+                this.djangoData.hasActiveCart = true;
+                this.djangoData.cartId = carritoId;
+                
+                // Solo recargar si estamos en la pestaña del carrito activo para ver los productos
+                const activeTab = document.querySelector('#active-cart-tab');
+                if (activeTab && activeTab.classList.contains('active')) {
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1000);
+                }
             } else {
                 this.showNotification(data.message, 'danger');
             }
@@ -533,9 +564,7 @@ class CarritoManager {
                 }, 500);
             }
         }, 5000);
-    }
-
-    getIconForType(type) {
+    }    getIconForType(type) {
         const icons = {
             'success': 'check-circle',
             'danger': 'x-circle',
@@ -543,6 +572,67 @@ class CarritoManager {
             'info': 'info-circle'
         };
         return icons[type] || 'info-circle';
+    }
+
+    // Nuevo método para actualizar el nombre del carrito en la navbar
+    updateCartName(name) {
+        const cartNameEl = document.getElementById('cart-name');
+        if (cartNameEl) {
+            cartNameEl.textContent = name || 'Sin carrito';
+        }
+    }    // Nuevo método para actualizar la selección visual de carritos
+    updateCartSelection(activeCarritoId) {
+        // Remover la clase active de todos los carritos y actualizar botones
+        document.querySelectorAll('.cart-list-item').forEach(item => {
+            const cartId = item.dataset.cartId;
+            const badge = item.querySelector('.badge');
+            const activateBtn = item.querySelector('.activar-carrito-btn');
+            
+            if (cartId === activeCarritoId) {
+                // Este es el carrito que se acaba de activar
+                item.classList.add('active');
+                if (badge) {
+                    badge.textContent = 'Activo';
+                    badge.className = 'badge bg-success rounded-pill';
+                }
+                // Ocultar el botón de activar y mostrar solo el badge
+                if (activateBtn) {
+                    activateBtn.style.display = 'none';
+                }
+            } else {
+                // Otros carritos se vuelven inactivos
+                item.classList.remove('active');
+                if (badge) {
+                    badge.textContent = 'Inactivo';
+                    badge.className = 'badge bg-secondary rounded-pill';
+                }
+                // Mostrar el botón de activar
+                if (activateBtn) {
+                    activateBtn.style.display = 'inline-block';
+                } else {
+                    // Si no existe el botón, crear uno nuevo
+                    const buttonContainer = item.querySelector('.d-flex.align-items-center.gap-2');
+                    if (buttonContainer && !buttonContainer.querySelector('.activar-carrito-btn')) {
+                        const newActivateBtn = document.createElement('button');
+                        newActivateBtn.className = 'btn btn-sm btn-outline-success activar-carrito-btn';
+                        newActivateBtn.dataset.carritoId = cartId;
+                        newActivateBtn.title = 'Activar este carrito';
+                        newActivateBtn.innerHTML = '<i class="bi bi-check-circle"></i> Activar';
+                        
+                        // Agregar event listener al nuevo botón
+                        newActivateBtn.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            if (confirm('¿Deseas activar este carrito? El carrito activo actual se desactivará.')) {
+                                this.activateCart(cartId);
+                            }
+                        });
+                        
+                        buttonContainer.insertBefore(newActivateBtn, badge);
+                    }
+                }
+            }
+        });
     }
 }
 

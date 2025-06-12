@@ -40,6 +40,8 @@ def crear_carrito(request):
             'status': 'success',
             'message': mensaje,
             'carrito_id': carrito.id_carrito,
+            'cart_name': carrito.nombre_display, 
+            'cart_count': carrito.total_productos,  
             'redirect_url': reverse('carrito:ver_carrito') if activo else None
         })
         
@@ -111,7 +113,9 @@ def activar_carrito(request):
         
         return JsonResponse({
             'status': 'success',
-            'message': f'Carrito {carrito.nombre_display} activado correctamente'
+            'message': f'Carrito {carrito.nombre_display} activado correctamente',
+            'cart_name': carrito.nombre_display, 
+            'cart_count': carrito.total_productos 
         })
         
     except Exception as e:

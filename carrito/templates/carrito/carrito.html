@@ -246,7 +246,7 @@
                     
                     <!-- Acciones adicionales del carrito -->
                     <div class="d-grid gap-2">
-                        <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteCartModal">
+                        <button type="button" class="btn btn-outline-danger eliminar-carrito-btn" data-bs-toggle="modal" data-bs-target="#deleteCartModal" data-carrito-id="{{ carrito.id_carrito }}">
                             <i class="bi bi-trash"></i> Eliminar este carrito
                         </button>
                     </div>
@@ -263,24 +263,33 @@
                     <div class="card-header bg-white">
                         <h5 class="mb-0">Mis Carritos</h5>
                     </div>
-                    <div class="list-group list-group-flush">
-                        {% if todos_carritos.count > 0 %}
+                    <div class="list-group list-group-flush">                        {% if todos_carritos.count > 0 %}
                             {% for cart in todos_carritos %}
-                            <a href="#" class="list-group-item list-group-item-action cart-list-item {% if cart.activo %}active{% endif %} d-flex justify-content-between align-items-center" data-cart-id="{{ cart.id_carrito }}">
-                                <div>
-                                    <h6 class="mb-1">{{ cart.nombre_display }}</h6>
-                                    <small class="text-muted">Creado el: {{ cart.fecha_creacion|date:"d/m/Y" }}</small>
-                                    <br><small class="text-muted">{{ cart.total_productos }} productos - ${{ cart.precio_total }}</small>
-                                    {% if cart.nombre %}
-                                    <br><small class="badge bg-info text-dark">{{ cart.nombre }}</small>
-                                    {% endif %}
+                            <div class="list-group-item cart-list-item {% if cart.activo %}active{% endif %}" data-cart-id="{{ cart.id_carrito }}">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1">{{ cart.nombre_display }}</h6>
+                                        <small class="text-muted">Creado el: {{ cart.fecha_creacion|date:"d/m/Y" }}</small>
+                                        <br><small class="text-muted">{{ cart.total_productos }} productos - ${{ cart.precio_total }}</small>
+                                        {% if cart.nombre %}
+                                        <br><small class="badge bg-info text-dark">{{ cart.nombre }}</small>
+                                        {% endif %}
+                                    </div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        {% if cart.activo %}
+                                            <span class="badge bg-success rounded-pill">Activo</span>
+                                        {% else %}
+                                            <button class="btn btn-sm btn-outline-success activar-carrito-btn" data-carrito-id="{{ cart.id_carrito }}" title="Activar este carrito">
+                                                <i class="bi bi-check-circle"></i> Activar
+                                            </button>
+                                            <span class="badge bg-secondary rounded-pill">Inactivo</span>
+                                        {% endif %}
+                                        <button class="btn btn-sm btn-outline-danger eliminar-carrito-btn" data-bs-toggle="modal" data-bs-target="#deleteCartModal" data-carrito-id="{{ cart.id_carrito }}" title="Eliminar carrito">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
                                 </div>
-                                {% if cart.activo %}
-                                    <span class="badge bg-success rounded-pill">Activo</span>
-                                {% else %}
-                                    <span class="badge bg-secondary rounded-pill">Inactivo</span>
-                                {% endif %}
-                            </a>
+                            </div>
                             {% endfor %}
                         {% else %}
                             <div class="list-group-item text-center py-4">
