@@ -293,41 +293,33 @@ def actualizar_cantidad(request):
 @login_required
 @require_POST
 def eliminar_del_carrito(request):
-    """Vista para eliminar un producto del carrito por producto, supermercado y carrito"""
+    """Vista para eliminar un producto del carrito usando solo el item_id de CarritoProducto"""
     try:
-        carrito_id = request.POST.get('carrito_id')
-        producto_id = request.POST.get('producto_id')
-        supermercado_id = request.POST.get('supermercado_id')
-        print(f"[DEBUG] carrito_id={carrito_id}, producto_id={producto_id}, supermercado_id={supermercado_id}")
-        if not (carrito_id and producto_id):
-            return JsonResponse({'status': 'error', 'message': 'Faltan datos para eliminar el producto'}, status=400)
-        # Buscar el item por la combinación
-        filtro = {
-            'carrito_id': carrito_id,
-            'producto_id': producto_id,
-            'carrito__usuario': request.user
-        }
-        if supermercado_id:
-            filtro['supermercado_id'] = supermercado_id
-        else:
-            filtro['supermercado__isnull'] = True
+        item_id = request.POST.get('item_id')
+        print(f"[DEBUG] item_id recibido: {item_id}")
+        if not item_id:
+            print("[ERROR] No se recibió item_id")
+            return JsonResponse({'status': 'error', 'message': 'Falta el item_id para eliminar el producto'}, status=400)
         try:
-            item = CarritoProducto.objects.get(**filtro)
-        except CarritoProducto.DoesNotExist:
-            return JsonResponse({'status': 'error', 'message': 'El producto ya no está en el carrito'}, status=404)
+            item_id_int = int(item_id)
+        except ValueError:
+            print(f"[ERROR] item_id no es un entero válido: {item_id}")
+            return JsonResponse({'status': 'error', 'message': 'item_id inválido'}, status=400)
+        # Buscar el item por su id y que pertenezca al usuario
+        item = get_object_or_404(CarritoProducto, id=item_id_int, carrito__usuario=request.user)
         carrito = item.carrito
         producto_nombre = item.producto.nombre
         item.delete()
-        carrito = Carrito.objects.get(pk=carrito.pk)
+        carrito.refresh_from_db()
         return JsonResponse({
             'status': 'success',
             'message': f'{producto_nombre} eliminado del carrito',
             'cart_count': carrito.total_productos,
-            'cart_total': carrito.precio_total
+            'cart_total': float(carrito.precio_total) if carrito.precio_total else 0
         })
     except Exception as e:
         print(f"[ERROR] Excepción inesperada al eliminar producto: {e}")
-        return JsonResponse({'status': 'error', 'message': 'Error al eliminar el producto del carrito'}, status=500)
+        return JsonResponse({'status': 'error', 'message': f'Error interno: {e}'}, status=500)
 
 @login_required
 @require_POST

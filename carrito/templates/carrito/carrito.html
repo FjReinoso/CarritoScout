@@ -158,6 +158,9 @@
                                             <span class="category-pill">{{ item.producto.categoria }}</span>
                                             <span class="category-pill">{{ item.producto.unidad_medida }}</span>
                                         </div>
+                                        <small class="text-muted">
+                                            ID item: {{ item.id }} | ID producto: {{ item.producto.id }} | Supermercado: {{ item.supermercado.nombre|default:'Sin supermercado' }}
+                                        </small>
                                     </div>
                                     
                                     <!-- Control de cantidad -->
@@ -177,7 +180,7 @@
                                     
                                     <!-- Eliminar -->
                                     <div class="col-md-1 col-sm-3 text-end">
-                                        <button class="remove-btn" data-item-id="{{ item.id }}" data-producto-id="{{ item.producto.id }}" data-supermercado-id="{{ item.supermercado.id|default:'' }}">
+                                        <button class="remove-btn" data-item-id="{{ item.id }}">
                                             <i class="bi bi-x-circle"></i>
                                         </button>
                                     </div>

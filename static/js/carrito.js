@@ -1,5 +1,3 @@
-
-
 class CarritoManager {
     constructor() {
         this.djangoData = null;
@@ -77,7 +75,8 @@ class CarritoManager {
         // Botones de eliminar producto
         document.querySelectorAll('.remove-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                const itemId = e.target.dataset.itemId;
+                // Usar currentTarget para asegurar que siempre se obtiene el item_id correcto
+                const itemId = e.currentTarget.dataset.itemId;
                 if (confirm('¿Estás seguro que deseas eliminar este producto del carrito?')) {
                     this.removeItem(itemId);
                 }
