@@ -5,11 +5,12 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.utils import timezone
 from django.db import transaction
-from django.db.models import F, Sum, Count
+from django.db.models import F, Sum, Count, Q
 from django.views.decorators.http import require_POST
 from django.urls import reverse
-from .models import Carrito, CarritoProducto, HistorialCarrito, InvitacionCarrito
+from .models import Carrito, CarritoProducto, HistorialCarrito, InvitacionCarrito, CarritoActivoUsuario
 from productos.models import Producto
+
 @login_required
 @require_POST
 def crear_carrito(request):
@@ -54,17 +55,18 @@ def crear_carrito(request):
 @login_required
 def ver_carrito(request):
     """Vista principal del carrito"""
-    # Buscar el carrito activo del usuario
-    carrito = Carrito.objects.filter(usuario=request.user, activo=True).first()
+    # Buscar el carrito activo del usuario (propio o compartido)
+    carrito_activo_obj = CarritoActivoUsuario.objects.filter(usuario=request.user).select_related('carrito').first()
+    carrito = carrito_activo_obj.carrito if carrito_activo_obj else None
     
-    # Obtener todos los carritos del usuario
-    todos_carritos = Carrito.objects.filter(usuario=request.user).order_by('-fecha_creacion')
+    # Obtener todos los carritos del usuario (propios y compartidos)
+    todos_carritos = Carrito.objects.filter(
+        Q(usuario=request.user) | Q(usuarios_compartidos=request.user)
+    ).distinct().order_by('-fecha_creacion')
     
     # Invitaciones pendientes para el usuario
-    from .models import InvitacionCarrito
     invitaciones_pendientes = InvitacionCarrito.objects.filter(usuario=request.user, estado='pendiente').select_related('carrito', 'carrito__usuario')
     
-    # Si no hay carrito activo, usar variables por defecto
     if not carrito:
         context = {
             'carrito': None,
@@ -94,36 +96,39 @@ def ver_carrito(request):
     }
     
     return render(request, 'carrito/carrito.html', context)
+
 @login_required
 @require_POST
 def activar_carrito(request):
-    """Vista para activar un carrito específico"""
+    """Vista para activar un carrito específico (propio o compartido) para el usuario actual"""
+    from django.db.models import Q
     try:
         carrito_id = request.POST.get('carrito_id')
-        
         if not carrito_id:
             return JsonResponse({
                 'status': 'error',
                 'message': 'ID de carrito no proporcionado'
             })
-        
-        # Verificar que el carrito existe y pertenece al usuario
-        carrito = get_object_or_404(Carrito, id_carrito=carrito_id, usuario=request.user)
-        
-        # Desactivar todos los carritos del usuario
-        Carrito.objects.filter(usuario=request.user, activo=True).update(activo=False)
-        
-        # Activar el carrito seleccionado
-        carrito.activo = True
-        carrito.save()
-        
+        # Permitir activar si el usuario es dueño o compartido
+        carrito = Carrito.objects.filter(
+            Q(id_carrito=carrito_id) & (Q(usuario=request.user) | Q(usuarios_compartidos=request.user))
+        ).first()
+        if not carrito:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'No tienes permisos para activar este carrito.'
+            })
+        # Actualizar o crear la relación de carrito activo para este usuario
+        CarritoActivoUsuario.objects.update_or_create(
+            usuario=request.user,
+            defaults={'carrito': carrito, 'fecha_activacion': timezone.now()}
+        )
         return JsonResponse({
             'status': 'success',
             'message': f'Carrito {carrito.nombre_display} activado correctamente',
-            'cart_name': carrito.nombre_display, 
-            'cart_count': carrito.total_productos 
+            'cart_name': carrito.nombre_display,
+            'cart_count': carrito.total_productos
         })
-        
     except Exception as e:
         return JsonResponse({
             'status': 'error',
@@ -179,7 +184,7 @@ def eliminar_carrito(request):
 @login_required
 @require_POST
 def agregar_al_carrito(request):
-    """Vista para agregar productos al carrito vía AJAX"""
+    """Vista para agregar productos al carrito activo del usuario (propio o compartido)"""
     try:
         producto_id = request.POST.get('producto_id')
         cantidad = int(request.POST.get('cantidad', 1))
@@ -188,13 +193,13 @@ def agregar_al_carrito(request):
         
         if not producto_id:
             return JsonResponse({
-                'status': 'error', 
+                'status': 'error',
                 'message': 'ID de producto no proporcionado'
             }, status=400)
         
         if cantidad <= 0:
             return JsonResponse({
-                'status': 'error', 
+                'status': 'error',
                 'message': 'La cantidad debe ser mayor que cero'
             }, status=400)
         
@@ -219,15 +224,22 @@ def agregar_al_carrito(request):
         if precio_unitario is None:
             precio_unitario = float(producto.precio) if producto.precio is not None else 0
         
-        # Obtener o crear carrito activo
-        carrito, created = Carrito.objects.get_or_create(
-            usuario=request.user, 
-            activo=True, 
-            defaults={
-                'fecha_creacion': timezone.now(),
-                'nombre': None
-            }
-        )
+        # Buscar el carrito activo del usuario (propio o compartido)
+        carrito_activo_obj = CarritoActivoUsuario.objects.filter(usuario=request.user).select_related('carrito').first()
+        
+        if not carrito_activo_obj:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'No tienes un carrito activo para agregar productos.'
+            }, status=400)
+        carrito = carrito_activo_obj.carrito
+        
+        # Solo permitir agregar si el usuario es dueño o compartido
+        if not (carrito.usuario == request.user or carrito.usuarios_compartidos.filter(id=request.user.id).exists()):
+            return JsonResponse({
+                'status': 'error',
+                'message': 'No tienes permisos para modificar este carrito.'
+            }, status=403)
         
         # Buscar si ya existe ese producto en ese supermercado en el carrito
         carrito_producto, created = CarritoProducto.objects.get_or_create(
@@ -299,21 +311,19 @@ def actualizar_cantidad(request):
 @login_required
 @require_POST
 def eliminar_del_carrito(request):
-    """Vista para eliminar un producto del carrito usando solo el item_id de CarritoProducto"""
+    """Vista para eliminar un producto del carrito activo del usuario (propio o compartido)"""
     try:
         item_id = request.POST.get('item_id')
-        print(f"[DEBUG] item_id recibido: {item_id}")
         if not item_id:
-            print("[ERROR] No se recibió item_id")
             return JsonResponse({'status': 'error', 'message': 'Falta el item_id para eliminar el producto'}, status=400)
-        try:
-            item_id_int = int(item_id)
-        except ValueError:
-            print(f"[ERROR] item_id no es un entero válido: {item_id}")
-            return JsonResponse({'status': 'error', 'message': 'item_id inválido'}, status=400)
-        # Buscar el item por su id y que pertenezca al usuario
-        item = get_object_or_404(CarritoProducto, id=item_id_int, carrito__usuario=request.user)
+        item = get_object_or_404(CarritoProducto, id=item_id)
         carrito = item.carrito
+        # Solo permitir eliminar si el usuario es dueño o compartido y el carrito es el activo
+        carrito_activo_obj = CarritoActivoUsuario.objects.filter(usuario=request.user).select_related('carrito').first()
+        if not carrito_activo_obj or carrito_activo_obj.carrito.id_carrito != carrito.id_carrito:
+            return JsonResponse({'status': 'error', 'message': 'Solo puedes eliminar productos de tu carrito activo.'}, status=403)
+        if not (carrito.usuario == request.user or carrito.usuarios_compartidos.filter(id=request.user.id).exists()):
+            return JsonResponse({'status': 'error', 'message': 'No tienes permisos para modificar este carrito.'}, status=403)
         producto_nombre = item.producto.nombre
         item.delete()
         carrito.refresh_from_db()
@@ -324,7 +334,6 @@ def eliminar_del_carrito(request):
             'cart_total': float(carrito.precio_total) if carrito.precio_total else 0
         })
     except Exception as e:
-        print(f"[ERROR] Excepción inesperada al eliminar producto: {e}")
         return JsonResponse({'status': 'error', 'message': f'Error interno: {e}'}, status=500)
 
 @login_required
@@ -408,6 +417,7 @@ def detalle_historial(request, historial_id):
     }
     
     return render(request, 'carrito/detalle_historial.html', context)
+
 @login_required
 @require_POST
 def invitar_usuario(request):

@@ -109,3 +109,17 @@ class HistorialCarrito(models.Model):
         
     def __str__(self):
         return f"Historial #{self.id_historial_carrito} - {self.usuario.username}"
+
+class CarritoActivoUsuario(models.Model):
+    usuario = models.OneToOneField(User, on_delete=models.CASCADE, related_name='carrito_activo')
+    carrito = models.ForeignKey('Carrito', on_delete=models.CASCADE, related_name='activos_por_usuario')
+    fecha_activacion = models.DateTimeField(default=timezone.now)
+    
+    class Meta:
+        db_table = 'Carrito_Activo_Usuario'
+        verbose_name = 'Carrito Activo por Usuario'
+        verbose_name_plural = 'Carritos Activos por Usuario'
+        unique_together = ('usuario',)
+    
+    def __str__(self):
+        return f"{self.usuario.username} -> {self.carrito.nombre_display}"
