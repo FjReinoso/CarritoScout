@@ -264,8 +264,18 @@
     </div>
     {% endif %}
 </div>
+
+<!-- El token CSRF debe estar dentro de un formulario para que JavaScript pueda leerlo correctamente -->
+<form id="csrf-form" style="display:none;">{% csrf_token %}</form>
 {% endblock %}
 
 {% block extra_js %}
 <script src="{% static 'js/detalleProducto.js' %}"></script>
+<script>
+// Asegura que el token CSRF esté disponible para JS
+window.getCsrfToken = function() {
+    const csrfInput = document.querySelector('#csrf-form input[name="csrfmiddlewaretoken"]');
+    return csrfInput ? csrfInput.value : null;
+};
+</script>
 {% endblock %}

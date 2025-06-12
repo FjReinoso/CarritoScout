@@ -48,25 +48,28 @@ class Carrito(models.Model):
 
 class CarritoProducto(models.Model):
     """Modelo intermedio para productos en carritos"""
+    id = models.AutoField(primary_key=True)
     carrito = models.ForeignKey(Carrito, on_delete=models.CASCADE, related_name='items')
     producto = models.ForeignKey('productos.Producto', on_delete=models.CASCADE)
+    supermercado = models.ForeignKey('productos.Supermercado', on_delete=models.CASCADE, null=True, blank=True, verbose_name='Supermercado')
+    precio_unitario = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, verbose_name='Precio unitario')
     cantidad = models.PositiveIntegerField(default=1)
     fecha_agregado = models.DateTimeField(default=timezone.now)
     
     class Meta:
         db_table = 'Carrito_Productos'
-        unique_together = ['carrito', 'producto']  # Un producto por carrito
+        unique_together = ['carrito', 'producto', 'supermercado']  # Un producto por supermercado por carrito
         verbose_name = 'Producto en Carrito'
         verbose_name_plural = 'Productos en Carrito'
-        
+    
     def __str__(self):
-        return f"{self.cantidad} x {self.producto.nombre}"
+        return f"{self.cantidad} x {self.producto.nombre} ({self.supermercado.nombre if self.supermercado else 'Sin supermercado'})"
     
     @property
     def subtotal(self):
         """Calcula el subtotal de este item"""
-        precio_unitario = self.producto.precio or 0
-        return precio_unitario * self.cantidad
+        precio = self.precio_unitario if self.precio_unitario is not None else (self.producto.precio or 0)
+        return precio * self.cantidad
 
 class InvitacionCarrito(models.Model):
     """Modelo intermedio para invitaciones a carritos compartidos"""

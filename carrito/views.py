@@ -156,9 +156,8 @@ def eliminar_carrito(request):
         # Si era el carrito activo, activar otro carrito
         if was_active:
             otro_carrito = Carrito.objects.filter(usuario=request.user).first()
-            if otro_carrito:
-                otro_carrito.activo = True
-                otro_carrito.save()
+            otro_carrito.activo = True
+            otro_carrito.save()
         
         return JsonResponse({
             'status': 'success',
@@ -175,42 +174,94 @@ def eliminar_carrito(request):
 @require_POST
 def agregar_al_carrito(request):
     """Vista para agregar productos al carrito vía AJAX"""
-    producto_id = request.POST.get('producto_id')
-    cantidad = int(request.POST.get('cantidad', 1))
-    
-    if cantidad <= 0:
-        return JsonResponse({'status': 'error', 'message': 'La cantidad debe ser mayor que cero'}, status=400)
-    
-    producto = get_object_or_404(Producto, id_producto=producto_id)
-    
-    # Obtener o crear carrito activo
-    carrito, created = Carrito.objects.get_or_create(
-        usuario=request.user, 
-        activo=True, 
-        defaults={'fecha_creacion': timezone.now()}
-    )
-    
-    # Verificar si el producto ya está en el carrito
-    carrito_producto, created = CarritoProducto.objects.get_or_create(
-        carrito=carrito,
-        producto=producto,
-        defaults={'cantidad': cantidad}
-    )
-    
-    # Si ya existía, incrementar la cantidad
-    if not created:
-        carrito_producto.cantidad = F('cantidad') + cantidad
-        carrito_producto.save()
-    
-    # Obtener los datos actualizados del carrito
-    carrito.refresh_from_db()
-    
-    return JsonResponse({
-        'status': 'success',
-        'message': f'{producto.nombre} añadido al carrito',
-        'cart_count': carrito.total_productos,
-        'cart_total': carrito.precio_total
-    })
+    try:
+        producto_id = request.POST.get('producto_id')
+        cantidad = int(request.POST.get('cantidad', 1))
+        supermercado_id = request.POST.get('supermercado_id')
+        precio_unitario = request.POST.get('precio_unitario')
+        
+        if not producto_id:
+            return JsonResponse({
+                'status': 'error', 
+                'message': 'ID de producto no proporcionado'
+            }, status=400)
+        
+        if cantidad <= 0:
+            return JsonResponse({
+                'status': 'error', 
+                'message': 'La cantidad debe ser mayor que cero'
+            }, status=400)
+        
+        # Verificar que el producto existe
+        producto = get_object_or_404(Producto, id_producto=producto_id)
+        supermercado = None
+        if supermercado_id:
+            from productos.models import Supermercado
+            supermercado = get_object_or_404(Supermercado, id_supermercado=supermercado_id)
+        
+        # Si no se recibe precio_unitario, intentar obtenerlo del modelo Precio
+        if precio_unitario is not None and precio_unitario != '':
+            try:
+                precio_unitario = float(precio_unitario)
+            except ValueError:
+                precio_unitario = None
+        if precio_unitario is None and supermercado:
+            from productos.models import Precio
+            precio_obj = Precio.objects.filter(id_producto=producto, id_supermercado=supermercado).first()
+            if precio_obj:
+                precio_unitario = float(precio_obj.precio)
+        if precio_unitario is None:
+            precio_unitario = float(producto.precio) if producto.precio is not None else 0
+        
+        # Obtener o crear carrito activo
+        carrito, created = Carrito.objects.get_or_create(
+            usuario=request.user, 
+            activo=True, 
+            defaults={
+                'fecha_creacion': timezone.now(),
+                'nombre': None
+            }
+        )
+        
+        # Buscar si ya existe ese producto en ese supermercado en el carrito
+        carrito_producto, created = CarritoProducto.objects.get_or_create(
+            carrito=carrito,
+            producto=producto,
+            supermercado=supermercado,
+            defaults={'cantidad': cantidad, 'precio_unitario': precio_unitario}
+        )
+        
+        # Si ya existía, incrementar la cantidad y actualizar precio si cambió
+        if not created:
+            carrito_producto.cantidad = F('cantidad') + cantidad
+            carrito_producto.precio_unitario = precio_unitario
+            carrito_producto.save()
+            carrito_producto.refresh_from_db()
+            mensaje = f'{producto.nombre} actualizado en el carrito (cantidad: {carrito_producto.cantidad})'
+        else:
+            mensaje = f'{producto.nombre} añadido al carrito'
+        
+        # Obtener los datos actualizados del carrito
+        carrito.refresh_from_db()
+        
+        return JsonResponse({
+            'status': 'success',
+            'message': mensaje,
+            'cart_count': carrito.total_productos,
+            'cart_total': float(carrito.precio_total) if carrito.precio_total else 0,
+            'cart_name': carrito.nombre_display
+        })
+        
+    except ValueError:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Cantidad inválida'
+        }, status=400)
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Error al agregar el producto al carrito'
+        }, status=500)
 
 @login_required
 @require_POST
@@ -242,26 +293,41 @@ def actualizar_cantidad(request):
 @login_required
 @require_POST
 def eliminar_del_carrito(request):
-    """Vista para eliminar un producto del carrito"""
-    item_id = request.POST.get('item_id')
-    
-    # Obtener el item del carrito
-    item = get_object_or_404(CarritoProducto, id=item_id, carrito__usuario=request.user)
-    carrito = item.carrito
-    producto_nombre = item.producto.nombre
-    
-    # Eliminar el producto
-    item.delete()
-    
-    # Refrescar datos del carrito
-    carrito.refresh_from_db()
-    
-    return JsonResponse({
-        'status': 'success',
-        'message': f'{producto_nombre} eliminado del carrito',
-        'cart_count': carrito.total_productos,
-        'cart_total': carrito.precio_total
-    })
+    """Vista para eliminar un producto del carrito por producto, supermercado y carrito"""
+    try:
+        carrito_id = request.POST.get('carrito_id')
+        producto_id = request.POST.get('producto_id')
+        supermercado_id = request.POST.get('supermercado_id')
+        print(f"[DEBUG] carrito_id={carrito_id}, producto_id={producto_id}, supermercado_id={supermercado_id}")
+        if not (carrito_id and producto_id):
+            return JsonResponse({'status': 'error', 'message': 'Faltan datos para eliminar el producto'}, status=400)
+        # Buscar el item por la combinación
+        filtro = {
+            'carrito_id': carrito_id,
+            'producto_id': producto_id,
+            'carrito__usuario': request.user
+        }
+        if supermercado_id:
+            filtro['supermercado_id'] = supermercado_id
+        else:
+            filtro['supermercado__isnull'] = True
+        try:
+            item = CarritoProducto.objects.get(**filtro)
+        except CarritoProducto.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'El producto ya no está en el carrito'}, status=404)
+        carrito = item.carrito
+        producto_nombre = item.producto.nombre
+        item.delete()
+        carrito = Carrito.objects.get(pk=carrito.pk)
+        return JsonResponse({
+            'status': 'success',
+            'message': f'{producto_nombre} eliminado del carrito',
+            'cart_count': carrito.total_productos,
+            'cart_total': carrito.precio_total
+        })
+    except Exception as e:
+        print(f"[ERROR] Excepción inesperada al eliminar producto: {e}")
+        return JsonResponse({'status': 'error', 'message': 'Error al eliminar el producto del carrito'}, status=500)
 
 @login_required
 @require_POST

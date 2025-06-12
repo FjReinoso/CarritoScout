@@ -309,4 +309,167 @@ document.addEventListener('DOMContentLoaded', function() {
     if (loadMoreBtn) {
         loadMoreBtn.addEventListener('click', loadMoreProducts);
     }
+
+    // ===============================
+    // FUNCIONALIDAD AGREGAR AL CARRITO
+    // ===============================
+    
+    // Función para obtener el token CSRF
+    function getCsrfToken() {
+        const csrfInput = document.querySelector('[name=csrfmiddlewaretoken]');
+        if (csrfInput) {
+            return csrfInput.value;
+        }
+        
+        // Buscar en las cookies si no está en un input
+        const cookies = document.cookie.split(';');
+        for (let cookie of cookies) {
+            const [name, value] = cookie.trim().split('=');
+            if (name === 'csrftoken') {
+                return decodeURIComponent(value);
+            }
+        }
+        return '';
+    }
+
+    // Función para mostrar notificaciones
+    function showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `alert alert-${type} notification-toast`;
+        notification.innerHTML = `
+            <div class="d-flex align-items-center">
+                <i class="bi bi-${getIconForType(type)} me-2"></i>
+                <span>${message}</span>
+                <button type="button" class="btn-close ms-auto" onclick="this.parentElement.parentElement.remove()"></button>
+            </div>
+        `;
+
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1055;
+            min-width: 300px;
+            max-width: 400px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        `;
+
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.style.opacity = '0';
+                notification.style.transition = 'opacity 0.5s ease';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.remove();
+                    }
+                }, 500);
+            }
+        }, 4000);
+    }
+
+    function getIconForType(type) {
+        const icons = {
+            'success': 'check-circle',
+            'danger': 'x-circle',
+            'warning': 'exclamation-triangle',
+            'info': 'info-circle'
+        };
+        return icons[type] || 'info-circle';
+    }
+
+    // Función para actualizar el badge del carrito en la navbar
+    function updateCartBadge(count) {
+        const badge = document.querySelector('.cart-badge');
+        if (badge) {
+            badge.textContent = count;
+            badge.style.display = count > 0 ? 'inline' : 'none';
+        }
+    }
+
+    // Función para actualizar el nombre del carrito en la navbar
+    function updateCartName(name) {
+        const cartNameEl = document.getElementById('cart-name');
+        if (cartNameEl) {
+            cartNameEl.textContent = name || 'Sin carrito';
+        }
+    }
+
+    // Función principal para agregar productos al carrito
+    async function addToCart(productId, productName, button) {
+        // Verificar si el usuario está autenticado
+        if (!document.querySelector('[name=csrfmiddlewaretoken]') && !getCsrfToken()) {
+            showNotification('Debes iniciar sesión para agregar productos al carrito', 'warning');
+            return;
+        }
+
+        // Mostrar estado de carga en el botón
+        const originalContent = button.innerHTML;
+        button.disabled = true;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Agregando...';
+
+        try {
+            const response = await fetch('/carrito/agregar/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': getCsrfToken()
+                },
+                body: `producto_id=${productId}&cantidad=1`
+            });
+
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                showNotification(data.message, 'success');
+                
+                // Actualizar el badge del carrito
+                updateCartBadge(data.cart_count);
+                
+                // Actualizar el nombre del carrito si se proporcionó
+                if (data.cart_name) {
+                    updateCartName(data.cart_name);
+                }
+                
+                // Cambiar temporalmente el botón a "Agregado"
+                button.innerHTML = '<i class="fas fa-check me-1"></i>Agregado';
+                button.classList.remove('btn-success');
+                button.classList.add('btn-outline-success');
+                
+                setTimeout(() => {
+                    button.innerHTML = originalContent;
+                    button.classList.remove('btn-outline-success');
+                    button.classList.add('btn-success');
+                    button.disabled = false;
+                }, 1500);
+                
+            } else {
+                showNotification(data.message || 'Error al agregar el producto', 'danger');
+                button.innerHTML = originalContent;
+                button.disabled = false;
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showNotification('Error de conexión. Intenta nuevamente.', 'danger');
+            button.innerHTML = originalContent;
+            button.disabled = false;
+        }
+    }
+
+    // Event listeners para todos los botones "Agregar al carrito"
+    document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const productId = this.dataset.productId;
+            const productName = this.dataset.productName;
+            
+            if (!productId) {
+                showNotification('Error: ID de producto no encontrado', 'danger');
+                return;
+            }
+            
+            addToCart(productId, productName, this);
+        });
+    });
 });
