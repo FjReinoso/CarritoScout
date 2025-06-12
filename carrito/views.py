@@ -23,7 +23,7 @@ def crear_carrito(request):
         if activo:
             Carrito.objects.filter(usuario=request.user, activo=True).update(activo=False)
         
-        # Crear el nuevo carrito
+        # Crear el nuevo carrito (NO agregar el creador a usuarios_compartidos)
         carrito = Carrito.objects.create(
             usuario=request.user,
             nombre=nombre if nombre else None,
@@ -60,6 +60,10 @@ def ver_carrito(request):
     # Obtener todos los carritos del usuario
     todos_carritos = Carrito.objects.filter(usuario=request.user).order_by('-fecha_creacion')
     
+    # Invitaciones pendientes para el usuario
+    from .models import InvitacionCarrito
+    invitaciones_pendientes = InvitacionCarrito.objects.filter(usuario=request.user, estado='pendiente').select_related('carrito', 'carrito__usuario')
+    
     # Si no hay carrito activo, usar variables por defecto
     if not carrito:
         context = {
@@ -68,6 +72,7 @@ def ver_carrito(request):
             'todos_carritos': todos_carritos,
             'total_carritos': todos_carritos.count(),
             'carritos_compartidos': 0,
+            'invitaciones_pendientes': invitaciones_pendientes,
         }
         return render(request, 'carrito/carrito.html', context)
     
@@ -85,6 +90,7 @@ def ver_carrito(request):
         'todos_carritos': todos_carritos,
         'total_carritos': todos_carritos.count(),
         'carritos_compartidos': carritos_compartidos,
+        'invitaciones_pendientes': invitaciones_pendientes,
     }
     
     return render(request, 'carrito/carrito.html', context)
@@ -405,58 +411,78 @@ def detalle_historial(request, historial_id):
 @login_required
 @require_POST
 def invitar_usuario(request):
-    """Vista para invitar un usuario a un carrito"""
+    """Vista para invitar un usuario a un carrito y crear invitación pendiente"""
+    import logging
+    logger = logging.getLogger("carrito.invitar_usuario")
     try:
         email = request.POST.get('email', '').strip()
         carrito_id = request.POST.get('carrito_id')
-        
+        logger.info(f"[INVITAR] email={email}, carrito_id={carrito_id}, user={request.user}")
         if not email:
+            logger.warning("[INVITAR] Email vacío")
             return JsonResponse({
                 'status': 'error',
                 'message': 'Por favor ingresa un email válido'
             })
-        
-        # Verificar que el carrito existe y pertenece al usuario
         carrito = get_object_or_404(Carrito, id_carrito=carrito_id, usuario=request.user)
-        
-        # Buscar el usuario por email
+        logger.info(f"[INVITAR] Carrito encontrado: {carrito}")
         try:
-            usuario_invitado = User.objects.get(email=email)
-        except User.DoesNotExist:
+            usuarios_invitados = User.objects.filter(email=email)
+            if usuarios_invitados.count() == 0:
+                logger.warning(f"[INVITAR] No existe usuario con email: {email}")
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'No se encontró un usuario con ese email'
+                })
+            if usuarios_invitados.count() > 1:
+                logger.error(f"[INVITAR] Hay más de un usuario con el email: {email}")
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Error: hay más de un usuario registrado con ese email. Contacta al administrador.'
+                })
+            usuario_invitado = usuarios_invitados.first()
+            logger.info(f"[INVITAR] Usuario invitado encontrado: {usuario_invitado}")
+        except Exception as e:
+            logger.error(f"[INVITAR] Excepción inesperada al buscar usuario: {e}", exc_info=True)
             return JsonResponse({
                 'status': 'error',
-                'message': 'No se encontró un usuario con ese email'
+                'message': 'Error inesperado al buscar usuario. Contacta al administrador.'
             })
-        
-        # Verificar que no sea el mismo usuario
-        if usuario_invitado == request.user:
+        if usuario_invitado == carrito.usuario:
+            logger.warning(f"[INVITAR] El usuario invitado es el creador del carrito")
             return JsonResponse({
                 'status': 'error',
                 'message': 'No puedes invitarte a ti mismo'
             })
-        
-        # Verificar que no esté ya invitado
-        if InvitacionCarrito.objects.filter(carrito=carrito, usuario=usuario_invitado).exists():
+        if InvitacionCarrito.objects.filter(carrito=carrito, usuario=usuario_invitado, estado='pendiente').exists():
+            logger.info(f"[INVITAR] Ya existe invitación pendiente para este usuario y carrito")
             return JsonResponse({
                 'status': 'error',
-                'message': 'Este usuario ya tiene una invitación pendiente o ya está en el carrito'
+                'message': 'Este usuario ya tiene una invitación pendiente para este carrito'
             })
-        
-        # Crear la invitación
+        if InvitacionCarrito.objects.filter(carrito=carrito, usuario=usuario_invitado, estado='aceptada').exists() or \
+           carrito.usuarios_compartidos.filter(id=usuario_invitado.id).exists():
+            logger.info(f"[INVITAR] El usuario ya tiene acceso al carrito")
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Este usuario ya tiene acceso al carrito'
+            })
         invitacion = InvitacionCarrito.objects.create(
             carrito=carrito,
             usuario=usuario_invitado,
-            fecha_invitacion=timezone.now()
+            fecha_invitacion=timezone.now(),
+            estado='pendiente',
+            fecha_respuesta=None
         )
-        
+        logger.info(f"[INVITAR] Invitación creada correctamente: {invitacion}")
         return JsonResponse({
             'status': 'success',
-            'message': f'Usuario {email} invitado correctamente',
+            'message': f'Invitación enviada a {email}',
             'user_name': usuario_invitado.username,
             'user_email': email
         })
-        
     except Exception as e:
+        logger.error(f"[INVITAR] Excepción inesperada: {e}", exc_info=True)
         return JsonResponse({
             'status': 'error',
             'message': 'Error al enviar la invitación. Inténtalo de nuevo.'
@@ -469,42 +495,35 @@ def responder_invitacion(request):
     try:
         invitacion_id = request.POST.get('invitacion_id')
         accion = request.POST.get('accion')  # 'aceptar' o 'rechazar'
-        
-        invitacion = get_object_or_404(
-            InvitacionCarrito, 
-            id=invitacion_id, 
-            usuario=request.user,
-            estado='pendiente'
-        )
-        
-        if accion == 'aceptar':
-            invitacion.estado = 'aceptada'
-            invitacion.fecha_respuesta = timezone.now()
-            invitacion.save()
-            
-            # Agregar el usuario al carrito compartido
-            invitacion.carrito.usuarios_compartidos.add(request.user)
-            
-            mensaje = f'Te has unido al carrito #{invitacion.carrito.id_carrito}'
-            
-        elif accion == 'rechazar':
-            invitacion.estado = 'rechazada'
-            invitacion.fecha_respuesta = timezone.now()
-            invitacion.save()
-            
-            mensaje = 'Invitación rechazada'
-            
-        else:
-            return JsonResponse({
-                'status': 'error',
-                'message': 'Acción no válida'
-            })
-        
+        with transaction.atomic():
+            invitacion = get_object_or_404(
+                InvitacionCarrito,
+                id=invitacion_id,
+                usuario=request.user,
+                estado='pendiente'
+            )
+            if accion == 'aceptar':
+                invitacion.estado = 'aceptada'
+                invitacion.fecha_respuesta = timezone.now()
+                invitacion.save()
+                # Agregar el usuario al carrito compartido (nunca el creador, y solo si no está ya)
+                if request.user != invitacion.carrito.usuario and not invitacion.carrito.usuarios_compartidos.filter(id=request.user.id).exists():
+                    invitacion.carrito.usuarios_compartidos.add(request.user)
+                mensaje = f'Te has unido al carrito #{invitacion.carrito.id_carrito}'
+            elif accion == 'rechazar':
+                invitacion.estado = 'rechazada'
+                invitacion.fecha_respuesta = timezone.now()
+                invitacion.save()
+                mensaje = 'Invitación rechazada'
+            else:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Acción no válida'
+                })
         return JsonResponse({
             'status': 'success',
             'message': mensaje
         })
-        
     except Exception as e:
         return JsonResponse({
             'status': 'error',

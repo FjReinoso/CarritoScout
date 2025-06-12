@@ -9,6 +9,7 @@ class CarritoManager {
         document.addEventListener('DOMContentLoaded', () => {
             this.loadDjangoData();
             this.setupEventListeners();
+            this.setupInvitationListeners(); // Añadir listeners de invitaciones
         });
     }
 
@@ -105,8 +106,8 @@ class CarritoManager {
         const inviteUserModal = document.getElementById('inviteUserModal');
         if (inviteUserModal) {
             inviteUserModal.addEventListener('hidden.bs.modal', () => {
-                document.getElementById('userEmail').value = '';
-                document.getElementById('userPermission').selectedIndex = 0;
+                const emailInput = document.getElementById('userEmail');
+                if (emailInput) emailInput.value = '';
             });
         }
     }
@@ -203,6 +204,66 @@ class CarritoManager {
                 item.classList.add('selected');
                 
                 console.log('Cart selected for viewing:', item.dataset.cartId);
+            });
+        });
+    }
+
+    setupInvitationListeners() {
+        document.querySelectorAll('.btn-aceptar-invitacion').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const invitacionId = btn.dataset.invitacionId;
+                if (!invitacionId) return;
+                btn.disabled = true;
+                try {
+                    const response = await fetch('/carrito/responder_invitacion/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'X-CSRFToken': this.djangoData.csrfToken
+                        },
+                        body: `invitacion_id=${invitacionId}&accion=aceptar`
+                    });
+                    const data = await response.json();
+                    if (data.status === 'success') {
+                        this.showNotification(data.message, 'success');
+                        btn.closest('li').remove();
+                        setTimeout(() => location.reload(), 1000);
+                    } else {
+                        this.showNotification(data.message, 'danger');
+                        btn.disabled = false;
+                    }
+                } catch (error) {
+                    this.showNotification('Error al aceptar la invitación', 'danger');
+                    btn.disabled = false;
+                }
+            });
+        });
+        document.querySelectorAll('.btn-rechazar-invitacion').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const invitacionId = btn.dataset.invitacionId;
+                if (!invitacionId) return;
+                btn.disabled = true;
+                try {
+                    const response = await fetch('/carrito/responder_invitacion/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'X-CSRFToken': this.djangoData.csrfToken
+                        },
+                        body: `invitacion_id=${invitacionId}&accion=rechazar`
+                    });
+                    const data = await response.json();
+                    if (data.status === 'success') {
+                        this.showNotification(data.message, 'success');
+                        btn.closest('li').remove();
+                    } else {
+                        this.showNotification(data.message, 'danger');
+                        btn.disabled = false;
+                    }
+                } catch (error) {
+                    this.showNotification('Error al rechazar la invitación', 'danger');
+                    btn.disabled = false;
+                }
             });
         });
     }
@@ -339,16 +400,17 @@ class CarritoManager {
     }
 
     async inviteUser() {
-        const email = document.getElementById('userEmail').value;
-        const permission = document.getElementById('userPermission').value;
-
+        const emailInput = document.getElementById('userEmail');
+        if (!emailInput) {
+            this.showNotification('No se encontró el campo de email', 'danger');
+            return;
+        }
+        const email = emailInput.value;
         if (!email) {
             this.showNotification('Por favor ingresa el email del usuario', 'warning');
             return;
         }
-
         this.showNotification(`Invitando a ${email}...`, 'info');
-
         try {
             const response = await fetch(this.djangoData.urls.inviteUser, {
                 method: 'POST',
@@ -356,30 +418,23 @@ class CarritoManager {
                     'Content-Type': 'application/x-www-form-urlencoded',
                     'X-CSRFToken': this.djangoData.csrfToken
                 },
-                body: `email=${encodeURIComponent(email)}&carrito_id=${this.djangoData.cartId}&permission=${permission}`
+                body: `email=${encodeURIComponent(email)}&carrito_id=${this.djangoData.cartId}`
             });
-
             const data = await response.json();
-
             if (data.status === 'success') {
                 const userBadge = document.createElement('span');
                 userBadge.className = 'user-badge pending';
                 userBadge.innerHTML = `
                     <i class="bi bi-person me-1"></i> ${data.user_name} (Pendiente)
                 `;
-
                 const userBadgesContainer = document.querySelector('.user-badges');
                 if (userBadgesContainer) {
                     userBadgesContainer.appendChild(userBadge);
                 }
-
                 const modal = bootstrap.Modal.getInstance(document.getElementById('inviteUserModal'));
                 modal.hide();
-
                 this.showNotification(data.message, 'success');
-
-                document.getElementById('userEmail').value = '';
-                document.getElementById('userPermission').selectedIndex = 0;
+                emailInput.value = '';
             } else {
                 this.showNotification(data.message, 'danger');
             }
