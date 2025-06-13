@@ -59,7 +59,6 @@ INSTALLED_APPS = [
     'carrito',
     'notificaciones',
     'analytics',
-    'admin_panel',
 ]
 
 MIDDLEWARE = [

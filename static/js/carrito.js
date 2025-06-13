@@ -545,14 +545,41 @@ class CarritoManager {
     }
 
     updateCartTotals(cartTotal, cartCount) {
+        // Actualiza el total en el resumen
         const cartTotalEl = document.querySelector('.cart-summary strong:last-child');
         if (cartTotalEl) cartTotalEl.textContent = '€' + cartTotal;
 
+        // Actualiza el número de productos en el resumen
+        const resumenProductosEl = document.querySelector('.cart-summary .mb-2 span:first-child');
+        if (resumenProductosEl) resumenProductosEl.textContent = `Productos (${cartCount}):`;
+
+        // Actualiza el dinero de productos en el resumen
+        const resumenProductosDineroEl = document.querySelector('.cart-summary .mb-2 span:last-child');
+        if (resumenProductosDineroEl) resumenProductosDineroEl.textContent = '€' + cartTotal;
+
+        // Actualiza el número de productos en la línea superior
         const productCountEl = document.querySelector('.mb-3 strong');
         if (productCountEl) productCountEl.textContent = cartCount;
 
-        const summaryCountEl = document.querySelector('.cart-summary .mb-2 span:first-child');
-        if (summaryCountEl) summaryCountEl.textContent = `Productos (${cartCount}):`;
+        // Actualiza el promedio en estadísticas rápidas (media de precio por producto)
+        // Busca el h6 que contenga 'Promedio' y actualiza el siguiente h3
+        const estadisticasCards = document.querySelectorAll('.statistics-card');
+        estadisticasCards.forEach(card => {
+            const h6s = card.querySelectorAll('h6');
+            h6s.forEach((h6, idx) => {
+                if (h6.textContent.trim().toLowerCase().includes('promedio')) {
+                    const h3 = card.querySelectorAll('h3')[idx];
+                    if (h3) {
+                        if (cartCount > 0) {
+                            const promedio = (parseFloat(cartTotal) / cartCount).toFixed(2);
+                            h3.textContent = `€${promedio}`;
+                        } else {
+                            h3.textContent = '€0.00';
+                        }
+                    }
+                }
+            });
+        });
     }
 
     printShoppingList() {
