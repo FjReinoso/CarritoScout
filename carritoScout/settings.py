@@ -38,7 +38,7 @@ LOGGING = {
     },
 }
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [f"https://carritoscout.fly.dev"]
 
 LOGIN_REDIRECT_URL = 'usuarios:pagina_principal'
 LOGOUT_REDIRECT_URL = 'usuarios:login'
