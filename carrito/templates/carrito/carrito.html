@@ -146,7 +146,7 @@
                                             {% if item.producto.imagen %}
                                                 <img src="{{ item.producto.imagen.url }}" alt="{{ item.producto.nombre }}" class="img-fluid">
                                             {% else %}
-                                                <img src="{% static 'img/producto-default{ item.producto.nombre }}" class="img-fluid">
+                                                <img src="{% static 'img/producto-default.png' %}" class="img-fluid">
                                             {% endif %}
                                         </div>
                                     </div>
@@ -267,7 +267,7 @@
     <!-- Pestaña de Todos los Carritos -->
     <div class="tab-pane fade" id="all-carts" role="tabpanel" aria-labelledby="all-carts-tab">
         <div class="row">
-            <div class="col-12 mb-4"> <!-- Cambiado de col-md-4 a col-12 para ocupar todo el ancho -->
+            <div class="col-12 mb-4"> 
                 <div class="card shadow-sm">
                     <div class="card-header bg-white">
                         <h5 class="mb-0">Mis Carritos</h5>

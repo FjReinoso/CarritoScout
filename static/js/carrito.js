@@ -442,7 +442,8 @@ class CarritoManager {
             this.showNotification('Error al enviar la invitación', 'danger');
             console.error('Error:', error);
         }
-    }    async activateCart(carritoId) {
+    }    
+    async activateCart(carritoId) {
         this.showNotification('Activando carrito...', 'info');
 
         try {
@@ -469,14 +470,8 @@ class CarritoManager {
                 // Actualizar el objeto djangoData para reflejar el nuevo carrito activo
                 this.djangoData.hasActiveCart = true;
                 this.djangoData.cartId = carritoId;
-                
-                // Solo recargar si estamos en la pestaña del carrito activo para ver los productos
-                const activeTab = document.querySelector('#active-cart-tab');
-                if (activeTab && activeTab.classList.contains('active')) {
-                    setTimeout(() => {
-                        location.reload();
-                    }, 1000);
-                }
+                //Recargamos la página para reflejar los cambios
+                window.location.reload();
             } else {
                 this.showNotification(data.message, 'danger');
             }

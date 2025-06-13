@@ -136,15 +136,19 @@ def producto_list(request):
     return render(request, 'productos/index.html', context)
 
 def producto_detail(request, producto_id):
-    producto = get_object_or_404(Producto, id_producto=producto_id)
-    precios = Precio.objects.filter(id_producto=producto).select_related('id_supermercado').order_by('precio')
+    producto = Producto.objects.get(id_producto=producto_id)
+    # Obtener todos los precios de este producto
+    precios_all = Precio.objects.filter(id_producto=producto).select_related('id_supermercado')
+    # Elegir el precio más reciente por supermercado
+    precios_dict = {}
+    for precio in precios_all:
+        sup_id = precio.id_supermercado_id
+        if sup_id not in precios_dict or precio.fecha_actualizacion > precios_dict[sup_id].fecha_actualizacion:
+            precios_dict[sup_id] = precio
+    precios = sorted(precios_dict.values(), key=lambda p: p.precio)
     
-    # Productos relacionados de la misma categoría
-    productos_relacionados = Producto.objects.filter(
-        categoria=producto.categoria
-    ).exclude(
-        id_producto=producto.id_producto
-    ).prefetch_related('precios__id_supermercado')[:8]  # Limitar a 8 productos
+    # Productos relacionados 
+    productos_relacionados = Producto.objects.filter(categoria=producto.categoria).exclude(id_producto=producto.id_producto)[:8]
     
     context = {
         'producto': producto,
