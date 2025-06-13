@@ -1,4 +1,4 @@
-from carrito.models import Carrito
+from carrito.models import CarritoActivoUsuario
 from django.db.models import Q
 import logging
 
@@ -12,16 +12,9 @@ def carrito_context(request):
     
     if request.user.is_authenticated:
         try:
-            # Buscar carrito activo donde el usuario es dueño o compartido
-            carrito_activo = Carrito.objects.filter(
-                Q(usuario=request.user) | Q(usuarios_compartidos=request.user),
-                activo=True
-            ).first()
-            context['carrito_activo'] = carrito_activo
-            if carrito_activo:
-                logger.debug(f"Carrito activo encontrado: ID {carrito_activo.id_carrito}, Nombre: {carrito_activo.nombre_display}")
-            else:
-                logger.debug(f"No se encontró carrito activo para el usuario {request.user.username}")
+            # Buscar el carrito activo usando la tabla CarritoActivoUsuario
+            carrito_activo_obj = CarritoActivoUsuario.objects.filter(usuario=request.user).select_related('carrito').first()
+            context['carrito_activo'] = carrito_activo_obj.carrito if carrito_activo_obj else None
         except Exception as e:
             logger.error(f"Error al obtener carrito activo: {e}")
     

@@ -269,7 +269,7 @@
                     <div class="list-group list-group-flush">
                         {% if todos_carritos.count > 0 %}
                             {% for cart in todos_carritos %}
-                            <div class="list-group-item cart-list-item {% if cart.activo %}active{% endif %}" data-cart-id="{{ cart.id_carrito }}">
+                            <div class="list-group-item cart-list-item {% if carrito and cart.id_carrito == carrito.id_carrito %}active{% endif %}" data-cart-id="{{ cart.id_carrito }}">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div class="flex-grow-1">
                                         <h6 class="mb-1">{{ cart.nombre_display }}</h6>
@@ -277,7 +277,7 @@
                                         <br><small class="text-muted">{{ cart.total_productos }} productos - €{{ cart.precio_total }}</small>
                                     </div>
                                     <div class="d-flex align-items-center gap-2">
-                                        {% if cart.activo %}
+                                        {% if carrito and cart.id_carrito == carrito.id_carrito %}
                                             <span class="badge bg-success rounded-pill">Activo</span>
                                         {% else %}
                                             <button class="btn btn-sm btn-outline-success activar-carrito-btn" data-carrito-id="{{ cart.id_carrito }}" title="Activar este carrito">
