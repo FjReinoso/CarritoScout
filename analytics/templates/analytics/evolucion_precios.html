@@ -1,0 +1,137 @@
+{% extends 'usuarios/baseConNavbar.html' %}
+{% load static %}
+
+{% block title %}Evolución de Precios - Analytics{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/carrito.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h1 class="mb-4"><i class="bi bi-graph-up"></i> Evolución de Precios</h1>
+    <div class="row mb-4">
+        <div class="col-md-4 mb-2">
+            <label for="tipo-analisis" class="form-label">Tipo de análisis</label>
+            <select id="tipo-analisis" class="form-select">
+                <option value="producto">Por Producto</option>
+                <option value="categoria">Por Categoría</option>
+                <option value="supermercado">Por Supermercado</option>
+            </select>
+        </div>
+        <div class="col-md-4 mb-2" id="filtro-producto">
+            <label for="producto-select" class="form-label">Producto</label>
+            <select id="producto-select" class="form-select">
+                <option value="">Selecciona un producto</option>
+                {% for producto in productos %}
+                <option value="{{ producto.id_producto }}">{{ producto.nombre }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-4 mb-2 d-none" id="filtro-categoria">
+            <label for="categoria-select" class="form-label">Categoría</label>
+            <select id="categoria-select" class="form-select">
+                <option value="">Selecciona una categoría</option>
+                {% for categoria in categorias %}
+                <option value="{{ categoria }}">{{ categoria }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-4 mb-2 d-none" id="filtro-supermercado">
+            <label for="supermercado-select" class="form-label">Supermercado</label>
+            <select id="supermercado-select" class="form-select">
+                <option value="">Selecciona un supermercado</option>
+                {% for supermercado in supermercados %}
+                <option value="{{ supermercado.id_supermercado }}">{{ supermercado.nombre }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <canvas id="evolucionChart" height="100"></canvas>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const tipoAnalisis = document.getElementById('tipo-analisis');
+const filtroProducto = document.getElementById('filtro-producto');
+const filtroCategoria = document.getElementById('filtro-categoria');
+const filtroSupermercado = document.getElementById('filtro-supermercado');
+const productoSelect = document.getElementById('producto-select');
+const categoriaSelect = document.getElementById('categoria-select');
+const supermercadoSelect = document.getElementById('supermercado-select');
+let chart;
+
+function updateFiltros() {
+    filtroProducto.classList.add('d-none');
+    filtroCategoria.classList.add('d-none');
+    filtroSupermercado.classList.add('d-none');
+    if (tipoAnalisis.value === 'producto') {
+        filtroProducto.classList.remove('d-none');
+    } else if (tipoAnalisis.value === 'categoria') {
+        filtroCategoria.classList.remove('d-none');
+    } else if (tipoAnalisis.value === 'supermercado') {
+        filtroSupermercado.classList.remove('d-none');
+    }
+}
+
+tipoAnalisis.addEventListener('change', updateFiltros);
+
+function fetchDataAndDraw() {
+    let tipo = tipoAnalisis.value;
+    let id = '';
+    if (tipo === 'producto') id = productoSelect.value;
+    if (tipo === 'categoria') id = categoriaSelect.value;
+    if (tipo === 'supermercado') id = supermercadoSelect.value;
+    if (!id) return;
+    fetch(`/analytics/data/?tipo=${tipo}&id=${id}`)
+        .then(res => res.json())
+        .then(data => {
+            drawChart(data.labels, data.data, tipo);
+        });
+}
+
+function drawChart(labels, data, tipo) {
+    const ctx = document.getElementById('evolucionChart').getContext('2d');
+    if (chart) chart.destroy();
+    chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Precio (€)',
+                data: data,
+                borderColor: '#0d6efd',
+                backgroundColor: 'rgba(13,110,253,0.1)',
+                tension: 0.2,
+                pointRadius: 3,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: true },
+                title: { display: true, text: 'Evolución de Precios' }
+            },
+            scales: {
+                y: { beginAtZero: false }
+            }
+        }
+    });
+}
+
+[productoSelect, categoriaSelect, supermercadoSelect].forEach(sel => {
+    sel.addEventListener('change', fetchDataAndDraw);
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    updateFiltros();
+});
+</script>
+{% endblock %}
