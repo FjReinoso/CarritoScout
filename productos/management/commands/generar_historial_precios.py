@@ -3,7 +3,7 @@ from productos.models import Supermercado, Producto, Precio
 from django.utils import timezone
 from datetime import timedelta
 import random
-
+##python manage.py generar_historial_precios
 class Command(BaseCommand):
     help = 'Genera 5 sets de precios históricos (más baratos) para todos los productos y supermercados existentes, con fechas de 1 a 5 meses atrás.'
 

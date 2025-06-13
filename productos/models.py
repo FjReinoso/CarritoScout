@@ -67,11 +67,11 @@ class Precio(models.Model):
         db_column='id_supermercado'
     )
     precio = models.DecimalField(max_digits=10, decimal_places=2)
-    fecha_actualizacion = models.DateTimeField(auto_now=True)
+    fecha_actualizacion = models.DateTimeField()
     
     class Meta:
         db_table = 'Precios'
-        unique_together = ['id_producto', 'id_supermercado']  # Un precio por producto por supermercado
+        unique_together = ['id_producto', 'id_supermercado', 'fecha_actualizacion']  # Permite histórico de precios
         
     def __str__(self):
         return f"{self.id_producto.nombre} - {self.id_supermercado.nombre}: €{self.precio}"

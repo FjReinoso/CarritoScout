@@ -24,24 +24,30 @@ def evolucion_precios_data(request):
     labels = []
     if tipo == 'producto' and id:
         precios = Precio.objects.filter(id_producto=id).order_by('fecha_actualizacion')
-        labels = [p.fecha_actualizacion.strftime('%Y-%m-%d') for p in precios]
-        data = [float(p.precio) for p in precios]
+        from collections import defaultdict
+        precios_por_mes = defaultdict(list)
+        for p in precios:
+            mes = p.fecha_actualizacion.strftime('%Y-%m')
+            precios_por_mes[mes].append(float(p.precio))
+        labels = sorted(precios_por_mes.keys())
+        data = [sum(precios_por_mes[mes]) / len(precios_por_mes[mes]) for mes in labels]
     elif tipo == 'categoria' and id:
         productos = Producto.objects.filter(categoria=id)
         precios = Precio.objects.filter(id_producto__in=productos).order_by('fecha_actualizacion')
-        # Agrupar por fecha y calcular promedio
-        fechas = sorted(set(p.fecha_actualizacion.date() for p in precios))
-        for fecha in fechas:
-            precios_fecha = precios.filter(fecha_actualizacion__date=fecha)
-            if precios_fecha.exists():
-                labels.append(str(fecha))
-                data.append(float(sum(p.precio for p in precios_fecha) / precios_fecha.count()))
+        from collections import defaultdict
+        precios_por_mes = defaultdict(list)
+        for p in precios:
+            mes = p.fecha_actualizacion.strftime('%Y-%m')
+            precios_por_mes[mes].append(float(p.precio))
+        labels = sorted(precios_por_mes.keys())
+        data = [sum(precios_por_mes[mes]) / len(precios_por_mes[mes]) for mes in labels]
     elif tipo == 'supermercado' and id:
         precios = Precio.objects.filter(id_supermercado=id).order_by('fecha_actualizacion')
-        fechas = sorted(set(p.fecha_actualizacion.date() for p in precios))
-        for fecha in fechas:
-            precios_fecha = precios.filter(fecha_actualizacion__date=fecha)
-            if precios_fecha.exists():
-                labels.append(str(fecha))
-                data.append(float(sum(p.precio for p in precios_fecha) / precios_fecha.count()))
+        from collections import defaultdict
+        precios_por_mes = defaultdict(list)
+        for p in precios:
+            mes = p.fecha_actualizacion.strftime('%Y-%m')
+            precios_por_mes[mes].append(float(p.precio))
+        labels = sorted(precios_por_mes.keys())
+        data = [sum(precios_por_mes[mes]) / len(precios_por_mes[mes]) for mes in labels]
     return JsonResponse({'labels': labels, 'data': data})
