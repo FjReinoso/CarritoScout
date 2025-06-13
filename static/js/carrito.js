@@ -471,6 +471,7 @@ class CarritoManager {
                 this.djangoData.hasActiveCart = true;
                 this.djangoData.cartId = carritoId;
                 //Recargamos la página para reflejar los cambios
+                console.log("DEBUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUG");
                 window.location.reload();
             } else {
                 this.showNotification(data.message, 'danger');

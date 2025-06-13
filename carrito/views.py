@@ -31,6 +31,14 @@ def crear_carrito(request):
             activo=activo,
             fecha_creacion=timezone.now()
         )
+
+        # Si el usuario quiere este carrito como activo, actualizar la relación CarritoActivoUsuario
+        if activo:
+            from .models import CarritoActivoUsuario
+            CarritoActivoUsuario.objects.update_or_create(
+                usuario=request.user,
+                defaults={'carrito': carrito, 'fecha_activacion': timezone.now()}
+            )
         
         # Preparar el mensaje
         mensaje = f"Carrito #{carrito.id_carrito} creado exitosamente"
