@@ -21,30 +21,30 @@
         </div>
         <div class="col-md-4 mb-2" id="filtro-producto">
             <label for="producto-select" class="form-label">Producto</label>
-            <select id="producto-select" class="form-select">
-                <option value="">Selecciona un producto</option>
+            <select id="producto-select" class="form-select" multiple size="6">
                 {% for producto in productos %}
                 <option value="{{ producto.id_producto }}">{{ producto.nombre }}</option>
                 {% endfor %}
             </select>
+            <small class="text-muted">Puedes seleccionar varios productos (Ctrl+Click)</small>
         </div>
         <div class="col-md-4 mb-2 d-none" id="filtro-categoria">
             <label for="categoria-select" class="form-label">Categoría</label>
-            <select id="categoria-select" class="form-select">
-                <option value="">Selecciona una categoría</option>
+            <select id="categoria-select" class="form-select" multiple size="6">
                 {% for categoria in categorias %}
                 <option value="{{ categoria }}">{{ categoria }}</option>
                 {% endfor %}
             </select>
+            <small class="text-muted">Puedes seleccionar varias categorías (Ctrl+Click)</small>
         </div>
         <div class="col-md-4 mb-2 d-none" id="filtro-supermercado">
             <label for="supermercado-select" class="form-label">Supermercado</label>
-            <select id="supermercado-select" class="form-select">
-                <option value="">Selecciona un supermercado</option>
+            <select id="supermercado-select" class="form-select" multiple size="6">
                 {% for supermercado in supermercados %}
                 <option value="{{ supermercado.id_supermercado }}">{{ supermercado.nombre }}</option>
                 {% endfor %}
             </select>
+            <small class="text-muted">Puedes seleccionar varios supermercados (Ctrl+Click)</small>
         </div>
     </div>
     <div class="card shadow-sm">
@@ -82,17 +82,25 @@ function updateFiltros() {
 
 tipoAnalisis.addEventListener('change', updateFiltros);
 
+function getSelectedValues(select) {
+    return Array.from(select.selectedOptions).map(opt => opt.value).filter(v => v);
+}
+
 function fetchDataAndDraw() {
     let tipo = tipoAnalisis.value;
-    let id = '';
-    if (tipo === 'producto') id = productoSelect.value;
-    if (tipo === 'categoria') id = categoriaSelect.value;
-    if (tipo === 'supermercado') id = supermercadoSelect.value;
-    if (!id) return;
-    fetch(`/analytics/data/?tipo=${tipo}&id=${id}`)
+    let ids = [];
+    if (tipo === 'producto') ids = getSelectedValues(productoSelect);
+    if (tipo === 'categoria') ids = getSelectedValues(categoriaSelect);
+    if (tipo === 'supermercado') ids = getSelectedValues(supermercadoSelect);
+    if (!ids.length) return;
+    fetch(`/analytics/data/?tipo=${tipo}&ids=${ids.join(',')}`)
         .then(res => res.json())
         .then(data => {
-            drawChart(data.labels, data.data, tipo);
+            if (data.series) {
+                drawMultiChart(data.labels, data.series, tipo);
+            } else {
+                drawChart(data.labels, data.data, tipo);
+            }
         });
 }
 
@@ -124,6 +132,64 @@ function drawChart(labels, data, tipo) {
             }
         }
     });
+}
+
+function drawMultiChart(labels, series, tipo) {
+    const ctx = document.getElementById('evolucionChart').getContext('2d');
+    if (chart) chart.destroy();
+    const colors = [
+        '#0d6efd', '#dc3545', '#198754', '#ffc107', '#6f42c1', '#fd7e14', '#20c997', '#6610f2', '#e83e8c', '#6c757d'
+    ];
+    let datasets = [];
+    let i = 0;
+    for (const [key, serie] of Object.entries(series)) {
+        datasets.push({
+            label: getLabelName(tipo, key),
+            data: labels.map(mes => {
+                const idx = serie.labels.indexOf(mes);
+                return idx !== -1 ? serie.data[idx] : null;
+            }),
+            borderColor: colors[i % colors.length],
+            backgroundColor: colors[i % colors.length] + '22',
+            tension: 0.2,
+            pointRadius: 3,
+            fill: false
+        });
+        i++;
+    }
+    chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: datasets
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: true },
+                title: { display: true, text: 'Evolución de Precios' }
+            },
+            scales: {
+                y: { beginAtZero: false }
+            }
+        }
+    });
+}
+
+function getLabelName(tipo, key) {
+    if (tipo === 'producto') {
+        const opt = productoSelect.querySelector(`option[value="${key}"]`);
+        return opt ? opt.textContent : key;
+    }
+    if (tipo === 'categoria') {
+        const opt = categoriaSelect.querySelector(`option[value="${key}"]`);
+        return opt ? opt.textContent : key;
+    }
+    if (tipo === 'supermercado') {
+        const opt = supermercadoSelect.querySelector(`option[value="${key}"]`);
+        return opt ? opt.textContent : key;
+    }
+    return key;
 }
 
 [productoSelect, categoriaSelect, supermercadoSelect].forEach(sel => {

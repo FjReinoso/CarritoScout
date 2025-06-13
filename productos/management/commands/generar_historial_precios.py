@@ -29,8 +29,12 @@ class Command(BaseCommand):
 
                 precio_base = float(precio_actual.precio)
                 for meses_atras in range(1, meses_historico + 1):
-                    # El precio en el pasado es más barato (hasta un 15% menos hace 5 meses)
-                    factor_descuento = 1 - (0.03 * meses_atras + random.uniform(0, 0.02))  # 3-5% menos por mes
+                    # El precio en el pasado es más barato, pero con no linealidad y rebotes
+                    # Base: 3-5% menos por mes, pero con rebote y ruido aleatorio
+                    tendencia = 1 - (0.03 * meses_atras + random.uniform(0, 0.02))
+                    rebote = 1 + random.uniform(-0.015, 0.015) * (1 if meses_atras % 2 == 0 else -1)  # Rebote alterno
+                    ruido = 1 + random.uniform(-0.01, 0.01)  # Ruido pequeño
+                    factor_descuento = tendencia * rebote * ruido
                     precio_hist = round(precio_base * factor_descuento, 2)
                     fecha_hist = timezone.now() - timedelta(days=30 * meses_atras + random.randint(0, 5))
                     # Evitar duplicados para la misma fecha
