@@ -284,22 +284,29 @@ def agregar_al_carrito(request):
 @login_required
 @require_POST
 def actualizar_cantidad(request):
-    """Vista para actualizar la cantidad de un producto en el carrito"""
+    """Vista para actualizar la cantidad de un producto en el carrito (dueño o compartido)"""
     item_id = request.POST.get('item_id')
     nueva_cantidad = int(request.POST.get('cantidad', 1))
-    
+
     if nueva_cantidad <= 0:
-        return JsonResponse({'status': 'error', 'message': 'La cantidad debe ser mayor que cero'}, status=400)
-    
-    # Obtener el item del carrito
-    item = get_object_or_404(CarritoProducto, id=item_id, carrito__usuario=request.user)
-    
+        return JsonResponse({
+            'status': 'error',
+            'message': 'La cantidad debe ser mayor que cero.'
+        }, status=400)
+
+    # Permitir modificar si el usuario es dueño o compartido
+    item = get_object_or_404(
+        CarritoProducto,
+        id=item_id,
+        carrito__in=Carrito.objects.filter(Q(usuario=request.user) | Q(usuarios_compartidos=request.user))
+    )
+
     # Actualizar cantidad
     item.cantidad = nueva_cantidad
     item.save()
-    
+
     carrito = item.carrito
-    
+
     return JsonResponse({
         'status': 'success',
         'message': 'Cantidad actualizada',
@@ -318,7 +325,7 @@ def eliminar_del_carrito(request):
             return JsonResponse({'status': 'error', 'message': 'Falta el item_id para eliminar el producto'}, status=400)
         item = get_object_or_404(CarritoProducto, id=item_id)
         carrito = item.carrito
-        # Solo permitir eliminar si el usuario es dueño o compartido y el carrito es el activo
+        # Solo permitir eliminar si el carrito es el activo
         carrito_activo_obj = CarritoActivoUsuario.objects.filter(usuario=request.user).select_related('carrito').first()
         if not carrito_activo_obj or carrito_activo_obj.carrito.id_carrito != carrito.id_carrito:
             return JsonResponse({'status': 'error', 'message': 'Solo puedes eliminar productos de tu carrito activo.'}, status=403)
@@ -340,11 +347,17 @@ def eliminar_del_carrito(request):
 @require_POST
 def vaciar_carrito(request):
     """Vista para vaciar completamente el carrito"""
-    carrito = get_object_or_404(Carrito, usuario=request.user, activo=True)
-    
+    from django.db.models import Q
+    # Buscar el carrito activo del usuario (propio o compartido)
+    carrito_activo_obj = CarritoActivoUsuario.objects.filter(usuario=request.user).select_related('carrito').first()
+    if not carrito_activo_obj:
+        return JsonResponse({'status': 'error', 'message': 'No tienes un carrito activo.'}, status=400)
+    carrito = carrito_activo_obj.carrito
+    # Solo permitir si el usuario es dueño o compartido
+    if not (carrito.usuario == request.user or carrito.usuarios_compartidos.filter(id=request.user.id).exists()):
+        return JsonResponse({'status': 'error', 'message': 'No tienes permisos para modificar este carrito.'}, status=403)
     # Eliminar todos los productos del carrito
     carrito.items.all().delete()
-    
     return JsonResponse({
         'status': 'success',
         'message': 'Carrito vaciado',

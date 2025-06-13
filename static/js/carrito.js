@@ -540,13 +540,13 @@ class CarritoManager {
         const itemEl = document.getElementById(`item-${itemId}`);
         if (itemEl) {
             const priceEl = itemEl.querySelector('.col-md-2.text-end h5');
-            if (priceEl) priceEl.textContent = '$' + subtotal;
+            if (priceEl) priceEl.textContent = '€' + subtotal;
         }
     }
 
     updateCartTotals(cartTotal, cartCount) {
         const cartTotalEl = document.querySelector('.cart-summary strong:last-child');
-        if (cartTotalEl) cartTotalEl.textContent = '$' + cartTotal;
+        if (cartTotalEl) cartTotalEl.textContent = '€' + cartTotal;
 
         const productCountEl = document.querySelector('.mb-3 strong');
         if (productCountEl) productCountEl.textContent = cartCount;
