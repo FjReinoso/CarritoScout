@@ -73,10 +73,12 @@ document.addEventListener('DOMContentLoaded', function() {
             const name = this.getAttribute('data-name');
             if (this.classList.contains('selected')) {
                 this.classList.remove('selected');
-                selectedSupermarkets = selectedSupermarkets.filter(sm => sm.id !== id);
+                selectedSupermarkets = selectedSupermarkets.filter(sm => String(sm.id) !== String(id));
             } else {
                 this.classList.add('selected');
-                selectedSupermarkets.push({ id, name });
+                if (!selectedSupermarkets.some(sm => String(sm.id) === String(id))) {
+                    selectedSupermarkets.push({ id: String(id), name });
+                }
             }
             updateHiddenFields();
             updateActiveFilters();
@@ -104,8 +106,14 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     function updateHiddenFields() {
-        document.getElementById('selected-supermarkets').value = selectedSupermarkets.map(sm => sm.id).join(',');
-        document.getElementById('selected-categories').value = selectedCategories.join(',');
+        // Filtrar valores vacíos o nulos para evitar 'null' en la query
+        document.getElementById('selected-supermarkets').value = selectedSupermarkets
+            .map(sm => String(sm.id))
+            .filter(id => id && id !== 'null' && id !== 'undefined')
+            .join(',');
+        document.getElementById('selected-categories').value = selectedCategories
+            .filter(cat => cat && cat !== 'null' && cat !== 'undefined')
+            .join(',');
     }
     
     function updateActiveFilters() {
@@ -137,7 +145,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     const id = badge.getAttribute('data-id');
                     const card = document.querySelector(`.supermarket-filter[data-id="${id}"]`);
                     if (card) card.classList.remove('selected');
-                    selectedSupermarkets = selectedSupermarkets.filter(sm => sm.id !== id);
+                    selectedSupermarkets = selectedSupermarkets.filter(sm => String(sm.id) !== String(id));
                 } else if (type === 'category') {
                     const category = badge.getAttribute('data-category');
                     const card = document.querySelector(`.category-filter[data-category="${category}"]`);
