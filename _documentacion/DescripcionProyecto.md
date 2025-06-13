@@ -39,7 +39,7 @@ Se incluirá un archivo `docker-compose.yml` para orquestar los diferentes servi
 
 ### **Comparación de Precios**
 - Comparación de precios de productos entre diferentes supermercados.
-- Visualización de precios actuales y históricos.
+- Visualización de precios actuales y históricos(parcial).
 - Filtros por categoría, supermercado y rango de precios.
 
 ### **Carrito de Compras**
@@ -52,18 +52,17 @@ Se incluirá un archivo `docker-compose.yml` para orquestar los diferentes servi
 - Gráficas de evolución de precios.
 - Análisis de tendencias de precios.
 
-### **Previsión de Costes**
+### **Previsión de Costes(opcional)**
 - Algoritmo para prever el coste de productos en base a datos históricos (opcional, ya que puede ser algo complicado).
 - Sugerencias de compra según previsiones de inflación.
 
-### **Alertas y Notificaciones**
+### **Alertas y Notificaciones(opcional)**
 - Notificaciones de cambios significativos en los precios.
 - Alertas de ofertas y descuentos en productos seleccionados.
 
 ### **Panel de Administración**
 - Gestión de usuarios y permisos.
 - Administración de productos y precios.
-- Visualización de estadísticas de uso de la aplicación.
 
 ---
 
