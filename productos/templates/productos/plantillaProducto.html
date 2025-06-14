@@ -2,7 +2,7 @@
 {% for producto in productos %}
 <div class="col">
     <div class="card h-100 shadow-sm product-card">
-        <!-- Product image -->
+        <!-- Imagen del producto -->
         <div class="product-img-container">
             {% if producto.imagen %}
             <img src="{{ producto.imagen.url }}" class="card-img-top product-img" alt="{{ producto.nombre }}">
@@ -17,7 +17,7 @@
             <p class="text-muted small mb-2">{{ producto.categoria|title }}</p>
             {% endif %}
             
-            <!-- Price range -->
+            <!-- Rango -->
             {% if producto.precio_minimo %}
             <p class="price-range">
                 <span class="fw-bold">{{ producto.rango_precios }}</span>
@@ -26,7 +26,7 @@
             <p class="text-muted">Precio no disponible</p>
             {% endif %}
             
-            <!-- Available at supermarkets badges -->
+            <!-- Está en el supermercado? -->
             <div class="supermarket-badges mt-2">
                 {% for precio in producto.precios.all|slice:":3" %}
                 <span class="badge bg-light text-dark me-1 mb-1">{{ precio.id_supermercado.nombre }}</span>

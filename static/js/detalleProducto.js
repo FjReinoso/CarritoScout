@@ -61,9 +61,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: body
             });
             if (!response.ok) throw new Error();
-            const data = await response.json();
-            if (data.status === 'success') {
-                mostrarNotificacion('success', data.message);
+            const data = await response.json();            if (data.status === 'success') {
+                // Mostrar una notificación diferente si se creó un carrito automáticamente
+                if (data.auto_created) {
+                    mostrarNotificacion('success', data.message);
+                    // Si se desea, se puede mostrar otra notificación o realizar acciones adicionales
+                    // cuando se crea un carrito automáticamente
+                } else {
+                    mostrarNotificacion('success', data.message);
+                }
+                
                 if (data.cart_count !== undefined) updateCartBadge(data.cart_count);
                 if (data.cart_name) updateCartName(data.cart_name);
                 button.innerHTML = '<i class="fas fa-check me-1"></i>Agregado';

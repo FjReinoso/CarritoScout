@@ -170,11 +170,9 @@
                                             <input type="number" min="1" class="quantity-input" value="{{ item.cantidad }}" data-item-id="{{ item.id }}">
                                             <button class="quantity-btn increase-btn" data-item-id="{{ item.id }}">+</button>
                                         </div>
-                                    </div>
-                                      <!-- Precio -->
-                                    <div class="col-md-2 col-sm-3 mb-2 mb-md-0 text-end">
-                                        <h5>€{{ item.subtotal }}</h5>
-                                        <small class="text-muted">€{{ item.precio_unitario|default:0 }} / unidad</small>
+                                    </div>                                    <!-- Precio -->
+                                    <div class="col-md-2 col-sm-3 mb-2 mb-md-0 text-end">                                        <h5>{{ item.subtotal }}€</h5>
+                                        <small class="text-muted">{{ item.precio_unitario|default:0 }}€/unidad</small>
                                     </div>
                                     
                                     <!-- Eliminar -->
@@ -195,19 +193,18 @@
                     <!-- Resumen del Carrito -->
                     <div class="cart-summary p-4">
                         <h3>Resumen del Carrito</h3>
-                        <hr>
-                        <div class="d-flex justify-content-between mb-2">
+                        <hr>                        <div class="d-flex justify-content-between mb-2">
                             <span>Productos ({{ carrito.total_productos }}):</span>
-                            <span>€{{ carrito.precio_total }}</span>
+                            <span>{{ carrito.precio_total }}€</span>
                         </div>
                         <div class="d-flex justify-content-between mb-2">
                             <span>Descuentos:</span>
-                            <span>€0.00</span>
+                            <span>0,00€</span>
                         </div>
                         <hr>
                         <div class="d-flex justify-content-between mb-3">
                             <strong>Total:</strong>
-                            <strong>€{{ carrito.precio_total }}</strong>
+                            <strong>{{ carrito.precio_total }}€</strong>
                         </div>
                         
                         {% if carrito.items_count > 0 %}
@@ -234,18 +231,11 @@
                                         <h6>Categorías</h6>
                                         <h3>{{ items|length }}</h3>
                                     </div>
-                                </div>
-                                <div class="col-6">
+                                </div>                                <div class="col-6">
                                     <div class="text-center mb-2">
                                         <i class="bi bi-cash-coin statistics-icon"></i>
                                         <h6>Precio por producto</h6>
-                                        <h3>
-                                            {% if carrito.total_productos > 0 %}
-                                                €{{ carrito.precio_total|divisibleby:carrito.total_productos|floatformat:2 }}
-                                            {% else %}
-                                                €0.00
-                                            {% endif %}
-                                        </h3>
+                                        <h3>{{ carrito.precio_promedio|floatformat:2 }}€</h3>
                                     </div>
                                 </div>
                             </div>
@@ -279,7 +269,7 @@
                                     <div class="flex-grow-1">
                                         <h6 class="mb-1">{{ cart.nombre_display }}</h6>
                                         <small class="text-muted">Creado el: {{ cart.fecha_creacion|date:"d/m/Y" }}</small>
-                                        <br><small class="text-muted">{{ cart.total_productos }} productos - €{{ cart.precio_total }}</small>
+                                        <br><small class="text-muted">{{ cart.total_productos }} productos - {{ cart.precio_total }}€</small>
                                     </div>
                                     <div class="d-flex align-items-center gap-2">
                                         {% if carrito and cart.id_carrito == carrito.id_carrito %}
@@ -342,10 +332,9 @@
                 </div>
                 <div class="col-md-4 mb-4">
                     <div class="card statistics-card h-100">
-                        <div class="card-body text-center py-4">
-                            <i class="bi bi-cash statistics-icon mb-3"></i>
+                        <div class="card-body text-center py-4">                            <i class="bi bi-cash statistics-icon mb-3"></i>
                             <h5>Gasto Total</h5>
-                            <h2>€{{ carrito.precio_total|default:0 }}</h2>
+                            <h2>{{ carrito.precio_total|default:0 }}€</h2>
                         </div>
                     </div>
                 </div>
@@ -565,7 +554,7 @@
                     
                     <div class="mt-4 text-end">
                         <p><strong>Total de productos:</strong> {{ carrito.total_productos }}</p>
-                        <p><strong>Costo estimado:</strong> €{{ carrito.precio_total }}</p>
+                        <p><strong>Costo estimado:</strong> {{ carrito.precio_total }}€</p>
                     </div>
                 </div>
             </div>

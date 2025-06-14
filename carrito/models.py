@@ -42,6 +42,13 @@ class Carrito(models.Model):
         return sum(item.subtotal for item in self.items.all())
     
     @property
+    def precio_promedio(self):
+        """Calcula el precio promedio por producto"""
+        if self.total_productos > 0:
+            return self.precio_total / self.total_productos
+        return 0
+    
+    @property
     def items_count(self):
         """Retorna el número de items diferentes en el carrito"""
         return self.items.count()

@@ -64,8 +64,7 @@
                     <h2>Compra #{{ historial.id_historial_carrito }}</h2>
                     <p class="mb-0">Fecha: {{ historial.fecha_finalizacion|date:"d/m/Y H:i" }}</p>
                 </div>
-                <div class="col-md-4 text-md-end">
-                    <h3>Total: €{{ historial.costo_total }}</h3>
+                <div class="col-md-4 text-md-end">                    <h3>Total: {{ historial.costo_total }}€</h3>
                     <p class="mb-0">{{ items|length }} productos</p>
                 </div>
             </div>
@@ -104,17 +103,16 @@
                                     <div class="text-muted small">{{ item.producto.categoria }}</div>
                                 </div>
                             </div>
-                        </td>
-                        <td>${{ item.producto.precio }}</td>
+                        </td>                        <td>{{ item.producto.precio }}€</td>
                         <td>{{ item.cantidad }}</td>
-                        <td>${{ item.subtotal }}</td>
+                        <td>{{ item.subtotal }}€</td>
                     </tr>
                     {% endfor %}
                 </tbody>
                 <tfoot>
                     <tr>
                         <td colspan="3" class="text-end"><strong>Total:</strong></td>
-                        <td><strong>${{ historial.costo_total }}</strong></td>
+                        <td><strong>{{ historial.costo_total }}€</strong></td>
                     </tr>
                 </tfoot>
             </table>

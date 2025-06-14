@@ -428,9 +428,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: `producto_id=${productId}&cantidad=1`
             });
 
-            const data = await response.json();
-
-            if (data.status === 'success') {
+            const data = await response.json();            if (data.status === 'success') {
+                // Mostrar una notificación adaptada si se creó un carrito automáticamente
                 showNotification(data.message, 'success');
                 
                 // Actualizar el badge del carrito

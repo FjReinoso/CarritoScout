@@ -120,12 +120,6 @@ class CarritoManager {
             });
         }
 
-        const downloadBtn = document.getElementById('downloadShoppingList');
-        if (downloadBtn) {
-            downloadBtn.addEventListener('click', () => {
-                this.downloadShoppingList();
-            });
-        }
 
         document.querySelectorAll('.shopping-list-checkbox').forEach(checkbox => {
             checkbox.addEventListener('change', (e) => {
@@ -536,14 +530,14 @@ class CarritoManager {
         const itemEl = document.getElementById(`item-${itemId}`);
         if (itemEl) {
             const priceEl = itemEl.querySelector('.col-md-2.text-end h5');
-            if (priceEl) priceEl.textContent = '€' + subtotal;
+            if (priceEl) priceEl.textContent = subtotal + '€';
         }
     }
 
     updateCartTotals(cartTotal, cartCount) {
         // Actualiza el total en el resumen
         const cartTotalEl = document.querySelector('.cart-summary strong:last-child');
-        if (cartTotalEl) cartTotalEl.textContent = '€' + cartTotal;
+        if (cartTotalEl) cartTotalEl.textContent = cartTotal + '€';
 
         // Actualiza el número de productos en el resumen
         const resumenProductosEl = document.querySelector('.cart-summary .mb-2 span:first-child');
@@ -551,26 +545,24 @@ class CarritoManager {
 
         // Actualiza el dinero de productos en el resumen
         const resumenProductosDineroEl = document.querySelector('.cart-summary .mb-2 span:last-child');
-        if (resumenProductosDineroEl) resumenProductosDineroEl.textContent = '€' + cartTotal;
+        if (resumenProductosDineroEl) resumenProductosDineroEl.textContent = cartTotal + '€';
 
         // Actualiza el número de productos en la línea superior
         const productCountEl = document.querySelector('.mb-3 strong');
-        if (productCountEl) productCountEl.textContent = cartCount;
-
-        // Actualiza el promedio en estadísticas rápidas (media de precio por producto)
-        // Busca el h6 que contenga 'Promedio' y actualiza el siguiente h3
+        if (productCountEl) productCountEl.textContent = cartCount;        // Actualiza el precio promedio por producto en estadísticas rápidas
+        // Busca el h6 que contenga 'Precio por producto' y actualiza el siguiente h3
         const estadisticasCards = document.querySelectorAll('.statistics-card');
         estadisticasCards.forEach(card => {
             const h6s = card.querySelectorAll('h6');
             h6s.forEach((h6, idx) => {
-                if (h6.textContent.trim().toLowerCase().includes('promedio')) {
+                if (h6.textContent.trim().toLowerCase().includes('precio por producto')) {
                     const h3 = card.querySelectorAll('h3')[idx];
                     if (h3) {
                         if (cartCount > 0) {
                             const promedio = (parseFloat(cartTotal) / cartCount).toFixed(2);
-                            h3.textContent = `€${promedio}`;
+                            h3.textContent = `${promedio}€`;
                         } else {
-                            h3.textContent = '€0.00';
+                            h3.textContent = '0,00€';
                         }
                     }
                 }

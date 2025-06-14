@@ -18,9 +18,9 @@ class Producto(models.Model):
     nombre = models.CharField(max_length=100)
     categoria = models.CharField(max_length=50, blank=True, null=True)
     unidad_medida = models.CharField(max_length=20, blank=True, null=True)
-    precio = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)  # Campo individual (puede ser precio promedio)
+    precio = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     descripcion = models.TextField(blank=True, null=True)
-    #imagen = models.ImageField(upload_to='productos/', blank=True, null=True)  # Campo adicional para imágenes usar pillow
+    #imagen = models.ImageField(upload_to='productos/', blank=True, null=True)  # Campo adicional para imágenes usar pillow (ruina)
     
     class Meta:
         db_table = 'Productos'
@@ -49,9 +49,9 @@ class Producto(models.Model):
         if min_precio is None:
             return "Precio no disponible"
         elif min_precio == max_precio:
-            return f"€{min_precio}"
+            return f"{min_precio}€"
         else:
-            return f"€{min_precio} - €{max_precio}"
+            return f"{min_precio}€ - {max_precio}€"
 
 class Precio(models.Model):
     id_precio = models.AutoField(primary_key=True)
@@ -74,4 +74,4 @@ class Precio(models.Model):
         unique_together = ['id_producto', 'id_supermercado', 'fecha_actualizacion']  # Permite histórico de precios
         
     def __str__(self):
-        return f"{self.id_producto.nombre} - {self.id_supermercado.nombre}: €{self.precio}"
+        return f"{self.id_producto.nombre} - {self.id_supermercado.nombre}: {self.precio}€"

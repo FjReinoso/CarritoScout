@@ -231,18 +231,32 @@ def agregar_al_carrito(request):
                 precio_unitario = float(precio_obj.precio)
         if precio_unitario is None:
             precio_unitario = float(producto.precio) if producto.precio is not None else 0
-        
-        # Buscar el carrito activo del usuario (propio o compartido)
+          # Buscar el carrito activo del usuario (propio o compartido)
         carrito_activo_obj = CarritoActivoUsuario.objects.filter(usuario=request.user).select_related('carrito').first()
         
+        # Si no hay carrito activo, crear uno automáticamente
         if not carrito_activo_obj:
-            return JsonResponse({
-                'status': 'error',
-                'message': 'No tienes un carrito activo para agregar productos.'
-            }, status=400)
-        carrito = carrito_activo_obj.carrito
-        
-        # Solo permitir agregar si el usuario es dueño o compartido
+            # Crear un nuevo carrito por defecto
+            nombre_default = f"Carrito de {request.user.username}"
+            carrito = Carrito.objects.create(
+                usuario=request.user,
+                nombre=nombre_default,
+                activo=True,
+                fecha_creacion=timezone.now()
+            )
+            
+            # Asignarlo como carrito activo
+            CarritoActivoUsuario.objects.update_or_create(
+                usuario=request.user,
+                defaults={'carrito': carrito, 'fecha_activacion': timezone.now()}
+            )
+            
+            # Mensaje específico para mostrar luego que se creó un carrito automáticamente
+            auto_created = True
+        else:
+            carrito = carrito_activo_obj.carrito
+            auto_created = False
+          # Solo permitir agregar si el usuario es dueño o compartido
         if not (carrito.usuario == request.user or carrito.usuarios_compartidos.filter(id=request.user.id).exists()):
             return JsonResponse({
                 'status': 'error',
@@ -256,8 +270,7 @@ def agregar_al_carrito(request):
             supermercado=supermercado,
             defaults={'cantidad': cantidad, 'precio_unitario': precio_unitario}
         )
-        
-        # Si ya existía, incrementar la cantidad y actualizar precio si cambió
+          # Si ya existía, incrementar la cantidad y actualizar precio si cambió
         if not created:
             carrito_producto.cantidad = F('cantidad') + cantidad
             carrito_producto.precio_unitario = precio_unitario
@@ -267,6 +280,10 @@ def agregar_al_carrito(request):
         else:
             mensaje = f'{producto.nombre} añadido al carrito'
         
+        # Si se creó automáticamente un carrito, agregar esa información al mensaje
+        if auto_created:
+            mensaje = f'{mensaje}. Se ha creado automáticamente un carrito para ti.'
+        
         # Obtener los datos actualizados del carrito
         carrito.refresh_from_db()
         
@@ -275,7 +292,8 @@ def agregar_al_carrito(request):
             'message': mensaje,
             'cart_count': carrito.total_productos,
             'cart_total': float(carrito.precio_total) if carrito.precio_total else 0,
-            'cart_name': carrito.nombre_display
+            'cart_name': carrito.nombre_display,
+            'auto_created': auto_created
         })
         
     except ValueError:
