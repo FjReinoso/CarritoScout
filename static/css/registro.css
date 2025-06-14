@@ -1,6 +1,4 @@
-/* Estilos para la página de registro practicamente se han reutilizado
-Completamente los estilos de login.css pero se ha tenido que hacer otra hoja
-Porque los elementos son totalmente diferentes (especialmente features) */
+/* --- ESTILOS GENERALES (ESCRITORIO, NO TOCAR) --- */
 body {
     background-color: #ffffff;
     height: 100vh; 
@@ -26,7 +24,11 @@ html {
     justify-content: center;
     padding: 1.5rem; 
     height: 100%;
-    overflow-y: hidden; /
+    overflow-y: hidden;
+}
+.form-section .card {
+    max-height: 700px; /* Más pequeño que antes */
+
 }
 
 .features-section {
@@ -56,7 +58,7 @@ html {
     border-bottom: none;
     padding: 1rem 1rem 0; 
 }
-/*Fix para los estilos de bootstrap*/
+
 .card-body {
     padding: 1rem !important;
 }
@@ -141,11 +143,10 @@ html {
 }
 
 .form-text {
-    margin-top: 0.25rem !important; /* Texto de ayuda mas pequeño*/
+    margin-top: 0.25rem !important;
     font-size: 0.75rem; 
 }
 
-/* Footer styles */
 .footer {
     background-color: #000000;
     color: #ffffff;
@@ -160,7 +161,7 @@ html {
     color: #ffffff;
     text-decoration: none;
     transition: color 0.2s ease-in-out;
-    margin: 0 0.4rem; /*Espaciado entre los links*/
+    margin: 0 0.4rem;
 }
 
 .footer a:hover {
@@ -186,39 +187,6 @@ html {
     display: block; 
 }
 
-/* Intento de arreglar en pantañas pequeñas */
-@media (max-width: 767.98px) {
-    .registro-container {
-        flex-direction: column;
-    }
-    
-    .features-section, .form-section {
-        height: 50vh; 
-        padding: 1rem;
-    }
-    
-    .feature-icon {
-        font-size: 1.75rem;
-    }
-    
-    .feature-item {
-        margin-bottom: 1rem;
-    }
-    
-    .card {
-        max-height: 45vh; 
-    }
-    
-    .footer {
-        padding: 0.5rem 0;
-    }
-    
-    .footer a {
-        margin: 0 0.3rem;
-    }
-}
-
-/* Ajustes para que las lineas queden cuadradas y no tenga saltos feos */
 .fs-4 {
     font-size: 1.25rem !important;
 }
@@ -230,4 +198,88 @@ html {
 
 .p-4 {
     padding: 1rem !important;
+}
+
+/* --- SOLO CAMBIOS PARA MOVIL --- */
+@media (max-width: 991.98px) {
+    html, body {
+        overflow: auto;
+        height: auto;
+        background: linear-gradient(90deg, #FF9A8B 0%, #FF6A88 55%, #FF99AC 100%) !important;
+        
+    }
+    .registro-container {
+        flex-direction: column !important;
+        min-height: 100vh;
+        height: auto;
+        width: 100vw;
+        overflow: visible;
+        
+    }
+    .form-section {
+        min-height: 90vh !important;      /* Ocupa toda la altura de la pantalla */
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important; /* Centra verticalmente */
+        align-items: center !important;
+        background: linear-gradient(90deg, #FF9A8B 0%, #FF6A88 55%, #FF99AC 100%) !important;
+        padding: 1.2rem 1rem !important;
+        box-sizing: border-box;
+        height: auto !important;
+    }
+    .features-section {
+        min-height: 30vh !important;
+        border-radius: 0 0 1.5rem 1.5rem !important;
+        box-shadow: 0 2px 8px rgba(255, 106, 136, 0.08) !important;
+        padding-bottom: 2rem !important;
+    }
+    .features-section {
+        display: none !important; /* OCULTA FEATURES EN MOVIL */
+    }
+    .form-section {
+        padding: 1.2rem 1rem !important;
+        overflow-y: visible !important;
+    }
+    .card {
+        max-width: 100% !important;
+        margin: 1.5rem auto 0 auto !important;
+        border-radius: 1rem !important;
+        box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.10) !important;
+        max-height: none !important;
+    }
+    .footer {
+        padding: 0.5rem 0 !important;
+        font-size: 0.8rem !important;
+        position: static !important;
+        width: 100% !important;
+    }
+    .footer a {
+        margin: 0 0.3rem !important;
+    }
+    /* Corrige el grid de Bootstrap para que ambas columnas ocupen todo el ancho */
+    .registro-container > .col-md-6 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .features-section {
+        padding: 0.7rem !important;
+        border-radius: 0 0 1rem 1rem !important;
+    }
+    .feature-icon {
+        font-size: 1.3rem !important;
+    }
+    .form-section {
+        padding: 0.7rem !important;
+    }
+    .card {
+        margin: 1rem auto 0 auto !important;
+        border-radius: 0.7rem !important;
+    }
+    .footer {
+        font-size: 0.75rem !important;
+        padding: 0.4rem 0 !important;
+    }
 }

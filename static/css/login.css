@@ -1,3 +1,4 @@
+/* --- ESTILOS GENERALES (ESCRITORIO) --- */
 body {
     background-color: #ffffff;
     height: 100vh;
@@ -124,26 +125,6 @@ html {
     padding: 1rem !important;
 }
 
-@media (max-width: 767.98px) {
-    .login-container {
-        flex-direction: column;
-    }
-    
-    .brand-section {
-        min-height: 30vh;
-        padding: 1rem;
-    }
-    
-    .brand-logo {
-        width: 100px;
-        margin-bottom: 1rem;
-    }
-    
-    .brand-tagline {
-        font-size: 1.2rem;
-    }
-}
-
 .footer {
     background-color: #000000;
     color: #ffffff;
@@ -184,14 +165,94 @@ html {
     display: block;
 }
 
-@media (max-width: 767.98px) {
-    .footer {
-        padding: 0.5rem 0;
+/* --- SOLO CAMBIOS PARA MOVIL --- */
+@media (max-width: 991.98px) {
+    html, body {
+        overflow: auto;
+        height: auto;
     }
-    
+    .login-container {
+        flex-direction: column !important;
+        display: flex !important;
+        min-height: 100vh;
+        height: auto;
+        width: 100vw;
+        overflow: visible;
+    }
+    .brand-section,
+    .form-section {
+        width: 100% !important;
+        min-width: 0 !important;
+        min-height: unset !important;
+        height: auto !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        padding: 1.2rem 1rem !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    .brand-section {
+        min-height: 30vh !important;
+        border-radius: 0 0 1.5rem 1.5rem !important;
+        box-shadow: 0 2px 8px rgba(255, 106, 136, 0.08) !important;
+    }
+    .brand-logo {
+        width: 100px !important;
+        margin-bottom: 1rem !important;
+    }
+    .brand-tagline {
+        font-size: 1.1rem !important;
+    }
+    .form-section {
+        background: #fff !important;
+        padding: 1.2rem 1rem !important;
+        overflow-y: visible !important;
+    }
+    .card {
+        max-width: 100% !important;
+        margin: 1.5rem auto 0 auto !important;
+        border-radius: 1rem !important;
+        box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.10) !important;
+    }
+    .footer {
+        padding: 0.5rem 0 !important;
+        font-size: 0.8rem !important;
+        position: static !important;
+        width: 100% !important;
+    }
     .footer a {
-        margin: 0 0.3rem;
+        margin: 0 0.3rem !important;
+    }
+    /* Corrige el grid de Bootstrap para que ambas columnas ocupen todo el ancho */
+    .login-container > .col-md-6 {
+        flex: 0 0 100%;
+        max-width: 100%;
     }
 }
 
+@media (max-width: 575.98px) {
+    .brand-section {
+        padding: 0.7rem !important;
+        border-radius: 0 0 1rem 1rem !important;
+    }
+    .brand-logo {
+        width: 80px !important;
+    }
+    .brand-tagline {
+        font-size: 1rem !important;
+    }
+    .form-section {
+        padding: 0.7rem !important;
+    }
+    .card {
+        margin: 1rem auto 0 auto !important;
+        border-radius: 0.7rem !important;
+    }
+    .footer {
+        font-size: 0.75rem !important;
+        padding: 0.4rem 0 !important;
+    }
+}
+
+/* --- BOOTSTRAP ICONS --- */
 @import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css");
