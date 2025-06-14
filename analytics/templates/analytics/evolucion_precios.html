@@ -25,29 +25,69 @@
         margin-bottom: 1.2rem;
     }
 }
+
+.product-badge {
+    display: inline-flex;
+    align-items: center;
+    background: linear-gradient(90deg, #FF9A8B 0%, #FF6A88 55%, #FF99AC 100%);
+    color: white;
+    border-radius: 20px;
+    padding: 6px 12px;
+    margin: 5px;
+    font-size: 0.9rem;
+}
+
+.product-badge .remove-product {
+    margin-left: 8px;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+
+#selected-products {
+    margin-top: 10px;
+    min-height: 40px;
+}
+
+.search-result-item {
+    padding: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.search-result-item:hover {
+    background-color: #f0f0f0;
+}
 </style>
 {% endblock %}
 
 {% block content %}
+<script id="productos-data" type="application/json">
+[
+{% for producto in productos %}
+    {"id": "{{ producto.id_producto }}", "name": "{{ producto.nombre }}"}{% if not forloop.last %},{% endif %}
+{% endfor %}
+]
+</script>
 <div class="container py-4">
     <h1 class="mb-4"><i class="bi bi-graph-up"></i> Evolución de Precios</h1>
-    <div class="row mb-4">
-        <div class="col-md-4 mb-2">
+    <div class="row mb-4">        <div class="col-md-4 mb-2">
             <label for="tipo-analisis" class="form-label">Tipo de análisis</label>
             <select id="tipo-analisis" class="form-select">
-                <option value="producto">Por Producto</option>
-                <option value="categoria">Por Categoría</option>
-                <option value="supermercado">Por Supermercado</option>
+                <option value="producto" selected>Por producto</option>
+                <option value="categoria">Por categoría</option>
+                <option value="supermercado">Por supermercado</option>
             </select>
-        </div>
-        <div class="col-md-4 mb-2" id="filtro-producto">
-            <label for="producto-select" class="form-label">Producto</label>
-            <select id="producto-select" class="form-select" multiple size="6">
-                {% for producto in productos %}
-                <option value="{{ producto.id_producto }}">{{ producto.nombre }}</option>
-                {% endfor %}
-            </select>
-            <small class="text-muted">Puedes seleccionar varios productos (Ctrl+Click)</small>
+        </div><div class="col-md-4 mb-2" id="filtro-producto">
+            <label for="producto-search" class="form-label">Buscar Producto</label>
+            <div class="input-group mb-2">
+                <input type="text" id="producto-search" class="form-control" placeholder="Buscar un producto..." autocomplete="off">
+                <button class="btn btn-outline-secondary" type="button" id="add-product-btn">Añadir</button>
+            </div>
+            <div id="search-results" class="position-absolute bg-white border rounded shadow-sm" style="display:none; z-index:1000; max-height:250px; overflow-y:auto; width:90%;">
+            </div>
+            <div id="selected-products"></div>
+            <input type="hidden" id="producto-select" value="">
+            <small class="text-muted">Busca y selecciona productos para añadir al gráfico</small>
         </div>
         <div class="col-md-4 mb-2 d-none" id="filtro-categoria">
             <label for="categoria-select" class="form-label">Categoría</label>
@@ -78,6 +118,7 @@
 
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <script>
 // Ajusta el tamaño de fuente y grosor de líneas solo en móvil para Chart.js
 function ajustarOpcionesChartMovil(opciones) {
@@ -107,9 +148,12 @@ const filtroProducto = document.getElementById('filtro-producto');
 const filtroCategoria = document.getElementById('filtro-categoria');
 const filtroSupermercado = document.getElementById('filtro-supermercado');
 const productoSelect = document.getElementById('producto-select');
+const productoSearch = document.getElementById('producto-search');
+const selectedProductsContainer = document.getElementById('selected-products');
 const categoriaSelect = document.getElementById('categoria-select');
 const supermercadoSelect = document.getElementById('supermercado-select');
 let chart;
+let selectedProducts = [];
 
 function updateFiltros() {
     filtroProducto.classList.add('d-none');
@@ -127,6 +171,9 @@ function updateFiltros() {
 tipoAnalisis.addEventListener('change', updateFiltros);
 
 function getSelectedValues(select) {
+    if (select === productoSelect) {
+        return selectedProducts.map(p => p.id);
+    }
     return Array.from(select.selectedOptions).map(opt => opt.value).filter(v => v);
 }
 
@@ -146,6 +193,106 @@ function fetchDataAndDraw() {
                 drawChart(data.labels, data.data, tipo);
             }
         });
+}
+
+function addProduct(productId, productName) {
+    if (!selectedProducts.some(p => p.id === productId)) {
+        selectedProducts.push({ id: productId, name: productName });
+        updateSelectedProductsDisplay();
+        fetchDataAndDraw();
+    }
+}
+
+function removeProduct(productId) {
+    selectedProducts = selectedProducts.filter(p => p.id !== productId);
+    updateSelectedProductsDisplay();
+    fetchDataAndDraw();
+}
+
+function updateSelectedProductsDisplay() {
+    selectedProductsContainer.innerHTML = '';
+    selectedProducts.forEach(product => {
+        const badge = document.createElement('div');
+        badge.className = 'product-badge';
+        badge.innerHTML = `
+            ${product.name}
+            <span class="remove-product" data-id="${product.id}">✕</span>
+        `;
+        selectedProductsContainer.appendChild(badge);
+    });
+
+    // Add event listeners to new remove buttons
+    document.querySelectorAll('.remove-product').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            removeProduct(e.target.getAttribute('data-id'));
+        });
+    });
+}
+
+// Autocomplete functionality
+const searchInput = document.getElementById('producto-search');
+const searchResultsContainer = document.getElementById('search-results');
+const addProductBtn = document.getElementById('add-product-btn');
+let productos = [];
+let selectedProduct = null;
+
+// Get all products from the server
+function initProductos() {
+    // Parse the products from the data attribute
+    productos = JSON.parse(document.getElementById('productos-data').textContent);
+}
+
+// Filter products based on search term
+function filterProductos(term) {
+    if (!term) return [];
+    term = term.toLowerCase();
+    return productos.filter(p => p.name.toLowerCase().includes(term));
+}
+
+// Display search results
+function showSearchResults(results) {
+    searchResultsContainer.innerHTML = '';
+    if (results.length === 0) {
+        searchResultsContainer.style.display = 'none';
+        return;
+    }
+
+    results.forEach(product => {
+        const div = document.createElement('div');
+        div.className = 'p-2 search-result-item';
+        div.textContent = product.name;
+        div.style.cursor = 'pointer';
+        div.dataset.id = product.id;
+        div.dataset.name = product.name;
+        div.addEventListener('click', () => {
+            selectProduct(product);
+        });
+        div.addEventListener('mouseenter', () => {
+            div.style.backgroundColor = '#f0f0f0';
+        });
+        div.addEventListener('mouseleave', () => {
+            div.style.backgroundColor = 'transparent';
+        });
+        searchResultsContainer.appendChild(div);
+    });
+
+    searchResultsContainer.style.display = 'block';
+}
+
+// Select a product from search results
+function selectProduct(product) {
+    searchInput.value = product.name;
+    selectedProduct = product;
+    searchResultsContainer.style.display = 'none';
+}
+
+// Add selected product to chart
+function handleAddProduct() {
+    if (selectedProduct) {
+        addProduct(selectedProduct.id, selectedProduct.name);
+        searchInput.value = '';
+        selectedProduct = null;
+    }
 }
 
 function drawChart(labels, data, tipo) {
@@ -224,8 +371,13 @@ function drawMultiChart(labels, series, tipo) {
 
 function getLabelName(tipo, key) {
     if (tipo === 'producto') {
-        const opt = productoSelect.querySelector(`option[value="${key}"]`);
-        return opt ? opt.textContent : key;
+        // Buscar en los productos seleccionados
+        const producto = selectedProducts.find(p => p.id === key);
+        if (producto) return producto.name;
+        
+        // Si no está en los seleccionados, buscar en todos los productos
+        const producto2 = productos.find(p => p.id === key);
+        if (producto2) return producto2.name;
     }
     if (tipo === 'categoria') {
         const opt = categoriaSelect.querySelector(`option[value="${key}"]`);
@@ -243,7 +395,33 @@ function getLabelName(tipo, key) {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Configurar el tipo de análisis predeterminado a 'producto'
+    tipoAnalisis.value = 'producto';
     updateFiltros();
+    initProductos();
+    
+    // Search input event listeners
+    searchInput.addEventListener('input', (e) => {
+        const results = filterProductos(e.target.value);
+        showSearchResults(results);
+    });
+    
+    // Hide search results when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!searchResultsContainer.contains(e.target) && e.target !== searchInput) {
+            searchResultsContainer.style.display = 'none';
+        }
+    });
+    
+    // Add product button click
+    addProductBtn.addEventListener('click', handleAddProduct);
+    
+    // Add product when pressing Enter in search input
+    searchInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && selectedProduct) {
+            handleAddProduct();
+        }
+    });
 });
 </script>
 {% endblock %}

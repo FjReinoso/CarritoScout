@@ -40,37 +40,43 @@
 
 <div class="row">
     <div class="col-md-4">
-        <div class="card feature-card h-100">
-            <div class="card-body text-center">
-                <div class="feature-icon">
-                    <i class="bi bi-search"></i>
+        <a href="{% url 'productos:producto_list' %}" class="text-decoration-none text-dark">
+            <div class="card feature-card h-100">
+                <div class="card-body text-center">
+                    <div class="feature-icon">
+                        <i class="bi bi-search"></i>
+                    </div>
+                    <h5 class="card-title">Busca Productos</h5>
+                    <p class="card-text">Encuentra fácilmente cualquier producto y compara sus precios en diferentes supermercados.</p>
                 </div>
-                <h5 class="card-title">Busca Productos</h5>
-                <p class="card-text">Encuentra fácilmente cualquier producto y compara sus precios en diferentes supermercados.</p>
             </div>
-        </div>
+        </a>
     </div>
     <div class="col-md-4">
-        <div class="card feature-card h-100">
-            <div class="card-body text-center">
-                <div class="feature-icon">
-                    <i class="bi bi-graph-up"></i>
+        <a href="{% url 'analytics:evolucion_precios' %}" class="text-decoration-none text-dark">
+            <div class="card feature-card h-100">
+                <div class="card-body text-center">
+                    <div class="feature-icon">
+                        <i class="bi bi-graph-up"></i>
+                    </div>
+                    <h5 class="card-title">Analiza Precios</h5>
+                    <p class="card-text">Visualiza el historial de precios y detecta cuándo es el mejor momento para comprar.</p>
                 </div>
-                <h5 class="card-title">Analiza Precios</h5>
-                <p class="card-text">Visualiza el historial de precios y detecta cuándo es el mejor momento para comprar.</p>
             </div>
-        </div>
+        </a>
     </div>
     <div class="col-md-4">
-        <div class="card feature-card h-100">
-            <div class="card-body text-center">
-                <div class="feature-icon">
-                    <i class="bi bi-cart-check"></i>
+        <a href="{% url 'carrito:ver_carrito' %}" class="text-decoration-none text-dark">
+            <div class="card feature-card h-100">
+                <div class="card-body text-center">
+                    <div class="feature-icon">
+                        <i class="bi bi-cart-check"></i>
+                    </div>
+                    <h5 class="card-title">Crea Listas de Compras</h5>
+                    <p class="card-text">Organiza tus compras y encuentra el supermercado con el total más económico.</p>
                 </div>
-                <h5 class="card-title">Crea Listas de Compras</h5>
-                <p class="card-text">Organiza tus compras y encuentra el supermercado con el total más económico.</p>
             </div>
-        </div>
+        </a>
     </div>
 </div>
 {% endblock %}
