@@ -32,6 +32,8 @@ services:
       - db
     environment:
       - DEBUG=True
+    env_file:
+      - .env
 
   phpmyadmin:
     image: phpmyadmin:latest

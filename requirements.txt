@@ -2,3 +2,8 @@ django
 djangorestframework
 mysqlclient
 django-browser-reload
+python-dotenv
+dj-database-url
+psycopg2-binary
+gunicorn
+whitenoise
