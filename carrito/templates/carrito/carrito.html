@@ -159,7 +159,7 @@
                                             <span class="category-pill">{{ item.producto.unidad_medida }}</span>
                                         </div>
                                         <small class="text-muted">
-                                            ID item: {{ item.id }} | ID producto: {{ item.producto.id }} | Supermercado: {{ item.supermercado.nombre|default:'Sin supermercado' }}
+                                            ID item: {{ item.id }}  <br> Supermercado: {{ item.supermercado.nombre|default:'Sin supermercado' }}
                                         </small>
                                     </div>
                                     
@@ -171,11 +171,10 @@
                                             <button class="quantity-btn increase-btn" data-item-id="{{ item.id }}">+</button>
                                         </div>
                                     </div>
-                                    
-                                    <!-- Precio -->
+                                      <!-- Precio -->
                                     <div class="col-md-2 col-sm-3 mb-2 mb-md-0 text-end">
                                         <h5>€{{ item.subtotal }}</h5>
-                                        <small class="text-muted">€{{ item.producto.precio }} / unidad</small>
+                                        <small class="text-muted">€{{ item.precio_unitario|default:0 }} / unidad</small>
                                     </div>
                                     
                                     <!-- Eliminar -->
@@ -239,7 +238,7 @@
                                 <div class="col-6">
                                     <div class="text-center mb-2">
                                         <i class="bi bi-cash-coin statistics-icon"></i>
-                                        <h6>Promedio</h6>
+                                        <h6>Precio por producto</h6>
                                         <h3>
                                             {% if carrito.total_productos > 0 %}
                                                 €{{ carrito.precio_total|divisibleby:carrito.total_productos|floatformat:2 }}
