@@ -133,7 +133,7 @@
                                 <tr>
                                     <th><i class="fas fa-store me-1"></i>Supermercado</th>
                                     <th><i class="fas fa-euro-sign me-1"></i>Precio</th>
-                                    <th><i class="fas fa-calendar-alt me-1"></i>Actualizado</th>
+                                    <th class="col-actualizado"><i class="fas fa-calendar-alt me-1"></i>Actualizado</th>
                                     <th class="text-center"><i class="fas fa-shopping-cart me-1"></i>Acciones</th>
                                 </tr>
                             </thead>
@@ -160,7 +160,7 @@
                                     <td>
                                         <span class="fw-bold">€{{ precio.precio }}</span>
                                     </td>
-                                    <td class="text-muted">
+                                    <td class="text-muted col-actualizado">
                                         <small>
                                             <i class="fas fa-clock me-1"></i>
                                             {{ precio.fecha_actualizacion|date:"d/m/Y" }}

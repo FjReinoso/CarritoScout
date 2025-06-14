@@ -167,11 +167,40 @@
             .cart-name {
                 display: none;
             }
-            
             .cart-button {
                 padding: 0.5rem;
                 min-width: 40px;
                 justify-content: center;
+            }
+            /* Oculta el logo en móvil */
+            .navbar-brand img {
+                display: none !important;
+            }
+            /* Título más pequeño en móvil */
+            .navbar-brand {
+                font-size: 1.1rem !important;
+            }
+            /* Centra el contenido de la navbar y el carrito */
+            .navbar .container {
+                display: flex !important;
+                flex-direction: row;
+                align-items: center;
+                justify-content: center;
+                position: relative;
+            }
+            .navbar .cart-mobile {
+                display: flex !important;
+                align-items: center;
+                justify-content: center;
+                flex: 1 1 auto;
+                position: static;
+                left: auto;
+                top: auto;
+                transform: none;
+                z-index: 10;
+            }
+            .navbar .cart-center {
+                display: none !important;
             }
         }
     </style>
@@ -184,15 +213,13 @@
             <button id="darkModeToggle" class="btn-dark-mode">
                 <i class="bi bi-moon"></i>
             </button>
-            
             <!-- Logo en el centro-izquierda -->
             <a class="navbar-brand me-auto" href="#">
                 <img src="{% static 'img/carrito-logo.png' %}" alt="">
-                CarritoScout
+                <span class="navbar-title">CarritoScout</span>
             </a>
-            
-            <!-- Centro - carrito con contador y nombre -->
-            <div class="d-flex justify-content-center position-absolute start-50 translate-middle-x">
+            <!-- Centro - carrito con contador y nombre (solo escritorio) -->
+            <div class="d-flex justify-content-center position-absolute start-50 translate-middle-x cart-center">
                 <a href="{% url 'carrito:ver_carrito' %}" class="cart-button">
                     <div class="cart-icon">
                         <i class="bi bi-cart3"></i>
@@ -211,6 +238,21 @@
                             Sin carrito
                         {% endif %}
                     </span>
+                </a>
+            </div>
+            <!-- Carrito móvil SIEMPRE visible a la derecha -->
+            <div class="cart-mobile" style="display:none">
+                <a href="{% url 'carrito:ver_carrito' %}" class="cart-button">
+                    <div class="cart-icon">
+                        <i class="bi bi-cart3"></i>
+                        <span class="cart-badge" id="cart-badge-mobile">
+                            {% if carrito_activo %}
+                                {{ carrito_activo.total_productos|default:"0" }}
+                            {% else %}
+                                0
+                            {% endif %}
+                        </span>
+                    </div>
                 </a>
             </div>
 
@@ -234,11 +276,13 @@
                     </a>
                     <a href="{% url 'usuarios:perfil' %}" class="btn btn-icon-only btn-profile" title="Mi Perfil">
                         <i class="bi bi-person-circle"></i>
+                        <span class="d-inline d-lg-none ms-1">Mi perfil</span>
                     </a>
                     <form action="{% url 'usuarios:logout' %}" method="post" style="display: inline;">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-icon-only btn-logout" title="Cerrar Sesión">
                             <i class="bi bi-box-arrow-right"></i>
+                            <span class="d-inline d-lg-none ms-1">Salir</span>
                         </button>
                     </form>
                 </div>
@@ -385,6 +429,18 @@
                 console.error('Error:', error);
             });
         }
+
+        // Mostrar el carrito móvil solo en móvil
+        function toggleCartMobile() {
+            const cartMobile = document.querySelector('.cart-mobile');
+            if (window.innerWidth <= 768) {
+                cartMobile.style.display = 'flex';
+            } else {
+                cartMobile.style.display = 'none';
+            }
+        }
+        window.addEventListener('resize', toggleCartMobile);
+        window.addEventListener('DOMContentLoaded', toggleCartMobile);
     </script>
     
     {% block extra_js %}{% endblock %}

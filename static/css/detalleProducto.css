@@ -344,6 +344,10 @@ h4, h5, h6 { font-size: 1rem; }
 
 /* Responsive */
 @media (max-width: 768px) {
+    .price-comparison-card table th:nth-child(3),
+    .price-comparison-card table td:nth-child(3) {
+        display: none !important;
+    }
     .product-title-main {
         font-size: 1.5rem;
     }
@@ -354,5 +358,11 @@ h4, h5, h6 { font-size: 1rem; }
 
     .related-products {
         padding: 1.5rem;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .col-actualizado {
+        display: none !important;
     }
 }

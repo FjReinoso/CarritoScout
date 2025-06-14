@@ -5,6 +5,27 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/carrito.css' %}">
+<style>
+@media (max-width: 768px) {
+    .card-body > canvas,
+    .card-body > #evolucionChart,
+    #evolucionChart {
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100vw !important;
+        height: 260px !important;
+        min-height: 180px !important;
+        display: block;
+        margin: 0 auto;
+    }
+    .card-body {
+        padding: 0.3rem !important;
+    }
+    .card.price-comparison-card, .card {
+        margin-bottom: 1.2rem;
+    }
+}
+</style>
 {% endblock %}
 
 {% block content %}
@@ -58,6 +79,29 @@
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+// Ajusta el tamaño de fuente y grosor de líneas solo en móvil para Chart.js
+function ajustarOpcionesChartMovil(opciones) {
+    if (window.innerWidth <= 768) {
+        if (!opciones.scales) opciones.scales = {};
+        if (!opciones.scales.x) opciones.scales.x = {};
+        if (!opciones.scales.y) opciones.scales.y = {};
+        opciones.plugins = opciones.plugins || {};
+        opciones.plugins.legend = opciones.plugins.legend || {};
+        opciones.plugins.legend.labels = opciones.plugins.legend.labels || {};
+        opciones.plugins.title = opciones.plugins.title || {};
+        opciones.plugins.title.font = opciones.plugins.title.font || {};
+        opciones.scales.x.ticks = Object.assign({}, opciones.scales.x.ticks, { font: { size: 11 } });
+        opciones.scales.y.ticks = Object.assign({}, opciones.scales.y.ticks, { font: { size: 11 } });
+        opciones.plugins.legend.labels.font = { size: 12 };
+        opciones.plugins.title.font.size = 13;
+        // Opcional: líneas más gruesas
+        if (opciones.elements && opciones.elements.line) {
+            opciones.elements.line.borderWidth = 2;
+        }
+    }
+    return opciones;
+}
+
 const tipoAnalisis = document.getElementById('tipo-analisis');
 const filtroProducto = document.getElementById('filtro-producto');
 const filtroCategoria = document.getElementById('filtro-categoria');
@@ -107,6 +151,16 @@ function fetchDataAndDraw() {
 function drawChart(labels, data, tipo) {
     const ctx = document.getElementById('evolucionChart').getContext('2d');
     if (chart) chart.destroy();
+    const opciones = ajustarOpcionesChartMovil({
+        responsive: true,
+        plugins: {
+            legend: { display: true },
+            title: { display: true, text: 'Evolución de Precios' }
+        },
+        scales: {
+            y: { beginAtZero: false }
+        }
+    });
     chart = new Chart(ctx, {
         type: 'line',
         data: {
@@ -121,16 +175,7 @@ function drawChart(labels, data, tipo) {
                 fill: true
             }]
         },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: { display: true },
-                title: { display: true, text: 'Evolución de Precios' }
-            },
-            scales: {
-                y: { beginAtZero: false }
-            }
-        }
+        options: opciones
     });
 }
 
@@ -157,22 +202,23 @@ function drawMultiChart(labels, series, tipo) {
         });
         i++;
     }
+    const opciones = ajustarOpcionesChartMovil({
+        responsive: true,
+        plugins: {
+            legend: { display: true },
+            title: { display: true, text: 'Evolución de Precios' }
+        },
+        scales: {
+            y: { beginAtZero: false }
+        }
+    });
     chart = new Chart(ctx, {
         type: 'line',
         data: {
             labels: labels,
             datasets: datasets
         },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: { display: true },
-                title: { display: true, text: 'Evolución de Precios' }
-            },
-            scales: {
-                y: { beginAtZero: false }
-            }
-        }
+        options: opciones
     });
 }
 
