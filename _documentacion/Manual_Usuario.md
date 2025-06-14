@@ -145,10 +145,12 @@ CarritoScout incluye un modo oscuro que se puede activar desde cualquier página
 3. Para volver al modo claro, haz clic en el icono de sol (`<i class="bi bi-sun"></i>`) que reemplaza al de luna
 
 ## 5. Exploración de Productos
+![Página principal de Productos](docuIMG/ProductosPrincipalDoc.png)
+(1) Botón de despliegue de filtros | (2) Contabilización de resultados | (3) Carta de producto | (4) Botón 'Ver detalles'
 
 ### 5.1 Búsqueda de Productos
 
-La sección de productos es accesible desde el menú principal haciendo clic en "Productos". Dentro de esta sección puedes buscar productos de varias maneras:
+La sección de productos es accesible desde el menú principal haciendo clic en "Productos". Dentro de esta sección puedes buscar productos de varias maneras, pero primero tendrémos que desplegar el filtro (1):
 
 1. **Exploración por supermercado**: Selecciona uno o varios supermercados para ver sus productos disponibles
    - Los supermercados disponibles incluyen: Mercadona, Carrefour, Día, Lidl, Ahorramas, etc.
@@ -171,9 +173,13 @@ El panel de filtros lateral ofrece múltiples opciones para refinar los resultad
    - Selecciona las tarjetas de los supermercados deseados (se resaltarán con un borde rosa)
    - Múltiples selecciones permiten comparar entre establecimientos
 
+    ![Filtros de Supermercado](docuIMG/FiltrosSuper.png)
+
 2. **Filtro de Categorías**:
    - Organizado por tipos de producto con iconos intuitivos
    - Cada categoría muestra ejemplos de productos incluidos
+
+   ![Filtros de Categorías](docuIMG/FiltrosCat.png)
 
 3. **Otros Filtros**:
    - **Campo de búsqueda**: Para encontrar productos específicos por nombre
@@ -181,21 +187,27 @@ El panel de filtros lateral ofrece múltiples opciones para refinar los resultad
    - **Ordenamiento**: Desplegable con opciones como:
      - Nombre A-Z / Z-A
      - Precio menor a mayor / mayor a menor
+    
+    ![Otros Filtrados](docuIMG/FiltrosOtros.png)
 
 4. **Gestión de Filtros**:w
    - Botón "Aplicar Filtros" para actualizar los resultados
    - Botón "Limpiar todos" para reiniciar la búsqueda
    - Panel de "Filtros activos" que muestra etiquetas con los filtros seleccionados
 
+   ![Filtros aplicados](docuIMG/FiltrosFinal.png)
+
 La interfaz incluye un botón flotante "Filtros" que permite mostrar/ocultar el panel lateral, especialmente útil en dispositivos móviles.
 
 ### 5.3 Detalles de Producto
 
-Al hacer clic en "Ver detalles" en cualquier producto accederás a su página completa que contiene:
+![Detalles de Producto](docuIMG/DetallesProd1.png)
 
-1. **Navegación de migas de pan**: Muestra la ruta desde inicio > productos > [categoría] > [producto actual]
+Al hacer clic en "Ver detalles"(4) en cualquier producto accederás a su página completa que contiene:
 
-2. **Sección principal del producto**:
+1. **Navegación de migas de pan(1)**: Muestra la ruta desde inicio > productos > [categoría] > [producto actual]
+
+2. **Sección principal del producto(2)**:
    - **Imagen del producto**: A tamaño completo en la columna izquierda
    - **Información detallada**:
      - Título y categoría del producto
@@ -204,7 +216,7 @@ Al hacer clic en "Ver detalles" en cualquier producto accederás a su página co
      - Descripción
      - Unidad de medida
 
-3. **Comparativa de precios**:
+3. **Comparativa de precios(3)**:
    - Listado de cada producto con un supermercado con su precio actual
    - Botón para añadir al carrito desde cada supermercado
    - Indicación visual del supermercado más económico
@@ -214,17 +226,20 @@ Al hacer clic en "Ver detalles" en cualquier producto accederás a su página co
    - Sugerencias de productos similares (Siempre se cogerán productos que sean de similar categoría sin incluir el que se está mostrando.)
 
 Esta vista detallada permite comparar precios de un mismo producto en diferentes establecimientos y analizar su evolución histórica antes de decidir la compra.
+![Productos relacionados](docuIMG/DetallesProd2.png)
 
 ## 6. Gestión de Carritos
 
-La gestión de carritos está organizada en pestañas, facilitando el acceso a todas las funcionalidades relacionadas con tus compras.
+![Página principal de Carritos](docuIMG/CarritoPrincipal.png)
+
+La gestión de carritos está organizada en pestañas, facilitando el acceso a todas las funcionalidades relacionadas con tus compras, Carrito Activo (1), Todos los Carritos (2), Estadisticas (3) y Invitaciones(4).
 
 ### 6.1 Crear un Nuevo Carrito
 
 Para crear un carrito personalizado:
 
 1. Accede a la sección de carritos dandole al badge de carritos con el número en el centro de la barra de navegación o desde el panel principal en su atajo. 
-Haz clic en el botón "Crear Nuevo Carrito" (rosa con un icono de carrito + plus)
+Haz clic en el botón "Crear Nuevo Carrito"(5) (rosa con un icono de carrito + plus)
 3. En el modal que aparece, completa:
    - **Nombre del carrito**: Un nombre descriptivo (ej. "Compra Semanal", "Despensa", etc.)
    - Marca la opción "Establecer como carrito activo" si deseas que sea tu carrito predeterminado
@@ -234,7 +249,7 @@ El sistema puede crear automáticamente un carrito si intentas añadir un produc
 
 ### 6.2 Añadir Productos al Carrito
 
-Para añadir un producto, tenemos que ir a la pestaña productos, entrar en los detalles de estos y desde ahi podemos añadir el producto que queramos al carrito activo actual.
+Para añadir un producto, tenemos que ir a la pestaña productos, entrar en los detalles de estos y desde ahi podemos añadir el producto que queramos al carrito activo actual. Tambien tenemos un atajo incorporado en Añadir Productos (6)
 
 Al añadir un producto, aparece una notificación temporal en la esquina superior derecha confirmando la acción.
 
@@ -242,9 +257,9 @@ Al añadir un producto, aparece una notificación temporal en la esquina superio
 
 Para ajustar la cantidad de un producto en el carrito:
 
-1. Accede a la pestaña "Carrito Activo"
+1. Accede a la pestaña "Carrito Activo"(1)
 2. Busca el producto que deseas modificar
-3. Utiliza:
+3. Utiliza el panel (8):
    - Botón "-" para disminuir la cantidad
    - Campo numérico central para introducir un valor específico
    - Botón "+" para aumentar la cantidad
@@ -256,20 +271,22 @@ Para ajustar la cantidad de un producto en el carrito:
 Para quitar un producto del carrito:
 
 1. En la pestaña del carrito activo, localiza el producto a eliminar
-2. Haz clic en el botón con icono de papelera (rojo) a la derecha del producto
+2. Haz clic en el botón con icono de papelera (rojo) a la derecha del producto (9)
 3. El producto se eliminará inmediatamente despues de pulsar en la alerta si desea eliminarlo.
+
+Para vaciar el carrito simplemente pulse el botón 'Vaciar Carrito' (7) y tambien se puede eliminar el carrito con su boton (11).
 
 
 ### 6.5 Compartir Carritos
 
 CarritoScout permite colaborar con otros usuarios compartiendo carritos:
 
-1. Desde la pestaña "Carrito Activo", localiza el botón "Invitar usuario".
+1. Desde la pestaña "Carrito Activo"(1), localiza el botón "Invitar usuario"(10).
 2. Haz clic en "Invitar usuario"
 3. En el formulario emergente introduce:
    - Correo electrónico (¡tiene que ser exacto o no le llegara!)
 4. Confirma con "Enviar invitación"
-5. El destinatario encontrará la invitación en la pestaña "Invitaciones" y podrá aceptarla o rechazarla. (cabe destacar que si no le ha llegado la invitación tendrá que refrescar la página.)
+5. El destinatario encontrará la invitación en la pestaña "Invitaciones"(4) y podrá aceptarla o rechazarla. (cabe destacar que si no le ha llegado la invitación tendrá que refrescar la página.)
 
 Una vez que un usuario se ha invitado en la pestaña carrito activo pasará de tener nombre +`(invitado) a nombre+(compartido).
 
@@ -279,14 +296,17 @@ Pero solo el dueño podrá eliminar el carrito. Un carrito compartido puede exis
 
 ### 6.6 Gestionar Múltiples Carritos
 
+![Todos los carritos](docuIMG/CarritosTodos.png)
+
 La pestaña "Todos los Carritos" permite gestionar varios carritos simultáneamente:
 
 1. Accede a la pestaña para ver el listado completo de tus carritos
 2. Para cada carrito puedes:
-   - **Activar**: Establecerlo como carrito principal con el botón "Activar"
-   - **Eliminar**: Borrarlo permanentemente con el botón de papelera
+   - **Activar**: Establecerlo como carrito principal con el botón "Activar"(2)
+   - **Eliminar**: Borrarlo permanentemente con el botón de papelera(3)
 
 Cada carrito muestra:
+- Badge si está activo o inactivo (1)
 - Nombre identificativo
 - Número de productos y precio total acumulado.
 - Fecha de creación 
@@ -303,7 +323,9 @@ La pestaña Invitaciones es donde recibiremos las notificaciones de que alguien 
 
 La funcionalidad de lista de compras te permite convertir tu carrito en un formato práctico para realizar tus compras físicamente.
 
-### 7.1 Generar Lista de Compra
+### 7.1 Generar Lista de Compra(12)
+
+![Lista de la compra](docuIMG/ListaCompra.png)
 
 Para obtener una lista de compra organizada:
 
@@ -318,6 +340,8 @@ Para obtener una lista de compra organizada:
 
 ### 7.2 Imprimir Lista
 
+![Imprimir Lista](docuIMG/Impreso.png)
+
 Para imprimir tu lista de compras:
 
 1. Desde la vista de lista de compra, haz clic en "Imprimir"
@@ -329,6 +353,8 @@ También puedes guardar la lista como PDF seleccionando la opción correspondien
 
 ## 8. Análisis de Precios
 
+![Vista de Analisis](docuIMG/Analisis1.png)
+
 La sección de análisis de precios proporciona herramientas visuales para entender las tendencias de precios y tomar decisiones de compra informadas.
 
 ### 8.1 Evolución de Precios
@@ -337,8 +363,8 @@ Para analizar cómo cambian los precios a lo largo del tiempo:
 
 1. Accede a la sección "Análisis" desde el menú principal (icono de gráfico)
 2. En la interfaz de "Evolución de Precios":
-   - Selecciona el tipo de análisis: producto, categoría o supermercado
-   - Utiliza el campo de búsqueda autocompletable para encontrar productos específicos o selecciona las demás categorias para supermercados y categorías.
+   - Selecciona el tipo de análisis(1): producto, categoría o supermercado
+   - Utiliza el campo de búsqueda autocompletable para encontrar productos específicos(2) o selecciona las demás categorias para supermercados y categorías.
    - El historial actualmente es mes a mes, y coge todos los datos disponibles.
    - El gráfico se actualizará automáticamente mostrando la evolución temporal
 
@@ -348,15 +374,17 @@ El gráfico interactivo muestra líneas de diferentes colores para cada supermer
 
 Para comparar la evolución de precios de varios productos simultáneamente:
 
-1. Utiliza el buscador para encontrar un producto
-2. Haz clic en "Añadir"
-3. El producto se añadirá como una etiqueta en la sección "Productos seleccionados"
+1. Utiliza el buscador para encontrar un producto(2)
+2. Haz clic en "Añadir"(3)
+3. El producto se añadirá como una etiqueta en la sección "Productos seleccionados"(4)
 4. Repite el proceso para añadir más productos (Los productos añadidos no desaparecen del listado)
 5. Para eliminar un producto de la comparación, haz clic en la "X" en su etiqueta
 
 Esta funcionalidad es especialmente útil para comparar productos similares o complementarios.
 
 ### 8.3 Filtros por Supermercados/Categorías
+
+![Vista de Analisis Est/Cat](docuIMG/Analisis2.png)
 
 Para personalizar la visualización por establecimientos:
 
@@ -368,24 +396,27 @@ El funcionamiento es similar para las categorías.
 
 ## 9. Perfil de Usuario
 
+![Perfil de usuario](docuIMG/Perfil.png)
+
 La sección de perfil te permite gestionar tu información personal y acceder a estadísticas de uso.
 
 ### 9.1 Datos Personales
 
-El perfil de usuario está organizado en pestañas para facilitar la navegación:
+El perfil de usuario está organizado en pestañas para facilitar la navegación: Mi Perfil(1), Estadisticas y Resumen (2) y Soporte y Ayuda (3).
 
 1. Accede a tu perfil haciendo clic en el botón circular con icono de usuario en la barra de navegación
-2. En la sección "Mi Perfil" (pestaña activa por defecto) encontrarás:
-   - **Datos Personales**: Formulario con tu información básica (nombre, apellidos, email)
+2. En la sección "Mi Perfil"(1) (pestaña activa por defecto) encontrarás:
+   - **Datos Personales(4)**: Formulario con tu información básica (nombre, apellidos, email)
 
 Para actualizar tus datos:
 1. Modifica los campos deseados en el formulario
 2. Haz clic en "Guardar cambios"
 3. Aparecerá una notificación confirmando que los cambios se han guardado correctamente
 
-Como limitaciones, la información adicional es totalmente opcional, y el nombre de usuario no se puede eliminar, además de esto el email tampoco aparece ya que es la clave identificadora única de cada usuario.
+Como limitaciones, la información adicional(5) es totalmente opcional, y el nombre de usuario no se puede eliminar, además de esto el email tampoco aparece ya que es la clave identificadora única de cada usuario.
 
-Para modificar la contraseña, simplemente añada la contraseña inicial y la nueva contraseña siempre cumpliendo con las restricciones de generación de contraseña y las diferentes validaciones. 
+Para modificar la contraseña(6), simplemente añada la contraseña inicial y la nueva contraseña siempre cumpliendo con las restricciones de generación de contraseña y las diferentes validaciones. 
+
 ### 9.2 Estadísticas y Resumen
 
 La pestaña "Estadísticas y Resumen" proporciona información sobre tu actividad:
@@ -410,6 +441,10 @@ Las notificaciones aparecen como mensajes temporales en la esquina superior dere
 - Verde: Acciones exitosas y confirmaciones
 - Rojo: Errores o problemas
 - Amarillo: Advertencias e información importante
+
+Por ejemplo : 
+![Notificación Éxito](docuIMG/Noti1.png)
+![Notificación Prohibición](docuIMG/Noti2.png)
 
 ## 11. Preguntas Frecuentes
 
