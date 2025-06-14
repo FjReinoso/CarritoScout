@@ -30,7 +30,7 @@
 8. [Análisis de Precios](#8-análisis-de-precios)
    - [Evolución de Precios](#81-evolución-de-precios)
    - [Selección Múltiple de Productos](#82-selección-múltiple-de-productos)
-   - [Filtros por Supermercados](#83-filtros-por-supermercados)
+   - [Filtros por Supermercados/Categorías](#83-filtros-por-supermercados)
 9. [Perfil de Usuario](#9-perfil-de-usuario)
    - [Datos Personales](#91-datos-personales)
    - [Estadísticas y Resumen](#92-estadísticas-y-resumen)
@@ -71,65 +71,70 @@ La aplicación cuenta con un diseño responsive que se adapta tanto a ordenadore
 
 Para aprovechar todas las funcionalidades de CarritoScout, debes crear una cuenta de usuario:
 
-1. Desde la página de inicio, haz clic en el botón "Registrarse" 
-2. Se mostrará el formulario de registro con los siguientes campos:
+1. Desde la página de inicio, haz clic en el botón "Registrarse". Identificador 4 de Inicio de Sesión (más abajo).
+2. Se mostrará el formulario de registro con los siguientes campos(Ver formulario en la foto):
    - **Nombre de usuario**: Identificador único para tu cuenta
    - **Correo electrónico**: Necesario para verificación y recuperación de cuenta
    - **Contraseña**: Debe tener al menos 8 caracteres y combinar letras y números
    - **Confirmar contraseña**: Repite la contraseña para verificación
    - **Nombre** y **Apellidos** (opcionales): Para personalizar tu experiencia
-3. Haz clic en el botón "Crear cuenta" para completar el registro
+3. Haz clic en el botón "Crear cuenta" para completar el registro. Identificador 1
+4. Si quiere volver al inicio de sesión pulse 'Inicie sesión aquí'. Identificador 2
 
 La interfaz de registro incluye una sección con información sobre las principales características de CarritoScout:
 - Comparación de precios entre supermercados
 - Alertas de ofertas personalizadas
 - Gestión de listas de compras
 
-![Pantalla de Registro](../static/img/screenshots/registro.png)
+![Pantalla de Registro](ocuIMG/REgistroDoc.png)
 
 ### 3.2 Inicio de Sesión
 
 Para acceder a tu cuenta existente:
 
-1. Desde cualquier página, haz clic en "Iniciar Sesión"
-2. En el panel de inicio de sesión introduce:
-   - **Nombre de usuario**: Tu identificador en la plataforma
-   - **Contraseña**: Tu clave personal de acceso
-3. Haz clic en el botón "Entrar"
+
+1. En el panel de inicio de sesión introduce:
+   - **Nombre de usuario**: Tu identificador en la plataforma. Identificador 1.
+   - **Contraseña**: Tu clave personal de acceso. Identificador 2
+2. Haz clic en el botón "Entrar". Identificador 3.
 
 La interfaz de inicio de sesión muestra una imagen de bienvenida en el lado izquierdo con el logo de CarritoScout y una descripción breve de la aplicación.
 
-
+![Pantalla de Inicio de Sesión](docuIMG/InicioSesionDoc.png)
 ## 4. Página Principal y Navegación
 
 ### 4.1 Interfaz General
 
 Tras iniciar sesión, accederás a la página principal de CarritoScout que consta de:
 
-- **Barra de navegación superior**: Con el logo, menú principal, acceso al carrito y perfil de usuario
-- **Seccion bienvenida**: Una sección destacada con el título de bienvenida en gradiente rosa característico
-- **Tarjetas de acceso rápido**: Tres tarjetas principales para acceder a las funciones más importantes:
-  - **Busca Productos**: Para explorar el catálogo y comparar precios
-  - **Analiza Precios**: Para ver la evolución de precios en el tiempo
-  - **Crea Listas de Compras**: Para gestionar carritos personalizados
+- **Barra de navegación superior(1)**: Con el logo, menú principal, acceso al carrito y perfil de usuario
+- **Seccion bienvenida(2)**: Una sección destacada con el título de bienvenida en gradiente rosa característico
+- **Tarjetas de acceso rápido(3,4,5)**: Tres tarjetas principales para acceder a las funciones más importantes:
+  - **Busca Productos(3)**: Para explorar el catálogo y comparar precios
+  - **Analiza Precios(4)**: Para ver la evolución de precios en el tiempo
+  - **Crea Listas de Compras(5)**: Para gestionar carritos personalizados
 
 Las tarjetas presentan un efecto de elevación al pasar el cursor por encima, proporcionando una experiencia interactiva que invita al usuario a explorar las distintas secciones.
-
+![Página principal](docuIMG/PaginaPrincipalDoc.png)
 ### 4.2 Barra de Navegación
 
 La barra de navegación principal está presente en todas las páginas y contiene:
 
-- **Botón de modo oscuro**: En el extremo izquierdo, permite alternar entre tema claro y oscuro
-- **Logo y nombre CarritoScout**: En la parte izquierda-central (No hace nada si lo pulsas)
-- **Icono de carrito con contador**: Muestra el número de productos en el carrito activo y el nombre del carrito activo
+- **Botón de modo oscuro(1)**: En el extremo izquierdo, permite alternar entre tema claro y oscuro
+- **Logo y nombre CarritoScout(2)**: En la parte izquierda-central (No hace nada si lo pulsas)
+- **Icono de carrito con contador(3)**: Muestra el número de productos en el carrito activo y el nombre del carrito activo
 - **Menú principal**: Con acceso a:
-  - **Inicio**: Vuelve a la página principal (`<i class="bi bi-house-door"></i>`)
-  - **Productos**: Explora el catálogo de productos (`<i class="bi bi-box"></i>`)
-  - **Análisis**: Accede a gráficos de evolución de precios (`<i class="bi bi-graph-up"></i>`)
-  - **Perfil**: Botón circular con acceso al perfil personal(En escritorio no tiene texto en plataformas moviles sí) (`<i class="bi bi-person-circle"></i>`)
-  - **Cerrar sesión**: Botón circular rojo para salir(En escritorio no tiene texto en plataformas moviles sí) (`<i class="bi bi-box-arrow-right"></i>`)
+  - **Inicio(4)**: Vuelve a la página principal (`<i class="bi bi-house-door"></i>`)
+  - **Productos(5)**: Explora el catálogo de productos (`<i class="bi bi-box"></i>`)
+  - **Análisis(6)**: Accede a gráficos de evolución de precios (`<i class="bi bi-graph-up"></i>`)
+  - **Perfil(7)**: Botón circular con acceso al perfil personal(En escritorio no tiene texto en plataformas moviles sí) (`<i class="bi bi-person-circle"></i>`)
+  - **Cerrar sesión(8)**: Botón circular rojo para salir(En escritorio no tiene texto en plataformas moviles sí) (`<i class="bi bi-box-arrow-right"></i>`)
+
+![Barra de Navegación](docuIMG/BarraDoc.png)
 
 En dispositivos móviles, la navegación se adapta con un menú desplegable y el carrito se muestra como un icono fijo a la derecha para facilitar el acceso.
+
+![Barra de Navegación para móviles](docuIMG/BarraMov.png)
 
 ### 4.3 Modo Oscuro (Experimental)
 
