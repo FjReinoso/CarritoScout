@@ -27,7 +27,8 @@
 7. [Guía de Despliegue](#guía-de-despliegue)
    - [Entorno de Desarrollo](#entorno-de-desarrollo)
    - [Configuración de Producción](#configuración-de-producción)
-8. [Ampliaciones y Mejoras](#ampliaciones-y-mejoras)
+8. [App Usuarios en profundidad](app-usuarios-en-profundidad)
+10. [Ampliaciones y Mejoras](#ampliaciones-y-mejoras)
 
 ## Introducción
 
@@ -668,6 +669,8 @@ Para el despliegue en producción se utiliza Fly.io:
 4. Implementar la estrategia de base de datos (PostgreSQL)
 5. Configurar Whitenoise para archivos estáticos
 6. Desplegar con el comando `flyctl deploy`
+## App Usuarios en profundidad
+
 
 ## Ampliaciones y Mejoras
 
