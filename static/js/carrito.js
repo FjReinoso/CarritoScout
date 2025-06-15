@@ -7,13 +7,13 @@ class CarritoManager {
 
     init() {
         document.addEventListener('DOMContentLoaded', () => {
-            this.loadDjangoData();
-            this.setupEventListeners();
-            this.setupInvitationListeners(); // Añadir listeners de invitaciones
+            this.cargarDatosDjango();
+            this.iniciarEventListeners();
+            this.iniciarInvitationListeners(); // Añadir listeners de invitaciones
         });
     }
 
-    loadDjangoData() {
+    cargarDatosDjango() {
         const dataScript = document.getElementById('django-data');
         if (dataScript) {
             try {
@@ -23,7 +23,9 @@ class CarritoManager {
                 this.djangoData = {};
             }
         }
-    }    setupEventListeners() {
+    }    
+
+    iniciarEventListeners() {
         // Event listeners para carrito activo (solo si existe)
         if (this.djangoData.hasActiveCart) {
             this.setupCartItemListeners();
@@ -133,7 +135,9 @@ class CarritoManager {
                 }
             });
         });
-    }    setupCartManagementListeners() {
+    } 
+
+    setupCartManagementListeners() {
         // Botones de activar carrito
         document.querySelectorAll('.activar-carrito-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -181,28 +185,9 @@ class CarritoManager {
                 document.getElementById('setAsActive').checked = false;
             });
         }
-    }    setupCartSelectorListeners() {
-        // Los carritos ahora solo se activan mediante botones específicos
-        // Esta función puede ser usada para futuras funcionalidades de selección visual
-        document.querySelectorAll('.cart-list-item').forEach(item => {
-            item.addEventListener('click', (e) => {
-                // Prevenir que los clics en botones activen esta función
-                if (e.target.closest('button')) {
-                    return;
-                }
-                
-                // Resaltar visualmente el carrito seleccionado (opcional)
-                document.querySelectorAll('.cart-list-item').forEach(el => {
-                    el.classList.remove('selected');
-                });
-                item.classList.add('selected');
-                
-                console.log('Cart selected for viewing:', item.dataset.cartId);
-            });
-        });
-    }
+    } 
 
-    setupInvitationListeners() {
+    iniciarInvitationListeners() {
         document.querySelectorAll('.btn-aceptar-invitacion').forEach(btn => {
             btn.addEventListener('click', async (e) => {
                 const invitacionId = btn.dataset.invitacionId;
@@ -437,6 +422,7 @@ class CarritoManager {
             console.error('Error:', error);
         }
     }    
+
     async activateCart(carritoId) {
         this.showNotification('Activando carrito...', 'info');
 
@@ -517,7 +503,7 @@ class CarritoManager {
     }
 
     // === MÉTODOS DE UI ===
-
+    //Esta función actualiza el badge del carrito en la navbar pero está duplicada con la de django, pero asi nos aseguramos
     updateCartBadge(count) {
         const badge = document.querySelector('.cart-badge');
         if (badge) {
@@ -569,7 +555,7 @@ class CarritoManager {
             });
         });
     }
-
+    // Generar el PDF
     printShoppingList() {
         const printContents = document.querySelector('.shopping-list').innerHTML;
         const originalContents = document.body.innerHTML;
@@ -591,13 +577,7 @@ class CarritoManager {
         location.reload();
     }
 
-    downloadShoppingList() {
-        this.showNotification('Descargando lista de compra...', 'info');
-        setTimeout(() => {
-            this.showNotification('Lista de compra descargada', 'success');
-        }, 1500);
-    }
-
+    //Las notificaciones creo que está 
     showNotification(message, type = 'info') {
         const notification = document.createElement('div');
         notification.className = `alert alert-${type} notification-toast`;
@@ -643,7 +623,7 @@ class CarritoManager {
         return icons[type] || 'info-circle';
     }
 
-    // Nuevo método para actualizar el nombre del carrito en la navbar
+    // Nuevo método para actualizar el nombre del carrito en la navbar para el cambio de carritos activos
     updateCartName(name) {
         const cartNameEl = document.getElementById('cart-name');
         if (cartNameEl) {

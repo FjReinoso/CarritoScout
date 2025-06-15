@@ -179,9 +179,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     initializeFilters();
     
-    // ===============================
     // BOTÓN "CARGAR MÁS" PRODUCTOS
-    // ===============================
+
     let loading = false;
     
     const updatePaginationInfo = function(data) {
@@ -318,10 +317,8 @@ document.addEventListener('DOMContentLoaded', function() {
         loadMoreBtn.addEventListener('click', loadMoreProducts);
     }
 
-    // ===============================
     // FUNCIONALIDAD AGREGAR AL CARRITO
-    // ===============================
-    
+
     // Función para obtener el token CSRF
     function getCsrfToken() {
         const csrfInput = document.querySelector('[name=csrfmiddlewaretoken]');
