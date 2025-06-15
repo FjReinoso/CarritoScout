@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
     const formulario = document.querySelector('#mi-perfil form');
-    const campoCorreo = document.querySelector('#email');
     const campoNombre = document.querySelector('#first_name');
     const campoApellidos = document.querySelector('#last_name');
 
@@ -44,11 +43,6 @@ document.addEventListener('DOMContentLoaded', function () {
     formulario.addEventListener('submit', function (evento) {
         let esValido = true;
 
-        // Validar cada campo
-        if (!campoCorreo.value || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(campoCorreo.value)) {
-            mostrarError(campoCorreo, 'Por favor, introduce un correo electrónico válido.');
-            esValido = false;
-        }
         if (campoNombre.value.trim() === '') {
             mostrarError(campoNombre, 'El nombre no puede estar vacío.');
             esValido = false;

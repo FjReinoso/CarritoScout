@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.hashers import check_password
-from .form import RegistroBasicoForm, RegistroOpcionalForm, PerfilUsuarioForm, PerfilUsuarioCorreoForm, DatosPersonalesForm, CambioPasswordForm
+from .form import RegistroBasicoForm, PerfilUsuarioForm, PerfilUsuarioCorreoForm, DatosPersonalesForm, CambioPasswordForm
 from .models import PerfilUsuario
 
 def login_view(request):
@@ -46,43 +46,12 @@ def registro_view(request):
     else:
         form = RegistroBasicoForm()
     
-    # Aquí añadimos print para depuración
+    # Control de errores del formulario
     if form.errors:
         print(f"Errores del formulario: {form.errors}")
         
     return render(request, 'usuarios/registro.html', {'form': form})
 
-def registro_basico(request):
-    if request.method == 'POST':
-        form = RegistroBasicoForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            login(request, user)
-            return redirect('usuarios:registro_opcional')
-    else:
-        form = RegistroBasicoForm()
-    return render(request, 'usuarios/registro_basico.html', {'form': form})
-
-def registro_opcional(request):
-    if request.method == 'POST':
-        form = RegistroOpcionalForm(request.POST)
-        if form.is_valid():
-            # Buscar o crear el perfil del usuario
-            try:
-                perfil = request.user.perfilusuario
-            except:
-                perfil = PerfilUsuario(usuario=request.user)
-            
-            # Actualizar los campos del perfil con los datos del formulario
-            perfil.direccion = form.cleaned_data['direccion']
-            perfil.telefono = form.cleaned_data['telefono']
-            perfil.fecha_nacimiento = form.cleaned_data['fecha_nacimiento']
-            perfil.save()
-            
-            return redirect('usuarios:pagina_principal')
-    else:
-        form = RegistroOpcionalForm()
-    return render(request, 'usuarios/registro_opcional.html', {'form': form})
 
 @login_required
 def pagina_principal(request):
@@ -151,17 +120,6 @@ def perfil_view(request):
                 
                 # Añadir mensaje de éxito
                 messages.success(request, "¡La información adicional se ha actualizado correctamente!")
-                return redirect('usuarios:perfil')
-        
-        # Si no reconocemos el formulario, asumimos que es el correo
-        else:
-            correo_form = PerfilUsuarioCorreoForm(request.POST, instance=user)
-            datos_personales_form = DatosPersonalesForm(instance=user)
-            perfil_form = PerfilUsuarioForm(instance=perfil)
-            
-            if correo_form.is_valid():
-                correo_form.save()
-                messages.success(request, "¡El correo electrónico se ha actualizado correctamente!")
                 return redirect('usuarios:perfil')
     else:
         # Inicializar todos los formularios

@@ -97,7 +97,7 @@ class DatosPersonalesForm(forms.ModelForm):
         max_length=24,
         required=True,
         error_messages={
-            'required': 'El nombre es obligatorio',
+            'required': 'El nombre no es obligatorio',
             'max_length': 'El nombre no puede exceder los 24 caracteres'
         }
     )
@@ -106,7 +106,7 @@ class DatosPersonalesForm(forms.ModelForm):
         max_length=24,
         required=True, 
         error_messages={
-            'required': 'Los apellidos son obligatorios',
+            'required': 'Los apellidos no son obligatorios',
             'max_length': 'Los apellidos no pueden exceder los 24 caracteres'
         }
     )
@@ -122,8 +122,3 @@ class RegistroBasicoForm(UserCreationForm):
     class Meta:
         model = User
         fields = ['username', 'email', 'first_name', 'last_name', 'password1', 'password2']
-
-class RegistroOpcionalForm(forms.ModelForm):
-    class Meta:
-        model = PerfilUsuario
-        fields = ['direccion', 'telefono', 'fecha_nacimiento']
